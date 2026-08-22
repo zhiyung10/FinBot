@@ -75,3 +75,15 @@ jobs:
             --output text)
 
           aws s3 sync frontend/ s3://$BUCKET/ --cache-control no-cache
+
+      - name: Print Website URL
+        run: |
+          WEBSITE_URL=$(aws cloudformation describe-stacks \
+            --stack-name ai-personal-finance-advisor \
+            --query "Stacks[0].Outputs[?OutputKey=='WebsiteUrl'].OutputValue" \
+            --output text)
+
+          echo "=========================================="
+          echo "  YOUR WEBSITE IS LIVE AT:"
+          echo "  $WEBSITE_URL"
+          echo "=========================================="
