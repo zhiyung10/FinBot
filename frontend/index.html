@@ -12,63 +12,68 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .app { display: flex; min-height: 100vh; }
 
 /* Sidebar */
-.sidebar { width: 240px; background: #141625; padding: 24px 16px; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; overflow-y: auto; z-index: 100; border-right: 1px solid rgba(255,255,255,0.06); }
-.sidebar-brand { font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 32px; padding: 0 8px; }
+.sidebar { width: 250px; background: #141625; padding: 20px 14px; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; overflow-y: auto; z-index: 100; border-right: 1px solid rgba(255,255,255,0.06); }
+.sidebar-brand { font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 8px; padding: 0 10px; }
 .sidebar-brand span { color: #7c6ff7; }
+.sidebar-tagline { font-size: 0.72rem; color: rgba(255,255,255,0.4); padding: 0 10px; margin-bottom: 24px; }
 .sidebar-nav { list-style: none; flex: 1; }
-.sidebar-nav li { margin-bottom: 4px; }
-.sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: all 0.2s; }
+.sidebar-nav li { margin-bottom: 2px; }
+.sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 11px 12px; border-radius: 10px; color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.82rem; font-weight: 500; transition: all 0.2s; cursor: pointer; }
 .sidebar-nav a:hover { color: #fff; background: rgba(124,111,247,0.1); }
 .sidebar-nav a.active { color: #fff; background: #7c6ff7; box-shadow: 0 4px 15px rgba(124,111,247,0.3); }
-.sidebar-nav svg { width: 18px; height: 18px; opacity: 0.7; }
+.sidebar-nav .nav-icon { width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; }
+.sidebar-nav .nav-step { font-size: 0.65rem; background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.5); padding: 1px 6px; border-radius: 4px; margin-left: auto; }
 
 /* Main Content */
-.main { margin-left: 240px; flex: 1; padding: 24px 32px; background: #1e2139; min-height: 100vh; }
+.main { margin-left: 250px; flex: 1; padding: 28px 36px; background: #1e2139; min-height: 100vh; }
 
-/* Header */
-.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 16px; }
-.header-left h1 { font-size: 1.4rem; color: #fff; font-weight: 700; }
-.header-left p { font-size: 0.82rem; color: rgba(255,255,255,0.5); margin-top: 4px; }
-.btn-run-all { background: linear-gradient(135deg, #7c6ff7, #5b4ee8); color: #fff; border: none; padding: 12px 32px; border-radius: 12px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 15px rgba(124,111,247,0.3); }
-.btn-run-all:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(124,111,247,0.4); }
-.btn-run-all:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+/* Page views */
+.page { display: none; animation: pageIn 0.3s ease; }
+.page.active { display: block; }
+@keyframes pageIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-/* Grid */
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-.grid-1 { margin-bottom: 20px; }
+/* Page header */
+.page-header { margin-bottom: 24px; }
+.page-header h1 { font-size: 1.4rem; color: #fff; font-weight: 700; margin-bottom: 6px; }
+.page-header p { font-size: 0.82rem; color: rgba(255,255,255,0.5); max-width: 600px; }
+.page-header .step-badge { display: inline-block; background: rgba(124,111,247,0.15); color: #a89ff7; padding: 3px 10px; border-radius: 6px; font-size: 0.72rem; font-weight: 600; margin-bottom: 8px; }
 
-/* Widget Cards */
-.widget { background: #252842; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06); overflow: hidden; transition: border-color 0.2s; }
-.widget:hover { border-color: rgba(124,111,247,0.2); }
-.widget-header { padding: 14px 18px; font-weight: 600; font-size: 0.85rem; color: rgba(255,255,255,0.7); border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; gap: 8px; }
-.widget-header.ai { background: linear-gradient(135deg, rgba(124,111,247,0.15), rgba(91,78,232,0.08)); color: #a89ff7; border-bottom-color: rgba(124,111,247,0.15); }
-.widget-header .icon { font-size: 1rem; }
-.widget-body { padding: 16px 18px; }
+/* Cards */
+.card { background: #252842; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06); padding: 20px; margin-bottom: 20px; }
+.card-title { font-size: 0.88rem; font-weight: 600; color: rgba(255,255,255,0.8); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.card-title .icon { font-size: 1.05rem; }
 
-/* Input Fields */
-textarea.input-field { width: 100%; min-height: 160px; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px; font-size: 0.83rem; font-family: inherit; resize: vertical; background: #1e2139; color: #e0e4f0; transition: border-color 0.2s, box-shadow 0.2s; }
+/* Inputs */
+textarea.input-field { width: 100%; min-height: 180px; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px 16px; font-size: 0.83rem; font-family: inherit; resize: vertical; background: #1e2139; color: #e0e4f0; transition: border-color 0.2s, box-shadow 0.2s; }
 textarea.input-field:focus { outline: none; border-color: #7c6ff7; box-shadow: 0 0 0 3px rgba(124,111,247,0.15); }
-textarea.input-field::placeholder { color: rgba(255,255,255,0.3); }
+textarea.input-field::placeholder { color: rgba(255,255,255,0.25); line-height: 1.5; }
 
-/* AI Output Panels */
-.ai-output { height: 340px; overflow-y: auto; padding: 14px; font-size: 0.83rem; background: #1e2139; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); position: relative; color: #ccd0e0; }
+/* Buttons */
+.btn { border: none; padding: 12px 28px; border-radius: 10px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+.btn-primary { background: linear-gradient(135deg, #7c6ff7, #5b4ee8); color: #fff; box-shadow: 0 4px 15px rgba(124,111,247,0.3); }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(124,111,247,0.4); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.btn-secondary { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7); }
+.btn-secondary:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.btn-group { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+
+/* AI Output */
+.ai-output { min-height: 200px; max-height: 500px; overflow-y: auto; padding: 16px; font-size: 0.83rem; background: #1a1d2e; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); color: #ccd0e0; margin-top: 16px; }
 .ai-output::-webkit-scrollbar { width: 4px; }
 .ai-output::-webkit-scrollbar-track { background: transparent; }
 .ai-output::-webkit-scrollbar-thumb { background: rgba(124,111,247,0.3); border-radius: 2px; }
-.ai-output .placeholder { color: rgba(255,255,255,0.25); text-align: center; padding-top: 140px; font-size: 0.82rem; }
-.ai-output .error { color: #f76f6f; }
+.ai-output .placeholder { color: rgba(255,255,255,0.2); text-align: center; padding: 60px 20px; font-size: 0.85rem; }
+.ai-output .error { color: #f76f6f; padding: 16px; }
 
-/* Streaming Animation */
+/* Streaming */
 .md-line { display: block; animation: fadeIn 0.15s ease-in; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: translateY(0); } }
 .cursor-blink { display: inline-block; width: 2px; height: 1em; background: #7c6ff7; animation: blink 0.7s infinite; vertical-align: text-bottom; margin-left: 2px; }
-@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
 
-/* Markdown in output */
+/* Markdown */
 .ai-output h1, .ai-output h2, .ai-output h3 { margin: 14px 0 8px; color: #fff; }
-.ai-output h1 { font-size: 1.15rem; }
-.ai-output h2 { font-size: 1rem; }
-.ai-output h3 { font-size: 0.9rem; }
+.ai-output h1 { font-size: 1.1rem; } .ai-output h2 { font-size: 0.98rem; } .ai-output h3 { font-size: 0.9rem; }
 .ai-output strong { font-weight: 700; color: #e8e8f8; }
 .ai-output em { font-style: italic; color: #b0b4d0; }
 .ai-output code { background: rgba(124,111,247,0.1); padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; color: #a89ff7; }
@@ -82,22 +87,29 @@ textarea.input-field::placeholder { color: rgba(255,255,255,0.3); }
 /* Spinner */
 .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.15); border-top-color: #7c6ff7; border-radius: 50%; animation: spin 0.6s linear infinite; margin-right: 8px; vertical-align: middle; }
 @keyframes spin { to { transform: rotate(360deg); } }
-.loading-msg { color: rgba(255,255,255,0.4); font-size: 0.83rem; padding: 12px; text-align: center; }
+.loading-msg { color: rgba(255,255,255,0.4); font-size: 0.83rem; padding: 40px; text-align: center; }
 
-/* Mobile */
+/* Welcome page */
+.welcome-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 20px; }
+.welcome-card { background: #252842; border-radius: 14px; padding: 20px; border: 1px solid rgba(255,255,255,0.06); cursor: pointer; transition: all 0.2s; }
+.welcome-card:hover { border-color: rgba(124,111,247,0.3); transform: translateY(-2px); }
+.welcome-card .wc-icon { font-size: 1.8rem; margin-bottom: 10px; }
+.welcome-card h3 { font-size: 0.9rem; color: #fff; margin-bottom: 6px; }
+.welcome-card p { font-size: 0.75rem; color: rgba(255,255,255,0.4); }
+
+/* Responsive */
 @media (max-width: 900px) {
-  .sidebar { display: none; }
+  .sidebar { width: 100%; height: auto; position: relative; flex-direction: row; padding: 12px; overflow-x: auto; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .sidebar-brand, .sidebar-tagline { display: none; }
+  .sidebar-nav { display: flex; gap: 4px; flex: none; }
+  .sidebar-nav li { margin: 0; }
+  .sidebar-nav a { padding: 8px 12px; white-space: nowrap; font-size: 0.75rem; }
+  .sidebar-nav .nav-step { display: none; }
   .main { margin-left: 0; padding: 16px; }
-  .grid-2 { grid-template-columns: 1fr; }
-  .header h1 { font-size: 1.2rem; }
+  .app { flex-direction: column; }
+  .welcome-grid { grid-template-columns: 1fr 1fr; }
 }
-
-/* Mobile header (shown when sidebar hidden) */
-.mobile-header { display: none; background: #141625; padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.06); }
-.mobile-header h1 { font-size: 1rem; color: #fff; font-weight: 700; }
-@media (max-width: 900px) {
-  .mobile-header { display: block; }
-}
+@media (max-width: 500px) { .welcome-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -106,137 +118,185 @@ textarea.input-field::placeholder { color: rgba(255,255,255,0.3); }
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-brand"><span>AI</span> Finance Advisor</div>
+    <div class="sidebar-tagline">Smart personal finance management</div>
     <ul class="sidebar-nav">
-      <li><a href="#" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</a></li>
-      <li><a href="#sectionBudget"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Budget</a></li>
-      <li><a href="#sectionRecommendation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Recommendations</a></li>
-      <li><a href="#sectionHealth"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Health Report</a></li>
-      <li><a href="#sectionSubscription"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>Subscriptions</a></li>
-      <li><a href="#sectionAdvisor"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>AI Advisor</a></li>
+      <li><a onclick="showPage('welcome')" data-page="welcome" class="active"><span class="nav-icon">&#127968;</span>Home</a></li>
+      <li><a onclick="showPage('inputs')" data-page="inputs"><span class="nav-icon">&#9999;&#65039;</span>My Finances<span class="nav-step">Step 1</span></a></li>
+      <li><a onclick="showPage('dashboard')" data-page="dashboard"><span class="nav-icon">&#128202;</span>Dashboard<span class="nav-step">Step 2</span></a></li>
+      <li><a onclick="showPage('budget')" data-page="budget"><span class="nav-icon">&#128176;</span>Budget Monitor<span class="nav-step">Step 3</span></a></li>
+      <li><a onclick="showPage('recommendation')" data-page="recommendation"><span class="nav-icon">&#129504;</span>Recommendations<span class="nav-step">Step 4</span></a></li>
+      <li><a onclick="showPage('health')" data-page="health"><span class="nav-icon">&#128200;</span>Health Report<span class="nav-step">Step 5</span></a></li>
+      <li><a onclick="showPage('subscription')" data-page="subscription"><span class="nav-icon">&#128276;</span>Subscriptions<span class="nav-step">Step 6</span></a></li>
+      <li><a onclick="showPage('advisor')" data-page="advisor"><span class="nav-icon">&#129302;</span>AI Advisor<span class="nav-step">Step 7</span></a></li>
     </ul>
   </aside>
 
-  <!-- Main -->
+  <!-- Main Content -->
   <main class="main">
-    <div class="mobile-header"><h1>AI Finance Advisor</h1></div>
 
-    <!-- Header -->
-    <div class="header">
-      <div class="header-left">
-        <h1>Welcome to Your Finance Hub</h1>
-        <p>Fill in your financial details and let AI analyze your situation.</p>
+    <!-- PAGE: Welcome -->
+    <div class="page active" id="page-welcome">
+      <div class="page-header">
+        <h1>Welcome to AI Finance Advisor &#128075;</h1>
+        <p>Your AI-powered personal finance assistant. Follow the steps below or click any feature to get started.</p>
       </div>
-      <button class="btn-run-all" id="btnRunAll" onclick="runAll()">&#9654; Run All AI Analysis</button>
-    </div>
-
-    <!-- Row 1: Income + Expense -->
-    <div class="grid-2">
-      <div class="widget">
-        <div class="widget-header"><span class="icon">&#128181;</span> Income Input</div>
-        <div class="widget-body">
-          <textarea class="input-field" id="incomeInput" placeholder="Enter your monthly income.&#10;Example:&#10;Salary : RM4500&#10;Freelance : RM800&#10;Passive Income : RM300"></textarea>
+      <div class="welcome-grid">
+        <div class="welcome-card" onclick="showPage('inputs')">
+          <div class="wc-icon">&#9999;&#65039;</div>
+          <h3>Step 1: Enter Your Finances</h3>
+          <p>Add your income, expenses, assets, and subscriptions.</p>
         </div>
-      </div>
-      <div class="widget">
-        <div class="widget-header"><span class="icon">&#128179;</span> Expense Input</div>
-        <div class="widget-body">
-          <textarea class="input-field" id="expenseInput" placeholder="List all monthly expenses.&#10;Example:&#10;Food RM600&#10;Transport RM350&#10;Rental RM800&#10;Entertainment RM200&#10;Insurance RM250&#10;Shopping RM300&#10;Utilities RM180"></textarea>
+        <div class="welcome-card" onclick="showPage('dashboard')">
+          <div class="wc-icon">&#128202;</div>
+          <h3>Step 2: Financial Dashboard</h3>
+          <p>See your income summary, savings rate, and health score.</p>
         </div>
-      </div>
-    </div>
-
-    <!-- Row 2: Asset + Subscription -->
-    <div class="grid-2">
-      <div class="widget">
-        <div class="widget-header"><span class="icon">&#127974;</span> Asset Input</div>
-        <div class="widget-body">
-          <textarea class="input-field" id="assetInput" placeholder="List all your current assets.&#10;Example:&#10;Savings RM12000&#10;EPF RM30000&#10;Stocks RM5000&#10;Gold RM2000&#10;Vehicle RM45000"></textarea>
+        <div class="welcome-card" onclick="showPage('budget')">
+          <div class="wc-icon">&#128176;</div>
+          <h3>Step 3: Budget Monitor</h3>
+          <p>Set spending limits and track your budget in real-time.</p>
         </div>
-      </div>
-      <div class="widget">
-        <div class="widget-header"><span class="icon">&#128179;</span> Subscription Input</div>
-        <div class="widget-body">
-          <textarea class="input-field" id="subscriptionInput" placeholder="Enter all subscriptions.&#10;Example:&#10;Netflix RM55 Monthly&#10;Spotify RM16 Monthly&#10;Adobe RM90 Monthly&#10;Google One RM10 Monthly"></textarea>
+        <div class="welcome-card" onclick="showPage('recommendation')">
+          <div class="wc-icon">&#129504;</div>
+          <h3>Step 4: AI Recommendations</h3>
+          <p>Get personalized advice on saving, investing, and spending.</p>
         </div>
-      </div>
-    </div>
-
-    <!-- Financial Dashboard -->
-    <div class="grid-1">
-      <div class="widget">
-        <div class="widget-header ai"><span class="icon">&#128202;</span> Financial Dashboard</div>
-        <div class="widget-body">
-          <div class="ai-output" id="outputDashboard"><span class="placeholder">Fill in Income, Assets, and Expenses then click Run All to generate your dashboard.</span></div>
+        <div class="welcome-card" onclick="showPage('health')">
+          <div class="wc-icon">&#128200;</div>
+          <h3>Step 5: Health Report</h3>
+          <p>Comprehensive financial health analysis with action plan.</p>
+        </div>
+        <div class="welcome-card" onclick="showPage('subscription')">
+          <div class="wc-icon">&#128276;</div>
+          <h3>Step 6: Subscription Alerts</h3>
+          <p>Track subscriptions and find cheaper alternatives.</p>
+        </div>
+        <div class="welcome-card" onclick="showPage('advisor')">
+          <div class="wc-icon">&#129302;</div>
+          <h3>Step 7: What-If Advisor</h3>
+          <p>Ask scenario questions like "Can I afford a car loan?"</p>
         </div>
       </div>
     </div>
 
-    <!-- Budget Section -->
-    <div class="grid-2" id="sectionBudget">
-      <div class="widget">
-        <div class="widget-header"><span class="icon">&#128203;</span> Expense Limit Planner</div>
-        <div class="widget-body">
-          <textarea class="input-field" id="budgetInput" placeholder="Set your budget. Choose one option:&#10;&#10;Option 1 - Automatic:&#10;Monthly Budget: RM3000&#10;Breakdown: Daily&#10;&#10;Option 2 - Manual:&#10;Daily Limit: RM100&#10;Weekly Limit: RM600&#10;Monthly Limit: RM2500"></textarea>
-        </div>
+    <!-- PAGE: My Finances (All Inputs) -->
+    <div class="page" id="page-inputs">
+      <div class="page-header">
+        <span class="step-badge">Step 1</span>
+        <h1>&#9999;&#65039; Enter Your Financial Information</h1>
+        <p>Fill in your monthly income, expenses, assets, and subscriptions. This data powers all AI features.</p>
       </div>
-      <div class="widget">
-        <div class="widget-header ai"><span class="icon">&#128176;</span> Budget Monitor</div>
-        <div class="widget-body">
-          <div class="ai-output" id="outputBudget"><span class="placeholder">Fill in Expense Input and Expense Limit Planner to generate budget analysis.</span></div>
-        </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">&#128181;</span> Monthly Income</div>
+        <textarea class="input-field" id="incomeInput" placeholder="Enter your monthly income sources.&#10;&#10;Example:&#10;Salary : RM4500&#10;Freelance : RM800&#10;Passive Income : RM300"></textarea>
       </div>
-    </div>
-
-    <!-- AI Financial Recommendation -->
-    <div class="grid-1" id="sectionRecommendation">
-      <div class="widget">
-        <div class="widget-header ai"><span class="icon">&#129504;</span> AI Financial Recommendation</div>
-        <div class="widget-body">
-          <div class="ai-output" id="outputRecommendation"><span class="placeholder">Fill in Income, Assets, Expenses, and Budget to generate personalized recommendations.</span></div>
-        </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">&#128179;</span> Monthly Expenses</div>
+        <textarea class="input-field" id="expenseInput" placeholder="List all monthly expenses.&#10;&#10;Example:&#10;Food RM600&#10;Transport RM350&#10;Rental RM800&#10;Entertainment RM200&#10;Insurance RM250&#10;Shopping RM300&#10;Utilities RM180"></textarea>
       </div>
-    </div>
-
-    <!-- Health Report Section -->
-    <div class="grid-2" id="sectionHealth">
-      <div class="widget">
-        <div class="widget-header"><span class="icon">&#127919;</span> Savings Goal Planner</div>
-        <div class="widget-body">
-          <textarea class="input-field" id="savingsInput" placeholder="Describe your savings goal:&#10;- What are you saving for? (House, Car, Emergency Fund)&#10;- Target Amount (e.g. RM50000)&#10;- Current Savings (e.g. RM5000)&#10;- Monthly Contribution (e.g. RM500)"></textarea>
-        </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">&#127974;</span> Current Assets</div>
+        <textarea class="input-field" id="assetInput" placeholder="List all your current assets.&#10;&#10;Example:&#10;Savings RM12000&#10;EPF RM30000&#10;Stocks RM5000&#10;Gold RM2000&#10;Vehicle RM45000"></textarea>
       </div>
-      <div class="widget">
-        <div class="widget-header ai"><span class="icon">&#128200;</span> Financial Health Report</div>
-        <div class="widget-body">
-          <div class="ai-output" id="outputHealthReport"><span class="placeholder">Fill in all inputs including Savings Goal to generate your health report.</span></div>
-        </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">&#128179;</span> Subscriptions</div>
+        <textarea class="input-field" id="subscriptionInput" placeholder="Enter all recurring subscriptions.&#10;&#10;Example:&#10;Netflix RM55 Monthly&#10;Spotify RM16 Monthly&#10;Adobe RM90 Monthly&#10;Google One RM10 Monthly"></textarea>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="showPage('dashboard')">Next: View Dashboard &#8594;</button>
       </div>
     </div>
 
-    <!-- Subscription Reminder -->
-    <div class="grid-1" id="sectionSubscription">
-      <div class="widget">
-        <div class="widget-header ai"><span class="icon">&#128276;</span> Subscription Reminder</div>
-        <div class="widget-body">
-          <div class="ai-output" id="outputSubscription"><span class="placeholder">Fill in Subscription Input to generate reminders and cost analysis.</span></div>
-        </div>
+    <!-- PAGE: Dashboard -->
+    <div class="page" id="page-dashboard">
+      <div class="page-header">
+        <span class="step-badge">Step 2</span>
+        <h1>&#128202; Financial Dashboard</h1>
+        <p>AI-generated overview of your income, expenses, savings rate, and financial health score.</p>
       </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="runFeature('dashboard')">&#9654; Generate Dashboard</button>
+        <button class="btn btn-secondary" onclick="showPage('inputs')">&#8592; Edit Inputs</button>
+      </div>
+      <div class="ai-output" id="outputDashboard"><span class="placeholder">Click "Generate Dashboard" to see your financial overview.<br>Make sure you've entered your Income, Expenses, and Assets first.</span></div>
     </div>
 
-    <!-- AI Advisor Section -->
-    <div class="grid-2" id="sectionAdvisor">
-      <div class="widget">
-        <div class="widget-header"><span class="icon">&#128172;</span> Advise for Financial Input</div>
-        <div class="widget-body">
-          <textarea class="input-field" id="adviseInput" placeholder="Ask a what-if question:&#10;&#10;Examples:&#10;• My PTPTN loan is RM40,000. How much can I pay monthly?&#10;• Can I afford a RM300 monthly car loan?&#10;• If I buy a RM2,000 laptop, how will it affect my budget?&#10;• If my salary increases by RM500, how should I allocate it?&#10;• What happens if I lose 20% of my income?"></textarea>
-        </div>
+    <!-- PAGE: Budget Monitor -->
+    <div class="page" id="page-budget">
+      <div class="page-header">
+        <span class="step-badge">Step 3</span>
+        <h1>&#128176; Budget Monitor</h1>
+        <p>Set spending limits and get AI-powered budget alerts and recommendations.</p>
       </div>
-      <div class="widget">
-        <div class="widget-header ai"><span class="icon">&#129302;</span> AI Financial Advisor &amp; Discussions</div>
-        <div class="widget-body">
-          <div class="ai-output" id="outputAdvisor"><span class="placeholder">Fill in all inputs and your question to get a personalized scenario analysis.</span></div>
-        </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">&#128203;</span> Expense Limit Planner</div>
+        <textarea class="input-field" id="budgetInput" placeholder="Set your budget plan:&#10;&#10;Option 1 - Automatic:&#10;Monthly Budget: RM3000&#10;Breakdown: Daily&#10;&#10;Option 2 - Manual:&#10;Daily Limit: RM100&#10;Weekly Limit: RM600&#10;Monthly Limit: RM2500"></textarea>
       </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="runFeature('budget')">&#9654; Analyze Budget</button>
+      </div>
+      <div class="ai-output" id="outputBudget"><span class="placeholder">Set your budget limits above, then click "Analyze Budget".<br>Requires: Expenses + Budget Plan.</span></div>
+    </div>
+
+    <!-- PAGE: AI Recommendation -->
+    <div class="page" id="page-recommendation">
+      <div class="page-header">
+        <span class="step-badge">Step 4</span>
+        <h1>&#129504; AI Financial Recommendation</h1>
+        <p>Personalized advice on income growth, expense optimization, savings, investments, and market outlook.</p>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="runFeature('recommendation')">&#9654; Get Recommendations</button>
+      </div>
+      <div class="ai-output" id="outputRecommendation"><span class="placeholder">Click "Get Recommendations" for personalized financial advice.<br>Requires: Income, Expenses, Assets.</span></div>
+    </div>
+
+    <!-- PAGE: Health Report -->
+    <div class="page" id="page-health">
+      <div class="page-header">
+        <span class="step-badge">Step 5</span>
+        <h1>&#128200; Financial Health Report</h1>
+        <p>Comprehensive analysis including health score, risk assessment, strengths, and action plan.</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">&#127919;</span> Savings Goal Planner</div>
+        <textarea class="input-field" id="savingsInput" placeholder="Describe your savings goal:&#10;&#10;- What are you saving for? (House, Car, Emergency Fund, Wedding)&#10;- Target Amount (e.g. RM50000)&#10;- Current Savings (e.g. RM5000)&#10;- Monthly Contribution (e.g. RM500)"></textarea>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="runFeature('health')">&#9654; Generate Health Report</button>
+      </div>
+      <div class="ai-output" id="outputHealthReport"><span class="placeholder">Click "Generate Health Report" for a full financial analysis.<br>For best results, fill in all inputs including your savings goal.</span></div>
+    </div>
+
+    <!-- PAGE: Subscription Reminder -->
+    <div class="page" id="page-subscription">
+      <div class="page-header">
+        <span class="step-badge">Step 6</span>
+        <h1>&#128276; Subscription Reminder</h1>
+        <p>Payment alerts, cost analysis, and cheaper alternatives for your subscriptions.</p>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="runFeature('subscription')">&#9654; Analyze Subscriptions</button>
+        <button class="btn btn-secondary" onclick="showPage('inputs')">&#8592; Edit Subscriptions</button>
+      </div>
+      <div class="ai-output" id="outputSubscription"><span class="placeholder">Click "Analyze Subscriptions" to see payment reminders and savings tips.<br>Requires: Subscription Input.</span></div>
+    </div>
+
+    <!-- PAGE: AI Advisor -->
+    <div class="page" id="page-advisor">
+      <div class="page-header">
+        <span class="step-badge">Step 7</span>
+        <h1>&#129302; AI Financial Advisor</h1>
+        <p>Ask any what-if question and get a detailed scenario analysis based on your actual finances.</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">&#128172;</span> Your Question</div>
+        <textarea class="input-field" id="adviseInput" placeholder="Ask a financial scenario question:&#10;&#10;Examples:&#10;• My PTPTN loan is RM40,000. How much can I pay monthly to settle it early?&#10;• Can I afford a RM300 monthly car loan?&#10;• If I buy a RM2,000 laptop, how will it affect my budget?&#10;• If my salary increases by RM500, how should I allocate it?&#10;• What happens if I lose 20% of my income?&#10;• Can I afford a RM5,000 vacation this year?"></textarea>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="runFeature('advisor')">&#9654; Get AI Analysis</button>
+      </div>
+      <div class="ai-output" id="outputAdvisor"><span class="placeholder">Type your financial question above and click "Get AI Analysis".<br>The AI uses all your financial data to provide personalized advice.</span></div>
     </div>
 
   </main>
@@ -252,6 +312,17 @@ const STREAM_URLS = {
   ai_financial_advisor_discussions: '__URL_AI_FINANCIAL_ADVISOR_DISCUSSIONS__',
 };
 
+// Page Navigation
+function showPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + pageId).classList.add('active');
+  document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+  const navLink = document.querySelector('[data-page="' + pageId + '"]');
+  if (navLink) navLink.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// Markdown Rendering
 function renderMarkdownLine(line) {
   if (line.match(/^---+$/)) return '<hr>';
   if (line.match(/^### /)) return '<h3>' + renderInline(line.slice(4)) + '</h3>';
@@ -261,7 +332,6 @@ function renderMarkdownLine(line) {
   if (line.match(/^[-*]\s/)) return '<li>' + renderInline(line.slice(2)) + '</li>';
   return '<span>' + renderInline(line) + '</span>';
 }
-
 function renderInline(text) {
   text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
   text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
@@ -269,18 +339,13 @@ function renderInline(text) {
   return text;
 }
 
+// Streaming
 async function streamToPanel(url, body, panelId) {
   const panel = document.getElementById(panelId);
-  panel.innerHTML = '<div class="loading-msg"><span class="spinner"></span>Generating...</div>';
-
+  panel.innerHTML = '<div class="loading-msg"><span class="spinner"></span>Generating AI response...</div>';
   try {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
+    const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     if (!res.ok) throw new Error('HTTP ' + res.status);
-
     panel.innerHTML = '';
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
@@ -288,7 +353,6 @@ async function streamToPanel(url, body, panelId) {
     let cursor = document.createElement('span');
     cursor.className = 'cursor-blink';
     panel.appendChild(cursor);
-
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
@@ -312,11 +376,12 @@ async function streamToPanel(url, body, panelId) {
     cursor.remove();
     panel.scrollTop = panel.scrollHeight;
   } catch (err) {
-    panel.innerHTML = '<div class="error">Error: ' + err.message + '</div>';
+    panel.innerHTML = '<div class="error">&#9888; Error: ' + err.message + '</div>';
   }
 }
 
-function runAll() {
+// Run individual features
+function runFeature(feature) {
   const income = document.getElementById('incomeInput').value;
   const expenses = document.getElementById('expenseInput').value;
   const assets = document.getElementById('assetInput').value;
@@ -325,41 +390,36 @@ function runAll() {
   const savingsGoal = document.getElementById('savingsInput').value;
   const adviseQuestion = document.getElementById('adviseInput').value;
 
-  const btn = document.getElementById('btnRunAll');
-  btn.disabled = true;
-  setTimeout(() => { btn.disabled = false; }, 5000);
-
-  if (income || expenses || assets) {
-    streamToPanel(STREAM_URLS.financial_dashboard, { income, expenses, assets }, 'outputDashboard');
-  }
-  if (expenses && budgetPlan) {
-    streamToPanel(STREAM_URLS.budget_monitor, { expenses, budget_plan: budgetPlan }, 'outputBudget');
-  }
-  if (income || expenses || assets) {
-    streamToPanel(STREAM_URLS.ai_financial_recommendation, { income, expenses, assets, budget_plan: budgetPlan }, 'outputRecommendation');
-  }
-  if (income || expenses || assets) {
-    streamToPanel(STREAM_URLS.financial_health_report, { income, expenses, assets, budget_plan: budgetPlan, savings_goal: savingsGoal }, 'outputHealthReport');
-  }
-  if (subscriptions) {
-    streamToPanel(STREAM_URLS.subscription_reminder, { subscriptions }, 'outputSubscription');
-  }
-  if (adviseQuestion) {
-    streamToPanel(STREAM_URLS.ai_financial_advisor_discussions, {
-      income, expenses, assets, budget_plan: budgetPlan,
-      savings_goal: savingsGoal, subscriptions, question: adviseQuestion
-    }, 'outputAdvisor');
+  switch (feature) {
+    case 'dashboard':
+      if (!income && !expenses && !assets) { alert('Please enter your Income, Expenses, or Assets first (Step 1).'); showPage('inputs'); return; }
+      streamToPanel(STREAM_URLS.financial_dashboard, { income, expenses, assets }, 'outputDashboard');
+      break;
+    case 'budget':
+      if (!expenses || !budgetPlan) { alert('Please enter your Expenses (Step 1) and Budget Plan above.'); return; }
+      streamToPanel(STREAM_URLS.budget_monitor, { expenses, budget_plan: budgetPlan }, 'outputBudget');
+      break;
+    case 'recommendation':
+      if (!income && !expenses && !assets) { alert('Please enter your financial data first (Step 1).'); showPage('inputs'); return; }
+      streamToPanel(STREAM_URLS.ai_financial_recommendation, { income, expenses, assets, budget_plan: budgetPlan }, 'outputRecommendation');
+      break;
+    case 'health':
+      if (!income && !expenses && !assets) { alert('Please enter your financial data first (Step 1).'); showPage('inputs'); return; }
+      streamToPanel(STREAM_URLS.financial_health_report, { income, expenses, assets, budget_plan: budgetPlan, savings_goal: savingsGoal }, 'outputHealthReport');
+      break;
+    case 'subscription':
+      if (!subscriptions) { alert('Please enter your Subscriptions first (Step 1).'); showPage('inputs'); return; }
+      streamToPanel(STREAM_URLS.subscription_reminder, { subscriptions }, 'outputSubscription');
+      break;
+    case 'advisor':
+      if (!adviseQuestion) { alert('Please type your financial question above.'); return; }
+      streamToPanel(STREAM_URLS.ai_financial_advisor_discussions, {
+        income, expenses, assets, budget_plan: budgetPlan,
+        savings_goal: savingsGoal, subscriptions, question: adviseQuestion
+      }, 'outputAdvisor');
+      break;
   }
 }
-
-// Smooth scroll for sidebar links
-document.querySelectorAll('.sidebar-nav a[href^="#"]').forEach(a => {
-  a.addEventListener('click', e => {
-    e.preventDefault();
-    const target = document.querySelector(a.getAttribute('href'));
-    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
-});
 </script>
 
 </body>
