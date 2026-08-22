@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: FinBot - Business Name Generator Pro
+Description: AI Personal Finance Advisor - Streaming Lambda Functions + S3 Frontend
 
 Globals:
   Function:
@@ -9,7 +9,9 @@ Globals:
     Runtime: python3.12
 
 Resources:
-  # IAM Role for Bedrock access
+  # ============================================
+  # IAM Role for Bedrock Access
+  # ============================================
   AppBedrockRole:
     Type: AWS::IAM::Role
     Properties:
@@ -37,11 +39,13 @@ Resources:
                   - !Sub "arn:aws:bedrock:*::foundation-model/anthropic.claude-haiku-4-5-20251001-v1:0-20260217-v1:0"
                   - "arn:aws:bedrock:*::foundation-model/anthropic.claude-haiku-4-5-20251001-v1:0-20260217-v1:0"
 
-  # Lambda Function - Business Name Ideas
-  BusinessNameIdeasFunction:
+  # ============================================
+  # Lambda Function 1: Financial Dashboard
+  # ============================================
+  FinancialDashboardFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../backend/lambda/
+      CodeUri: ../backend/financial_dashboard/
       Handler: run.sh
       Role: !GetAtt AppBedrockRole.Arn
       Layers:
@@ -54,10 +58,110 @@ Resources:
       FunctionUrlConfig:
         AuthType: NONE
         InvokeMode: RESPONSE_STREAM
-      Timeout: 60
-      MemorySize: 256
 
-  # S3 Bucket for Frontend Static Website Hosting
+  # ============================================
+  # Lambda Function 2: Budget Monitor
+  # ============================================
+  BudgetMonitorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../backend/budget_monitor/
+      Handler: run.sh
+      Role: !GetAtt AppBedrockRole.Arn
+      Layers:
+        - !Sub "arn:aws:lambda:${AWS::Region}:753240598075:layer:LambdaAdapterLayerX86:27"
+      Environment:
+        Variables:
+          AWS_LAMBDA_EXEC_WRAPPER: /opt/bootstrap
+          AWS_LWA_INVOKE_MODE: response_stream
+          PORT: "8080"
+      FunctionUrlConfig:
+        AuthType: NONE
+        InvokeMode: RESPONSE_STREAM
+
+  # ============================================
+  # Lambda Function 3: AI Financial Recommendation
+  # ============================================
+  AIFinancialRecommendationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../backend/ai_financial_recommendation/
+      Handler: run.sh
+      Role: !GetAtt AppBedrockRole.Arn
+      Layers:
+        - !Sub "arn:aws:lambda:${AWS::Region}:753240598075:layer:LambdaAdapterLayerX86:27"
+      Environment:
+        Variables:
+          AWS_LAMBDA_EXEC_WRAPPER: /opt/bootstrap
+          AWS_LWA_INVOKE_MODE: response_stream
+          PORT: "8080"
+      FunctionUrlConfig:
+        AuthType: NONE
+        InvokeMode: RESPONSE_STREAM
+
+  # ============================================
+  # Lambda Function 4: Financial Health Report
+  # ============================================
+  FinancialHealthReportFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../backend/financial_health_report/
+      Handler: run.sh
+      Role: !GetAtt AppBedrockRole.Arn
+      Layers:
+        - !Sub "arn:aws:lambda:${AWS::Region}:753240598075:layer:LambdaAdapterLayerX86:27"
+      Environment:
+        Variables:
+          AWS_LAMBDA_EXEC_WRAPPER: /opt/bootstrap
+          AWS_LWA_INVOKE_MODE: response_stream
+          PORT: "8080"
+      FunctionUrlConfig:
+        AuthType: NONE
+        InvokeMode: RESPONSE_STREAM
+
+  # ============================================
+  # Lambda Function 5: Subscription Reminder
+  # ============================================
+  SubscriptionReminderFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../backend/subscription_reminder/
+      Handler: run.sh
+      Role: !GetAtt AppBedrockRole.Arn
+      Layers:
+        - !Sub "arn:aws:lambda:${AWS::Region}:753240598075:layer:LambdaAdapterLayerX86:27"
+      Environment:
+        Variables:
+          AWS_LAMBDA_EXEC_WRAPPER: /opt/bootstrap
+          AWS_LWA_INVOKE_MODE: response_stream
+          PORT: "8080"
+      FunctionUrlConfig:
+        AuthType: NONE
+        InvokeMode: RESPONSE_STREAM
+
+  # ============================================
+  # Lambda Function 6: AI Financial Advisor & Discussions
+  # ============================================
+  AIFinancialAdvisorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../backend/ai_financial_advisor/
+      Handler: run.sh
+      Role: !GetAtt AppBedrockRole.Arn
+      Layers:
+        - !Sub "arn:aws:lambda:${AWS::Region}:753240598075:layer:LambdaAdapterLayerX86:27"
+      Environment:
+        Variables:
+          AWS_LAMBDA_EXEC_WRAPPER: /opt/bootstrap
+          AWS_LWA_INVOKE_MODE: response_stream
+          PORT: "8080"
+      FunctionUrlConfig:
+        AuthType: NONE
+        InvokeMode: RESPONSE_STREAM
+
+  # ============================================
+  # S3 Bucket for Frontend Static Website
+  # ============================================
   FrontendBucket:
     Type: AWS::S3::Bucket
     Properties:
@@ -70,7 +174,6 @@ Resources:
         IgnorePublicAcls: false
         RestrictPublicBuckets: false
 
-  # Bucket Policy for Public Read Access
   FrontendBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
@@ -84,9 +187,29 @@ Resources:
             Resource: !Sub "${FrontendBucket.Arn}/*"
 
 Outputs:
-  BusinessNameIdeasUrl:
-    Description: Function URL for Business Name Ideas
-    Value: !GetAtt BusinessNameIdeasFunctionUrl.FunctionUrl
+  FinancialDashboardUrl:
+    Description: Function URL for Financial Dashboard
+    Value: !GetAtt FinancialDashboardFunctionUrl.FunctionUrl
+
+  BudgetMonitorUrl:
+    Description: Function URL for Budget Monitor
+    Value: !GetAtt BudgetMonitorFunctionUrl.FunctionUrl
+
+  AIFinancialRecommendationUrl:
+    Description: Function URL for AI Financial Recommendation
+    Value: !GetAtt AIFinancialRecommendationFunctionUrl.FunctionUrl
+
+  FinancialHealthReportUrl:
+    Description: Function URL for Financial Health Report
+    Value: !GetAtt FinancialHealthReportFunctionUrl.FunctionUrl
+
+  SubscriptionReminderUrl:
+    Description: Function URL for Subscription Reminder
+    Value: !GetAtt SubscriptionReminderFunctionUrl.FunctionUrl
+
+  AIFinancialAdvisorUrl:
+    Description: Function URL for AI Financial Advisor & Discussions
+    Value: !GetAtt AIFinancialAdvisorFunctionUrl.FunctionUrl
 
   WebsiteUrl:
     Description: Frontend S3 Website URL

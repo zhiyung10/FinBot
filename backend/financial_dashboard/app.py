@@ -1,0 +1,70 @@
+import json
+import boto3
+from flask import Flask, request, Response, stream_with_context
+
+app = Flask(__name__)
+bedrock = boto3.client("bedrock-runtime", region_name="ap-southeast-1")
+MODEL_ID = "ap-southeast-1.anthropic.claude-haiku-4-5-20251001-v1:0-20260217-v1:0"
+
+SYSTEM_PROMPT = """You are a professional financial analyst. Based on the user's income, expenses, and assets, generate a well-organized financial dashboard containing the following sections:
+
+1. Total Income
+2. Total Expenses
+3. Total Assets
+4. Current Balance (Income minus Expenses)
+5. Estimated Savings Rate as a percentage
+6. Monthly Spending Progress shown as a text-based progress bar
+7. Financial Health Score from 0 to 100
+8. Overall Financial Status
+
+Use tables and emoji icons to organize the information clearly and make it visually appealing. After the dashboard, provide a short financial summary of 3 to 5 sentences explaining the user's current financial condition in plain language."""
+
+
+def generate(prompt):
+    body = json.dumps({
+        "anthropic_version": "bedrock-2023-05-31",
+        "max_tokens": 2048,
+        "temperature": 0.7,
+        "system": SYSTEM_PROMPT,
+        "messages": [{"role": "user", "content": [{"type": "text", "text": prompt}]}]
+    })
+    response = bedrock.invoke_model_with_response_stream(
+        modelId=MODEL_ID, body=body, contentType="application/json"
+    )
+    for event in response["body"]:
+        chunk = event.get("chunk")
+        if chunk:
+            data = json.loads(chunk["bytes"])
+            if data["type"] == "content_block_delta":
+                yield data["delta"].get("text", "")
+
+
+@app.route("/", methods=["POST", "OPTIONS"])
+def handler():
+    if request.method == "OPTIONS":
+        return Response("", status=200, headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "Content-Type",
+            "Access-Control-Allow-Methods": "POST,OPTIONS"
+        })
+
+    data = request.get_json(force=True)
+    income = data.get("income", "")
+    expenses = data.get("expenses", "")
+    assets = data.get("assets", "")
+
+    prompt = f"Based on the user's income: {income}, expenses: {expenses}, and assets: {assets}, generate a well-organized financial dashboard."
+
+    return Response(
+        stream_with_context(generate(prompt)),
+        content_type="text/plain; charset=utf-8",
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "Content-Type",
+            "Access-Control-Allow-Methods": "POST,OPTIONS"
+        }
+    )
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8080)

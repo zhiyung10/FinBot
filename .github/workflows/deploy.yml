@@ -1,4 +1,4 @@
-name: Deploy to AWS
+name: Deploy AI Personal Finance Advisor
 
 on:
   push:
@@ -33,7 +33,7 @@ jobs:
       - name: SAM Deploy
         run: |
           sam deploy \
-            --stack-name business-name-generator-pro \
+            --stack-name ai-personal-finance-advisor \
             --s3-bucket ${{ secrets.SAM_DEPLOY_BUCKET }} \
             --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
             --region ap-southeast-1 \
@@ -44,18 +44,33 @@ jobs:
         run: |
           get_output() {
             aws cloudformation describe-stacks \
-              --stack-name business-name-generator-pro \
+              --stack-name ai-personal-finance-advisor \
               --query "Stacks[0].Outputs[?OutputKey=='$1'].OutputValue" \
               --output text
           }
 
-          URL=$(get_output BusinessNameIdeasUrl)
-          sed -i "s|_URL_BUSINESS_NAME_IDEAS_|$URL|g" frontend/index.html
+          URL=$(get_output FinancialDashboardUrl)
+          sed -i "s|__URL_FINANCIAL_DASHBOARD__|$URL|g" frontend/index.html
+
+          URL=$(get_output BudgetMonitorUrl)
+          sed -i "s|__URL_BUDGET_MONITOR__|$URL|g" frontend/index.html
+
+          URL=$(get_output AIFinancialRecommendationUrl)
+          sed -i "s|__URL_AI_FINANCIAL_RECOMMENDATION__|$URL|g" frontend/index.html
+
+          URL=$(get_output FinancialHealthReportUrl)
+          sed -i "s|__URL_FINANCIAL_HEALTH_REPORT__|$URL|g" frontend/index.html
+
+          URL=$(get_output SubscriptionReminderUrl)
+          sed -i "s|__URL_SUBSCRIPTION_REMINDER__|$URL|g" frontend/index.html
+
+          URL=$(get_output AIFinancialAdvisorUrl)
+          sed -i "s|__URL_AI_FINANCIAL_ADVISOR_DISCUSSIONS__|$URL|g" frontend/index.html
 
       - name: Deploy frontend to S3
         run: |
           BUCKET=$(aws cloudformation describe-stacks \
-            --stack-name business-name-generator-pro \
+            --stack-name ai-personal-finance-advisor \
             --query "Stacks[0].Outputs[?OutputKey=='BucketName'].OutputValue" \
             --output text)
 
