@@ -56,7 +56,7 @@ jobs:
         run: |
           BUCKET=$(aws cloudformation describe-stacks \
             --stack-name business-name-generator-pro \
-            --query "Stacks[0].Outputs[?OutputKey=='FrontendBucketName'].OutputValue" \
+            --query "Stacks[0].Outputs[?OutputKey=='BucketName'].OutputValue" \
             --output text)
 
           aws s3 sync frontend/ s3://$BUCKET/ --cache-control no-cache
