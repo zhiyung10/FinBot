@@ -17,6 +17,7 @@ import {
   Settings,
   LogOut,
   X,
+  ScanLine,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
@@ -24,6 +25,7 @@ import { useRouter } from 'next/navigation'
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/transactions', label: 'Transactions', icon: ArrowLeftRight },
+  { href: '/receipt', label: 'Receipt Scanner', icon: ScanLine },
   { href: '/calendar', label: 'Financial Calendar', icon: Calendar },
   { href: '/budget', label: 'Budget', icon: PiggyBank },
   { href: '/assets', label: 'Assets', icon: Landmark },

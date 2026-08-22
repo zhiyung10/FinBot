@@ -13,8 +13,6 @@ export default function AdvisorPage() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [notConfigured, setNotConfigured] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -27,59 +25,33 @@ export default function AdvisorPage() {
 
     const userMessage = input.trim()
     setInput('')
-    setError(null)
     setMessages(prev => [...prev, { role: 'user', content: userMessage }])
     setLoading(true)
 
-    try {
-      const res = await fetch('/api/ai/advisor', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: userMessage,
-          conversationHistory: messages,
-        }),
-      })
-
-      const data = await res.json()
-
-      if (!res.ok) {
-        if (data.notConfigured) {
-          setNotConfigured(true)
-        }
-        throw new Error(data.error || 'Failed to get response')
-      }
-
-      setMessages(prev => [...prev, { role: 'assistant', content: data.message }])
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
-    } finally {
+    // Simulated response — in production, this calls the Bedrock API via a backend
+    setTimeout(() => {
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: 'AI Financial Advisor requires a server-side backend (e.g., Vercel, AWS Lambda) to securely call Amazon Bedrock. GitHub Pages only serves static files. To enable this feature, deploy with a server-capable platform or add an external API endpoint.'
+      }])
       setLoading(false)
-    }
-  }
-
-  if (notConfigured) {
-    return (
-      <div className="space-y-6">
-        <h1 className="text-2xl font-bold text-gray-900">AI Financial Advisor</h1>
-        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">
-          <AlertCircle size={48} className="text-yellow-600 mx-auto mb-3" />
-          <h3 className="text-lg font-semibold text-yellow-800 mb-2">Not Configured</h3>
-          <p className="text-yellow-700 text-sm">
-            Amazon Bedrock credentials are not configured. Please set AWS_ACCESS_KEY_ID and
-            AWS_SECRET_ACCESS_KEY in your environment variables to enable the AI Financial Advisor.
-          </p>
-        </div>
-      </div>
-    )
+    }, 1000)
   }
 
   return (
     <div className="flex flex-col h-[calc(100vh-8rem)] lg:h-[calc(100vh-4rem)]">
       <h1 className="text-2xl font-bold text-gray-900 mb-4">AI Financial Advisor</h1>
 
+      {/* Info banner */}
+      <div className="bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-3 mb-4 flex items-start gap-2">
+        <AlertCircle size={16} className="text-yellow-600 mt-0.5 shrink-0" />
+        <p className="text-xs text-yellow-700">
+          AI features require a server backend for secure API calls. This is a static deployment preview.
+        </p>
+      </div>
+
       {/* Chat Messages */}
-      <div className="flex-1 overflow-y-auto bg-white rounded-xl border border-gray-100 p-4 space-y-4 mb-4">
+      <div className="flex-1 overflow-y-auto bg-white/80 backdrop-blur-sm rounded-2xl border border-white/60 p-4 space-y-4 mb-4">
         {messages.length === 0 && (
           <div className="text-center text-gray-400 py-12">
             <Bot size={48} className="mx-auto mb-3 text-gray-300" />
@@ -90,12 +62,11 @@ export default function AdvisorPage() {
                 'Why am I spending so much this month?',
                 'How much should I save every month?',
                 'Can I afford a car?',
-                'Which expense category is affecting my savings the most?',
               ].map(suggestion => (
                 <button
                   key={suggestion}
                   onClick={() => setInput(suggestion)}
-                  className="block mx-auto text-sm text-blue-600 hover:text-blue-700 hover:underline"
+                  className="block mx-auto text-sm text-[var(--color-accent)] hover:underline"
                 >
                   &quot;{suggestion}&quot;
                 </button>
@@ -107,14 +78,14 @@ export default function AdvisorPage() {
         {messages.map((msg, i) => (
           <div key={i} className={cn('flex gap-3', msg.role === 'user' ? 'justify-end' : 'justify-start')}>
             {msg.role === 'assistant' && (
-              <div className="p-2 rounded-full bg-blue-50 h-fit">
-                <Bot size={16} className="text-blue-600" />
+              <div className="p-2 rounded-full bg-[var(--color-accent)]/10 h-fit">
+                <Bot size={16} className="text-[var(--color-accent)]" />
               </div>
             )}
             <div className={cn(
               'max-w-[80%] rounded-2xl px-4 py-3 text-sm',
               msg.role === 'user'
-                ? 'bg-blue-600 text-white'
+                ? 'bg-[var(--color-accent)] text-white'
                 : 'bg-gray-100 text-gray-900'
             )}>
               <div className="whitespace-pre-wrap">{msg.content}</div>
@@ -129,8 +100,8 @@ export default function AdvisorPage() {
 
         {loading && (
           <div className="flex gap-3">
-            <div className="p-2 rounded-full bg-blue-50 h-fit">
-              <Bot size={16} className="text-blue-600" />
+            <div className="p-2 rounded-full bg-[var(--color-accent)]/10 h-fit">
+              <Bot size={16} className="text-[var(--color-accent)]" />
             </div>
             <div className="bg-gray-100 rounded-2xl px-4 py-3">
               <div className="flex gap-1">
@@ -139,12 +110,6 @@ export default function AdvisorPage() {
                 <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
               </div>
             </div>
-          </div>
-        )}
-
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-700">
-            {error}
           </div>
         )}
 
@@ -159,12 +124,12 @@ export default function AdvisorPage() {
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask about your finances..."
           disabled={loading}
-          className="flex-1 px-4 py-3 bg-white border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none disabled:opacity-50"
+          className="flex-1 px-4 py-3 bg-white border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent outline-none disabled:opacity-50"
         />
         <button
           type="submit"
           disabled={loading || !input.trim()}
-          className="p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="p-3 bg-[var(--color-accent)] hover:bg-[#5b54e6] text-white rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Send size={18} />
         </button>

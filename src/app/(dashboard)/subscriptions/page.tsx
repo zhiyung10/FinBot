@@ -1,11 +1,22 @@
-import { createClient } from '@/lib/supabase/server'
+'use client'
+
+import { useEffect, useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
 import SubscriptionsContent from '@/components/subscriptions/SubscriptionsContent'
 
-export default async function SubscriptionsPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+export default function SubscriptionsPage() {
+  const [userId, setUserId] = useState<string | null>(null)
 
-  if (!user) return null
+  useEffect(() => {
+    async function getUser() {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) setUserId(user.id)
+    }
+    getUser()
+  }, [])
 
-  return <SubscriptionsContent userId={user.id} />
+  if (!userId) return null
+
+  return <SubscriptionsContent userId={userId} />
 }

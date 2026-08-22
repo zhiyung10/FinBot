@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import DashboardContent from '@/components/dashboard/DashboardContent'
+import ReceiptScanner from '@/components/receipt/ReceiptScanner'
 
-export default function DashboardPage() {
+export default function ReceiptPage() {
   const [userId, setUserId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -18,5 +18,5 @@ export default function DashboardPage() {
 
   if (!userId) return null
 
-  return <DashboardContent userId={userId} />
+  return <ReceiptScanner userId={userId} />
 }
