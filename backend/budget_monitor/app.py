@@ -35,28 +35,31 @@ def handler():
     if request.method == "OPTIONS":
         return Response("", status=200)
 
-    data = request.get_json(force=True)
-    expenses = data.get("expenses", "")
-    budget_plan = data.get("budget_plan", "")
+    try:
+        data = request.get_json(force=True)
+        expenses = data.get("expenses", "")
+        budget_plan = data.get("budget_plan", "")
 
-    prompt = f"Based on the user's expenses: {expenses} and budget plan: {budget_plan}, analyze spending against the selected budget limits."
+        prompt = f"Based on the user's expenses: {expenses} and budget plan: {budget_plan}, analyze spending against the selected budget limits."
 
-    body = json.dumps({
-        "anthropic_version": "bedrock-2023-05-31",
-        "max_tokens": 2048,
-        "temperature": 0.7,
-        "system": SYSTEM_PROMPT,
-        "messages": [{"role": "user", "content": [{"type": "text", "text": prompt}]}]
-    })
+        body = json.dumps({
+            "anthropic_version": "bedrock-2023-05-31",
+            "max_tokens": 2048,
+            "temperature": 0.7,
+            "system": SYSTEM_PROMPT,
+            "messages": [{"role": "user", "content": [{"type": "text", "text": prompt}]}]
+        })
 
-    response = bedrock.invoke_model(
-        modelId=MODEL_ID, body=body, contentType="application/json"
-    )
+        response = bedrock.invoke_model(
+            modelId=MODEL_ID, body=body, contentType="application/json"
+        )
 
-    result = json.loads(response["body"].read())
-    full_text = "".join(block["text"] for block in result["content"] if block["type"] == "text")
+        result = json.loads(response["body"].read())
+        full_text = "".join(block["text"] for block in result["content"] if block["type"] == "text")
 
-    return jsonify({"response": full_text}), 200
+        return jsonify({"response": full_text}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == "__main__":

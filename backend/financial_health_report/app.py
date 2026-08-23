@@ -38,31 +38,34 @@ def handler():
     if request.method == "OPTIONS":
         return Response("", status=200)
 
-    data = request.get_json(force=True)
-    income = data.get("income", "")
-    expenses = data.get("expenses", "")
-    assets = data.get("assets", "")
-    budget_plan = data.get("budget_plan", "")
-    savings_goal = data.get("savings_goal", "")
+    try:
+        data = request.get_json(force=True)
+        income = data.get("income", "")
+        expenses = data.get("expenses", "")
+        assets = data.get("assets", "")
+        budget_plan = data.get("budget_plan", "")
+        savings_goal = data.get("savings_goal", "")
 
-    prompt = f"Based on the user's income: {income}, expenses: {expenses}, assets: {assets}, budget plan: {budget_plan}, and savings goal: {savings_goal}, generate a comprehensive professional financial health report."
+        prompt = f"Based on the user's income: {income}, expenses: {expenses}, assets: {assets}, budget plan: {budget_plan}, and savings goal: {savings_goal}, generate a comprehensive professional financial health report."
 
-    body = json.dumps({
-        "anthropic_version": "bedrock-2023-05-31",
-        "max_tokens": 4000,
-        "temperature": 0.7,
-        "system": SYSTEM_PROMPT,
-        "messages": [{"role": "user", "content": [{"type": "text", "text": prompt}]}]
-    })
+        body = json.dumps({
+            "anthropic_version": "bedrock-2023-05-31",
+            "max_tokens": 4000,
+            "temperature": 0.7,
+            "system": SYSTEM_PROMPT,
+            "messages": [{"role": "user", "content": [{"type": "text", "text": prompt}]}]
+        })
 
-    response = bedrock.invoke_model(
-        modelId=MODEL_ID, body=body, contentType="application/json"
-    )
+        response = bedrock.invoke_model(
+            modelId=MODEL_ID, body=body, contentType="application/json"
+        )
 
-    result = json.loads(response["body"].read())
-    full_text = "".join(block["text"] for block in result["content"] if block["type"] == "text")
+        result = json.loads(response["body"].read())
+        full_text = "".join(block["text"] for block in result["content"] if block["type"] == "text")
 
-    return jsonify({"response": full_text}), 200
+        return jsonify({"response": full_text}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == "__main__":
