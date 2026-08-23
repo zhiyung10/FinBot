@@ -4,7 +4,7 @@ from flask import Flask, request, jsonify, Response
 
 app = Flask(__name__)
 bedrock = boto3.client("bedrock-runtime", region_name="ap-southeast-1")
-MODEL_ID = "anthropic.claude-3-5-haiku-20241022-v1:0"
+MODEL_ID = "arn:aws:bedrock:ap-southeast-1:169588426492:inference-profile/global.anthropic.claude-haiku-4-5-20251001-v1:0"
 
 SYSTEM_PROMPT = """You are a professional financial analyst. Based on the user's income, expenses, assets, budget plan, and savings goal, generate a comprehensive professional financial health report.
 
@@ -48,21 +48,14 @@ def handler():
 
         prompt = f"Based on the user's income: {income}, expenses: {expenses}, assets: {assets}, budget plan: {budget_plan}, and savings goal: {savings_goal}, generate a comprehensive professional financial health report."
 
-        body = json.dumps({
-            "anthropic_version": "bedrock-2023-05-31",
-            "max_tokens": 4000,
-            "temperature": 0.7,
-            "system": SYSTEM_PROMPT,
-            "messages": [{"role": "user", "content": [{"type": "text", "text": prompt}]}]
-        })
-
-        response = bedrock.invoke_model(
-            modelId=MODEL_ID, body=body, contentType="application/json"
+        response = bedrock.converse(
+            modelId=MODEL_ID,
+            system=[{"text": SYSTEM_PROMPT}],
+            messages=[{"role": "user", "content": [{"text": prompt}]}],
+            inferenceConfig={"maxTokens": 4000, "temperature": 0.7}
         )
 
-        result = json.loads(response["body"].read())
-        full_text = "".join(block["text"] for block in result["content"] if block["type"] == "text")
-
+        full_text = response["output"]["message"]["content"][0]["text"]
         return jsonify({"response": full_text}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
