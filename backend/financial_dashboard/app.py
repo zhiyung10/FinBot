@@ -19,6 +19,12 @@ SYSTEM_PROMPT = """You are a professional financial analyst. Based on the user's
 
 Use tables and emoji icons to organize the information clearly and make it visually appealing. After the dashboard, provide a short financial summary of 3 to 5 sentences explaining the user's current financial condition in plain language."""
 
+CORS_HEADERS = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "POST,OPTIONS"
+}
+
 
 def generate(prompt):
     body = json.dumps({
@@ -39,14 +45,18 @@ def generate(prompt):
                 yield data["delta"].get("text", "")
 
 
+@app.after_request
+def add_cors(response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    response.headers["Access-Control-Allow-Methods"] = "POST,OPTIONS"
+    return response
+
+
 @app.route("/", methods=["POST", "OPTIONS"])
 def handler():
     if request.method == "OPTIONS":
-        return Response("", status=200, headers={
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Headers": "Content-Type",
-            "Access-Control-Allow-Methods": "POST,OPTIONS"
-        })
+        return Response("", status=200, headers=CORS_HEADERS)
 
     data = request.get_json(force=True)
     income = data.get("income", "")
@@ -58,11 +68,7 @@ def handler():
     return Response(
         stream_with_context(generate(prompt)),
         content_type="text/plain; charset=utf-8",
-        headers={
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Headers": "Content-Type",
-            "Access-Control-Allow-Methods": "POST,OPTIONS"
-        }
+        headers=CORS_HEADERS
     )
 
 

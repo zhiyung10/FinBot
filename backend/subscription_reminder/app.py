@@ -8,7 +8,7 @@ MODEL_ID = "ap-southeast-1.anthropic.claude-haiku-4-5-20251001-v1:0-20260217-v1:
 
 SYSTEM_PROMPT = """You are a subscription management assistant. Based on the user's subscriptions, carefully analyze all subscriptions and generate the following:
 
-1. Upcoming Payment Reminders — List all subscriptions with simulated renewal dates (assume today is the 1st of the current month). Display reminders in priority order from most urgent to least urgent. For example: Netflix renews in 3 days, Spotify payment is due tomorrow.
+1. Upcoming Payment Reminders — List all subscriptions with simulated renewal dates (assume today is the 1st of the current month). Display reminders in priority order from most urgent to least urgent.
 2. Monthly Subscription Total — Sum of all monthly subscription costs.
 3. Annual Subscription Total — Projected total cost over 12 months.
 4. Subscriptions That May No Longer Be Worth Paying — Based on typical value for money, flag any subscriptions that seem redundant, underused, or overpriced relative to their category.
@@ -36,14 +36,18 @@ def generate(prompt):
                 yield data["delta"].get("text", "")
 
 
+@app.after_request
+def add_cors(response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    response.headers["Access-Control-Allow-Methods"] = "POST,OPTIONS"
+    return response
+
+
 @app.route("/", methods=["POST", "OPTIONS"])
 def handler():
     if request.method == "OPTIONS":
-        return Response("", status=200, headers={
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Headers": "Content-Type",
-            "Access-Control-Allow-Methods": "POST,OPTIONS"
-        })
+        return Response("", status=200)
 
     data = request.get_json(force=True)
     subscriptions = data.get("subscriptions", "")
@@ -52,12 +56,7 @@ def handler():
 
     return Response(
         stream_with_context(generate(prompt)),
-        content_type="text/plain; charset=utf-8",
-        headers={
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Headers": "Content-Type",
-            "Access-Control-Allow-Methods": "POST,OPTIONS"
-        }
+        content_type="text/plain; charset=utf-8"
     )
 
 
