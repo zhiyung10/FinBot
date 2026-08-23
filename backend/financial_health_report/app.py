@@ -4,7 +4,7 @@ from flask import Flask, request, jsonify, Response
 
 app = Flask(__name__)
 bedrock = boto3.client("bedrock-runtime", region_name="ap-southeast-1")
-MODEL_ID = "ap-southeast-1.anthropic.claude-haiku-4-5-20251001-v1:0-20260217-v1:0"
+MODEL_ID = "anthropic.claude-3-5-haiku-20241022-v1:0"
 
 SYSTEM_PROMPT = """You are a professional financial analyst. Based on the user's income, expenses, assets, budget plan, and savings goal, generate a comprehensive professional financial health report.
 
