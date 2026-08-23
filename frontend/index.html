@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AI Personal Finance Advisor - Manage income, expenses, assets, and get AI-powered financial recommendations">
 <title>AI Personal Finance Advisor</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -170,35 +171,130 @@ body.light .compare-item .label { color: #777; }
   .welcome-grid { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 500px) { .welcome-grid { grid-template-columns: 1fr; } }
+
+/* ========== ACCESSIBILITY ========== */
+
+/* Screen reader only - visually hidden */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+/* Skip to content link */
+.skip-link { position: absolute; top: -100px; left: 0; background: #7c6ff7; color: #fff; padding: 12px 24px; z-index: 9999; font-size: 0.9rem; font-weight: 600; border-radius: 0 0 8px 0; transition: top 0.2s; }
+.skip-link:focus { top: 0; }
+
+/* Focus indicators (default) */
+*:focus-visible { outline: 2px solid #7c6ff7; outline-offset: 2px; border-radius: 4px; }
+
+/* Enhanced focus mode */
+body.enhanced-focus *:focus-visible { outline: 3px solid #fbbf24; outline-offset: 3px; box-shadow: 0 0 0 5px rgba(251,191,36,0.3); }
+
+/* High contrast mode */
+body.high-contrast { background: #000 !important; color: #fff !important; }
+body.high-contrast .sidebar { background: #0a0a0a !important; border-color: #fff !important; }
+body.high-contrast .main { background: #111 !important; }
+body.high-contrast .card { background: #1a1a1a !important; border-color: #888 !important; }
+body.high-contrast .summary-card { background: #1a1a1a !important; border-color: #888 !important; }
+body.high-contrast .welcome-card { background: #1a1a1a !important; border-color: #888 !important; }
+body.high-contrast .ai-output { background: #0a0a0a !important; border-color: #888 !important; color: #fff !important; }
+body.high-contrast textarea.input-field { background: #1a1a1a !important; border-color: #aaa !important; color: #fff !important; }
+body.high-contrast .page-header p { color: #ccc !important; }
+body.high-contrast .sc-label { color: #ccc !important; }
+body.high-contrast .sidebar-nav a { color: #ccc !important; }
+body.high-contrast .sidebar-nav a.active { background: #fff !important; color: #000 !important; }
+body.high-contrast .btn-primary { background: #fff !important; color: #000 !important; box-shadow: none !important; }
+body.high-contrast .btn-secondary { background: #333 !important; color: #fff !important; border: 1px solid #888 !important; }
+
+/* Color blind mode - add text indicators */
+body.color-blind .sc-value.green::after { content: ' (Income)'; font-size: 0.6rem; font-weight: 400; }
+body.color-blind .sc-value.red::after { content: ' (Expense)'; font-size: 0.6rem; font-weight: 400; }
+body.color-blind .sc-value.blue::after { content: ' (Balance)'; font-size: 0.6rem; font-weight: 400; }
+body.color-blind .sc-value.purple::after { content: ' (Assets)'; font-size: 0.6rem; font-weight: 400; }
+body.color-blind .sc-value.teal::after { content: ' (Rate)'; font-size: 0.6rem; font-weight: 400; }
+body.color-blind .sc-value.gold::after { content: ' (Score)'; font-size: 0.6rem; font-weight: 400; }
+body.color-blind .sc-value { text-decoration: underline; text-decoration-style: dotted; }
+
+/* Large text */
+body.large-text { font-size: 1.1rem; }
+body.large-text .sidebar-nav a { font-size: 0.92rem; padding: 13px 14px; }
+body.large-text textarea.input-field { font-size: 0.95rem; }
+body.large-text .btn { font-size: 0.95rem; padding: 14px 30px; }
+body.large-text .ai-output { font-size: 0.95rem; }
+body.large-text .sc-value { font-size: 1.6rem; }
+
+/* Extra large text */
+body.xl-text { font-size: 1.3rem; }
+body.xl-text .sidebar-nav a { font-size: 1rem; padding: 14px 16px; }
+body.xl-text textarea.input-field { font-size: 1.1rem; min-height: 220px; }
+body.xl-text .btn { font-size: 1.05rem; padding: 16px 34px; }
+body.xl-text .ai-output { font-size: 1.05rem; max-height: 600px; }
+body.xl-text .sc-value { font-size: 1.8rem; }
+body.xl-text .page-header h1 { font-size: 1.7rem; }
+
+/* Reduced motion */
+body.reduced-motion *, body.reduced-motion *::before, body.reduced-motion *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; } }
+
+/* Simplified interface */
+body.simplified .welcome-card .wc-icon { display: none; }
+body.simplified .nav-icon { display: none; }
+body.simplified .nav-step { display: none; }
+body.simplified .step-badge { display: none; }
+body.simplified .sidebar-tagline { display: none; }
+body.simplified .card { padding: 24px; margin-bottom: 24px; }
+body.simplified .page-header { margin-bottom: 32px; }
+body.simplified .page-header p { font-size: 0.9rem; line-height: 1.8; }
+body.simplified .summary-grid { gap: 20px; }
+body.simplified .welcome-grid { gap: 20px; }
+
+/* Accessibility settings toggle styles */
+.a11y-toggle-group { display: flex; flex-direction: column; gap: 14px; }
+.a11y-toggle { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); }
+.a11y-toggle-label { font-size: 0.85rem; color: rgba(255,255,255,0.8); }
+.a11y-toggle-desc { font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 2px; }
+.a11y-switch { position: relative; width: 44px; height: 24px; background: rgba(255,255,255,0.15); border-radius: 12px; cursor: pointer; transition: background 0.2s; border: none; padding: 0; }
+.a11y-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; background: #fff; border-radius: 50%; transition: transform 0.2s; }
+.a11y-switch.active { background: #7c6ff7; }
+.a11y-switch.active::after { transform: translateX(20px); }
+.a11y-switch:focus-visible { outline: 2px solid #fbbf24; outline-offset: 2px; }
+body.light .a11y-toggle { background: rgba(0,0,0,0.03); border-color: #e0e0e0; }
+body.light .a11y-toggle-label { color: #333; }
+body.light .a11y-toggle-desc { color: #888; }
+body.light .a11y-switch { background: #ddd; }
+
+/* Respect system preferences */
+@media (prefers-contrast: more) { body { --force-high-contrast: 1; } }
 </style>
 </head>
 <body>
 
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<div id="a11y-announce" role="status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
 <div class="app">
   <!-- Sidebar -->
-  <aside class="sidebar">
+  <aside class="sidebar" role="complementary" aria-label="Main navigation">
     <div class="sidebar-brand"><span>AI</span> Finance Advisor</div>
     <div class="sidebar-tagline">Smart personal finance management</div>
-    <ul class="sidebar-nav">
-      <li><a onclick="showPage('welcome')" data-page="welcome" class="active"><span class="nav-icon">&#127968;</span>Home</a></li>
-      <li><a onclick="showPage('inputs')" data-page="inputs"><span class="nav-icon">&#9999;&#65039;</span>My Finances<span class="nav-step">Step 1</span></a></li>
-      <li><a onclick="showPage('dashboard')" data-page="dashboard"><span class="nav-icon">&#128202;</span>Dashboard<span class="nav-step">Step 2</span></a></li>
-      <li><a onclick="showPage('budget')" data-page="budget"><span class="nav-icon">&#128176;</span>Budget Monitor<span class="nav-step">Step 3</span></a></li>
-      <li><a onclick="showPage('recommendation')" data-page="recommendation"><span class="nav-icon">&#129504;</span>Recommendations<span class="nav-step">Step 4</span></a></li>
-      <li><a onclick="showPage('health')" data-page="health"><span class="nav-icon">&#128200;</span>Health Report<span class="nav-step">Step 5</span></a></li>
-      <li><a onclick="showPage('subscription')" data-page="subscription"><span class="nav-icon">&#128276;</span>Subscriptions<span class="nav-step">Step 6</span></a></li>
-      <li><a onclick="showPage('advisor')" data-page="advisor"><span class="nav-icon">&#129302;</span>AI Advisor<span class="nav-step">Step 7</span></a></li>
-      <li style="margin-top:16px;padding:0 10px;font-size:0.65rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.5px;">Tools</li>
-      <li><a onclick="showPage('chart')" data-page="chart"><span class="nav-icon">&#128200;</span>Expense Chart</a></li>
-      <li><a onclick="showPage('savingsprogress')" data-page="savingsprogress"><span class="nav-icon">&#127919;</span>Savings Progress</a></li>
-      <li><a onclick="showPage('comparison')" data-page="comparison"><span class="nav-icon">&#128202;</span>Monthly Compare</a></li>
-      <li><a onclick="showPage('export')" data-page="export"><span class="nav-icon">&#128196;</span>Export PDF</a></li>
-      <li><a onclick="toggleTheme()"><span class="nav-icon">&#127769;</span>Dark/Light Mode</a></li>
+    <ul class="sidebar-nav" role="navigation" aria-label="Application pages">
+      <li><a onclick="showPage('welcome')" data-page="welcome" class="active" tabindex="0" role="button" aria-label="Home page" aria-current="page"><span class="nav-icon" aria-hidden="true">&#127968;</span>Home</a></li>
+      <li><a onclick="showPage('inputs')" data-page="inputs" tabindex="0" role="button" aria-label="Enter your financial information - Step 1"><span class="nav-icon" aria-hidden="true">&#9999;&#65039;</span>My Finances<span class="nav-step">Step 1</span></a></li>
+      <li><a onclick="showPage('dashboard')" data-page="dashboard" tabindex="0" role="button" aria-label="Financial dashboard - Step 2"><span class="nav-icon" aria-hidden="true">&#128202;</span>Dashboard<span class="nav-step">Step 2</span></a></li>
+      <li><a onclick="showPage('budget')" data-page="budget" tabindex="0" role="button" aria-label="Budget monitor - Step 3"><span class="nav-icon" aria-hidden="true">&#128176;</span>Budget Monitor<span class="nav-step">Step 3</span></a></li>
+      <li><a onclick="showPage('recommendation')" data-page="recommendation" tabindex="0" role="button" aria-label="AI recommendations - Step 4"><span class="nav-icon" aria-hidden="true">&#129504;</span>Recommendations<span class="nav-step">Step 4</span></a></li>
+      <li><a onclick="showPage('health')" data-page="health" tabindex="0" role="button" aria-label="Financial health report - Step 5"><span class="nav-icon" aria-hidden="true">&#128200;</span>Health Report<span class="nav-step">Step 5</span></a></li>
+      <li><a onclick="showPage('subscription')" data-page="subscription" tabindex="0" role="button" aria-label="Subscription reminders - Step 6"><span class="nav-icon" aria-hidden="true">&#128276;</span>Subscriptions<span class="nav-step">Step 6</span></a></li>
+      <li><a onclick="showPage('advisor')" data-page="advisor" tabindex="0" role="button" aria-label="AI financial advisor - Step 7"><span class="nav-icon" aria-hidden="true">&#129302;</span>AI Advisor<span class="nav-step">Step 7</span></a></li>
+      <li style="margin-top:16px;padding:0 10px;font-size:0.65rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.5px;" aria-hidden="true">Tools</li>
+      <li><a onclick="showPage('chart')" data-page="chart" tabindex="0" role="button" aria-label="Expense breakdown chart"><span class="nav-icon" aria-hidden="true">&#128200;</span>Expense Chart</a></li>
+      <li><a onclick="showPage('savingsprogress')" data-page="savingsprogress" tabindex="0" role="button" aria-label="Savings goal progress"><span class="nav-icon" aria-hidden="true">&#127919;</span>Savings Progress</a></li>
+      <li><a onclick="showPage('comparison')" data-page="comparison" tabindex="0" role="button" aria-label="Monthly financial comparison"><span class="nav-icon" aria-hidden="true">&#128202;</span>Monthly Compare</a></li>
+      <li><a onclick="showPage('export')" data-page="export" tabindex="0" role="button" aria-label="Export financial report"><span class="nav-icon" aria-hidden="true">&#128196;</span>Export PDF</a></li>
+      <li><a onclick="toggleTheme()" tabindex="0" role="button" aria-label="Toggle dark and light mode"><span class="nav-icon" aria-hidden="true">&#127769;</span>Dark/Light Mode</a></li>
+      <li><a onclick="showPage('accessibility')" data-page="accessibility" tabindex="0" role="button" aria-label="Accessibility settings"><span class="nav-icon">&#9855;</span>Accessibility</a></li>
     </ul>
   </aside>
 
   <!-- Main Content -->
-  <main class="main">
+  <main class="main" role="main" id="main-content">
 
     <!-- PAGE: Welcome -->
     <div class="page active" id="page-welcome">
@@ -448,7 +544,58 @@ body.light .compare-item .label { color: #777; }
         </ul>
       </div>
       <div class="btn-group">
-        <button class="btn btn-primary" onclick="exportReport()">&#128190; Download Report (.txt)</button>
+        <button class="btn btn-primary" onclick="exportReport()" aria-label="Download financial report as text file">&#128190; Download Report (.txt)</button>
+      </div>
+    </div>
+
+    <!-- PAGE: Accessibility Settings -->
+    <div class="page" id="page-accessibility">
+      <div class="page-header">
+        <h1>&#9855; Accessibility Settings</h1>
+        <p>Customize the app to make it more comfortable for your needs. All preferences are saved automatically.</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">&#127912;</span> Display &amp; Vision</div>
+        <div class="a11y-toggle-group">
+          <div class="a11y-toggle">
+            <div><div class="a11y-toggle-label">High Contrast Mode</div><div class="a11y-toggle-desc">Increase contrast between text and background</div></div>
+            <button class="a11y-switch" id="toggleHighContrast" onclick="toggleA11y('high-contrast')" role="switch" aria-checked="false" aria-label="Toggle high contrast mode"></button>
+          </div>
+          <div class="a11y-toggle">
+            <div><div class="a11y-toggle-label">Color Blind Friendly Mode</div><div class="a11y-toggle-desc">Add text labels alongside color indicators</div></div>
+            <button class="a11y-switch" id="toggleColorBlind" onclick="toggleA11y('color-blind')" role="switch" aria-checked="false" aria-label="Toggle color blind friendly mode"></button>
+          </div>
+          <div class="a11y-toggle">
+            <div><div class="a11y-toggle-label">Enhanced Focus Indicators</div><div class="a11y-toggle-desc">Show thicker, more visible focus outlines for keyboard users</div></div>
+            <button class="a11y-switch" id="toggleEnhancedFocus" onclick="toggleA11y('enhanced-focus')" role="switch" aria-checked="false" aria-label="Toggle enhanced focus indicators"></button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">&#128221;</span> Text &amp; Readability</div>
+        <div class="a11y-toggle-group">
+          <div class="a11y-toggle">
+            <div><div class="a11y-toggle-label">Large Text</div><div class="a11y-toggle-desc">Increase font size for easier reading</div></div>
+            <button class="a11y-switch" id="toggleLargeText" onclick="toggleA11y('large-text')" role="switch" aria-checked="false" aria-label="Toggle large text"></button>
+          </div>
+          <div class="a11y-toggle">
+            <div><div class="a11y-toggle-label">Extra Large Text</div><div class="a11y-toggle-desc">Maximum font size for low vision users</div></div>
+            <button class="a11y-switch" id="toggleXLText" onclick="toggleA11y('xl-text')" role="switch" aria-checked="false" aria-label="Toggle extra large text"></button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">&#129504;</span> Cognitive &amp; Motion</div>
+        <div class="a11y-toggle-group">
+          <div class="a11y-toggle">
+            <div><div class="a11y-toggle-label">Reduced Motion</div><div class="a11y-toggle-desc">Disable animations and transitions</div></div>
+            <button class="a11y-switch" id="toggleReducedMotion" onclick="toggleA11y('reduced-motion')" role="switch" aria-checked="false" aria-label="Toggle reduced motion"></button>
+          </div>
+          <div class="a11y-toggle">
+            <div><div class="a11y-toggle-label">Simplified Interface</div><div class="a11y-toggle-desc">Remove decorative elements, increase spacing, reduce clutter</div></div>
+            <button class="a11y-switch" id="toggleSimplified" onclick="toggleA11y('simplified')" role="switch" aria-checked="false" aria-label="Toggle simplified interface"></button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -469,11 +616,15 @@ const STREAM_URLS = {
 function showPage(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + pageId).classList.add('active');
-  document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+  document.querySelectorAll('.sidebar-nav a').forEach(a => { a.classList.remove('active'); a.removeAttribute('aria-current'); });
   const navLink = document.querySelector('[data-page="' + pageId + '"]');
-  if (navLink) navLink.classList.add('active');
+  if (navLink) { navLink.classList.add('active'); navLink.setAttribute('aria-current', 'page'); }
   window.scrollTo(0, 0);
   if (pageId === 'dashboard') updateLocalDashboard();
+  // Announce page change to screen readers
+  const pageEl = document.getElementById('page-' + pageId);
+  const heading = pageEl ? pageEl.querySelector('h1') : null;
+  if (heading) announce('Navigated to ' + heading.textContent.replace(/[^\w\s]/g, '').trim());
 }
 
 // Parse RM amounts from text
@@ -530,7 +681,9 @@ function renderInline(text) {
 // Fetch AI response (buffered JSON)
 async function fetchAI(url, body, panelId) {
   const panel = document.getElementById(panelId);
+  panel.setAttribute('aria-busy', 'true');
   panel.innerHTML = '<div class="loading-msg"><span class="spinner"></span>Generating AI response... (may take 10-20 seconds)</div>';
+  announce('Generating AI response, please wait.');
   try {
     const res = await fetch(url, {
       method: 'POST',
@@ -542,8 +695,12 @@ async function fetchAI(url, body, panelId) {
     if (data.error) throw new Error(data.error);
     panel.innerHTML = renderMarkdown(data.response || '');
     panel.scrollTop = 0;
+    panel.setAttribute('aria-busy', 'false');
+    announce('AI analysis complete. Results are now displayed.');
   } catch (err) {
-    panel.innerHTML = '<div class="error">&#9888; Error: ' + err.message + '</div>';
+    panel.innerHTML = '<div class="error" role="alert">&#9888; Error: ' + err.message + '</div>';
+    panel.setAttribute('aria-busy', 'false');
+    announce('Error: ' + err.message);
   }
 }
 
@@ -594,8 +751,80 @@ function runFeature(feature) {
 function toggleTheme() {
   document.body.classList.toggle('light');
   localStorage.setItem('theme', document.body.classList.contains('light') ? 'light' : 'dark');
+  announce('Theme changed to ' + (document.body.classList.contains('light') ? 'light' : 'dark') + ' mode');
 }
 if (localStorage.getItem('theme') === 'light') document.body.classList.add('light');
+
+// ========== ACCESSIBILITY ==========
+function announce(msg) {
+  const el = document.getElementById('a11y-announce');
+  if (el) { el.textContent = ''; setTimeout(() => { el.textContent = msg; }, 50); }
+}
+
+function toggleA11y(mode) {
+  // Handle mutually exclusive text sizes
+  if (mode === 'large-text' && document.body.classList.contains('xl-text')) {
+    document.body.classList.remove('xl-text');
+    updateSwitch('toggleXLText', false);
+    localStorage.removeItem('a11y-xl-text');
+  }
+  if (mode === 'xl-text' && document.body.classList.contains('large-text')) {
+    document.body.classList.remove('large-text');
+    updateSwitch('toggleLargeText', false);
+    localStorage.removeItem('a11y-large-text');
+  }
+
+  document.body.classList.toggle(mode);
+  const isActive = document.body.classList.contains(mode);
+
+  // Map mode to switch ID
+  const switchMap = {
+    'high-contrast': 'toggleHighContrast',
+    'color-blind': 'toggleColorBlind',
+    'enhanced-focus': 'toggleEnhancedFocus',
+    'large-text': 'toggleLargeText',
+    'xl-text': 'toggleXLText',
+    'reduced-motion': 'toggleReducedMotion',
+    'simplified': 'toggleSimplified'
+  };
+  updateSwitch(switchMap[mode], isActive);
+
+  // Save to localStorage
+  if (isActive) { localStorage.setItem('a11y-' + mode, '1'); }
+  else { localStorage.removeItem('a11y-' + mode); }
+
+  announce(mode.replace(/-/g, ' ') + (isActive ? ' enabled' : ' disabled'));
+}
+
+function updateSwitch(id, active) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (active) { el.classList.add('active'); el.setAttribute('aria-checked', 'true'); }
+  else { el.classList.remove('active'); el.setAttribute('aria-checked', 'false'); }
+}
+
+// Load saved accessibility preferences
+(function loadA11yPrefs() {
+  const modes = ['high-contrast','color-blind','enhanced-focus','large-text','xl-text','reduced-motion','simplified'];
+  const switchMap = {
+    'high-contrast': 'toggleHighContrast', 'color-blind': 'toggleColorBlind',
+    'enhanced-focus': 'toggleEnhancedFocus', 'large-text': 'toggleLargeText',
+    'xl-text': 'toggleXLText', 'reduced-motion': 'toggleReducedMotion', 'simplified': 'toggleSimplified'
+  };
+  modes.forEach(mode => {
+    if (localStorage.getItem('a11y-' + mode) === '1') {
+      document.body.classList.add(mode);
+      updateSwitch(switchMap[mode], true);
+    }
+  });
+  // Respect system preferences
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.body.classList.add('reduced-motion');
+  }
+  if (window.matchMedia('(prefers-contrast: more)').matches) {
+    document.body.classList.add('high-contrast');
+  }
+})();
 
 // Expense Pie Chart
 function generatePieChart() {
@@ -692,6 +921,28 @@ function exportReport() {
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
   a.download = 'Financial_Report_' + new Date().toISOString().split('T')[0] + '.txt'; a.click();
 }
+
+// Keyboard support for nav links (Enter/Space to activate)
+document.querySelectorAll('.sidebar-nav a[role="button"]').forEach(link => {
+  link.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.click(); }
+  });
+});
+
+// Keyboard support for welcome cards
+document.querySelectorAll('.welcome-card').forEach(card => {
+  card.setAttribute('tabindex', '0');
+  card.setAttribute('role', 'button');
+  card.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.click(); }
+  });
+});
+
+// Add aria-live to AI output panels
+document.querySelectorAll('.ai-output').forEach(panel => {
+  panel.setAttribute('aria-live', 'polite');
+  panel.setAttribute('aria-atomic', 'false');
+});
 </script>
 
 </body>
