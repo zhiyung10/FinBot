@@ -1,6 +1,6 @@
 import json
 import boto3
-from flask import Flask, request, Response, stream_with_context
+from flask import Flask, request, jsonify, Response
 
 app = Flask(__name__)
 bedrock = boto3.client("bedrock-runtime", region_name="ap-southeast-1")
@@ -15,25 +15,6 @@ SYSTEM_PROMPT = """You are a subscription management assistant. Based on the use
 5. Possible Cheaper Alternatives — For each expensive or flagged subscription, suggest at least one cheaper or free alternative with a brief explanation.
 
 Present all reminders clearly with priority ordering and use tables where appropriate to improve readability."""
-
-
-def generate(prompt):
-    body = json.dumps({
-        "anthropic_version": "bedrock-2023-05-31",
-        "max_tokens": 2048,
-        "temperature": 0.7,
-        "system": SYSTEM_PROMPT,
-        "messages": [{"role": "user", "content": [{"type": "text", "text": prompt}]}]
-    })
-    response = bedrock.invoke_model_with_response_stream(
-        modelId=MODEL_ID, body=body, contentType="application/json"
-    )
-    for event in response["body"]:
-        chunk = event.get("chunk")
-        if chunk:
-            data = json.loads(chunk["bytes"])
-            if data["type"] == "content_block_delta":
-                yield data["delta"].get("text", "")
 
 
 @app.after_request
@@ -54,10 +35,22 @@ def handler():
 
     prompt = f"Based on the user's subscriptions: {subscriptions}, carefully analyze all subscriptions and generate payment reminders, cost analysis, and alternatives."
 
-    return Response(
-        stream_with_context(generate(prompt)),
-        content_type="text/plain; charset=utf-8"
+    body = json.dumps({
+        "anthropic_version": "bedrock-2023-05-31",
+        "max_tokens": 2048,
+        "temperature": 0.7,
+        "system": SYSTEM_PROMPT,
+        "messages": [{"role": "user", "content": [{"type": "text", "text": prompt}]}]
+    })
+
+    response = bedrock.invoke_model(
+        modelId=MODEL_ID, body=body, contentType="application/json"
     )
+
+    result = json.loads(response["body"].read())
+    full_text = "".join(block["text"] for block in result["content"] if block["type"] == "text")
+
+    return jsonify({"response": full_text}), 200
 
 
 if __name__ == "__main__":

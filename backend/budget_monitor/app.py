@@ -1,6 +1,6 @@
 import json
 import boto3
-from flask import Flask, request, Response, stream_with_context
+from flask import Flask, request, jsonify, Response
 
 app = Flask(__name__)
 bedrock = boto3.client("bedrock-runtime", region_name="ap-southeast-1")
@@ -22,25 +22,6 @@ Calculate and display clearly:
 Provide at least 3 practical, specific recommendations to help the user stay within their budget limits. Use tables and text-based visual indicators where helpful."""
 
 
-def generate(prompt):
-    body = json.dumps({
-        "anthropic_version": "bedrock-2023-05-31",
-        "max_tokens": 2048,
-        "temperature": 0.7,
-        "system": SYSTEM_PROMPT,
-        "messages": [{"role": "user", "content": [{"type": "text", "text": prompt}]}]
-    })
-    response = bedrock.invoke_model_with_response_stream(
-        modelId=MODEL_ID, body=body, contentType="application/json"
-    )
-    for event in response["body"]:
-        chunk = event.get("chunk")
-        if chunk:
-            data = json.loads(chunk["bytes"])
-            if data["type"] == "content_block_delta":
-                yield data["delta"].get("text", "")
-
-
 @app.after_request
 def add_cors(response):
     response.headers["Access-Control-Allow-Origin"] = "*"
@@ -60,10 +41,22 @@ def handler():
 
     prompt = f"Based on the user's expenses: {expenses} and budget plan: {budget_plan}, analyze spending against the selected budget limits."
 
-    return Response(
-        stream_with_context(generate(prompt)),
-        content_type="text/plain; charset=utf-8"
+    body = json.dumps({
+        "anthropic_version": "bedrock-2023-05-31",
+        "max_tokens": 2048,
+        "temperature": 0.7,
+        "system": SYSTEM_PROMPT,
+        "messages": [{"role": "user", "content": [{"type": "text", "text": prompt}]}]
+    })
+
+    response = bedrock.invoke_model(
+        modelId=MODEL_ID, body=body, contentType="application/json"
     )
+
+    result = json.loads(response["body"].read())
+    full_text = "".join(block["text"] for block in result["content"] if block["type"] == "text")
+
+    return jsonify({"response": full_text}), 200
 
 
 if __name__ == "__main__":

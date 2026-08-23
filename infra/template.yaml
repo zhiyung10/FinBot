@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: AI Personal Finance Advisor - Streaming Lambda Functions + S3 Frontend
+Description: AI Personal Finance Advisor - Lambda Functions + S3 Frontend
 
 Globals:
   Function:
@@ -9,9 +9,6 @@ Globals:
     Runtime: python3.12
 
 Resources:
-  # ============================================
-  # IAM Role for Bedrock Access
-  # ============================================
   AppBedrockRole:
     Type: AWS::IAM::Role
     Properties:
@@ -39,9 +36,6 @@ Resources:
                   - !Sub "arn:aws:bedrock:*::foundation-model/anthropic.claude-haiku-4-5-20251001-v1:0-20260217-v1:0"
                   - "arn:aws:bedrock:*::foundation-model/anthropic.claude-haiku-4-5-20251001-v1:0-20260217-v1:0"
 
-  # ============================================
-  # Lambda Function 1: Financial Dashboard
-  # ============================================
   FinancialDashboardFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -53,15 +47,11 @@ Resources:
       Environment:
         Variables:
           AWS_LAMBDA_EXEC_WRAPPER: /opt/bootstrap
-          AWS_LWA_INVOKE_MODE: response_stream
           PORT: "8080"
       FunctionUrlConfig:
         AuthType: NONE
-        InvokeMode: RESPONSE_STREAM
+        InvokeMode: BUFFERED
 
-  # ============================================
-  # Lambda Function 2: Budget Monitor
-  # ============================================
   BudgetMonitorFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -73,15 +63,11 @@ Resources:
       Environment:
         Variables:
           AWS_LAMBDA_EXEC_WRAPPER: /opt/bootstrap
-          AWS_LWA_INVOKE_MODE: response_stream
           PORT: "8080"
       FunctionUrlConfig:
         AuthType: NONE
-        InvokeMode: RESPONSE_STREAM
+        InvokeMode: BUFFERED
 
-  # ============================================
-  # Lambda Function 3: AI Financial Recommendation
-  # ============================================
   AIFinancialRecommendationFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -93,15 +79,11 @@ Resources:
       Environment:
         Variables:
           AWS_LAMBDA_EXEC_WRAPPER: /opt/bootstrap
-          AWS_LWA_INVOKE_MODE: response_stream
           PORT: "8080"
       FunctionUrlConfig:
         AuthType: NONE
-        InvokeMode: RESPONSE_STREAM
+        InvokeMode: BUFFERED
 
-  # ============================================
-  # Lambda Function 4: Financial Health Report
-  # ============================================
   FinancialHealthReportFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -113,15 +95,11 @@ Resources:
       Environment:
         Variables:
           AWS_LAMBDA_EXEC_WRAPPER: /opt/bootstrap
-          AWS_LWA_INVOKE_MODE: response_stream
           PORT: "8080"
       FunctionUrlConfig:
         AuthType: NONE
-        InvokeMode: RESPONSE_STREAM
+        InvokeMode: BUFFERED
 
-  # ============================================
-  # Lambda Function 5: Subscription Reminder
-  # ============================================
   SubscriptionReminderFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -133,15 +111,11 @@ Resources:
       Environment:
         Variables:
           AWS_LAMBDA_EXEC_WRAPPER: /opt/bootstrap
-          AWS_LWA_INVOKE_MODE: response_stream
           PORT: "8080"
       FunctionUrlConfig:
         AuthType: NONE
-        InvokeMode: RESPONSE_STREAM
+        InvokeMode: BUFFERED
 
-  # ============================================
-  # Lambda Function 6: AI Financial Advisor & Discussions
-  # ============================================
   AIFinancialAdvisorFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -153,15 +127,11 @@ Resources:
       Environment:
         Variables:
           AWS_LAMBDA_EXEC_WRAPPER: /opt/bootstrap
-          AWS_LWA_INVOKE_MODE: response_stream
           PORT: "8080"
       FunctionUrlConfig:
         AuthType: NONE
-        InvokeMode: RESPONSE_STREAM
+        InvokeMode: BUFFERED
 
-  # ============================================
-  # S3 Bucket for Frontend Static Website
-  # ============================================
   FrontendBucket:
     Type: AWS::S3::Bucket
     Properties:
@@ -188,33 +158,18 @@ Resources:
 
 Outputs:
   FinancialDashboardUrl:
-    Description: Function URL for Financial Dashboard
     Value: !GetAtt FinancialDashboardFunctionUrl.FunctionUrl
-
   BudgetMonitorUrl:
-    Description: Function URL for Budget Monitor
     Value: !GetAtt BudgetMonitorFunctionUrl.FunctionUrl
-
   AIFinancialRecommendationUrl:
-    Description: Function URL for AI Financial Recommendation
     Value: !GetAtt AIFinancialRecommendationFunctionUrl.FunctionUrl
-
   FinancialHealthReportUrl:
-    Description: Function URL for Financial Health Report
     Value: !GetAtt FinancialHealthReportFunctionUrl.FunctionUrl
-
   SubscriptionReminderUrl:
-    Description: Function URL for Subscription Reminder
     Value: !GetAtt SubscriptionReminderFunctionUrl.FunctionUrl
-
   AIFinancialAdvisorUrl:
-    Description: Function URL for AI Financial Advisor & Discussions
     Value: !GetAtt AIFinancialAdvisorFunctionUrl.FunctionUrl
-
   WebsiteUrl:
-    Description: Frontend S3 Website URL
     Value: !GetAtt FrontendBucket.WebsiteURL
-
   BucketName:
-    Description: Frontend S3 Bucket Name
     Value: !Ref FrontendBucket

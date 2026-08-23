@@ -1,6 +1,6 @@
 import json
 import boto3
-from flask import Flask, request, Response, stream_with_context
+from flask import Flask, request, jsonify, Response
 
 app = Flask(__name__)
 bedrock = boto3.client("bedrock-runtime", region_name="ap-southeast-1")
@@ -19,31 +19,6 @@ SYSTEM_PROMPT = """You are a professional financial analyst. Based on the user's
 
 Use tables and emoji icons to organize the information clearly and make it visually appealing. After the dashboard, provide a short financial summary of 3 to 5 sentences explaining the user's current financial condition in plain language."""
 
-CORS_HEADERS = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "Content-Type",
-    "Access-Control-Allow-Methods": "POST,OPTIONS"
-}
-
-
-def generate(prompt):
-    body = json.dumps({
-        "anthropic_version": "bedrock-2023-05-31",
-        "max_tokens": 2048,
-        "temperature": 0.7,
-        "system": SYSTEM_PROMPT,
-        "messages": [{"role": "user", "content": [{"type": "text", "text": prompt}]}]
-    })
-    response = bedrock.invoke_model_with_response_stream(
-        modelId=MODEL_ID, body=body, contentType="application/json"
-    )
-    for event in response["body"]:
-        chunk = event.get("chunk")
-        if chunk:
-            data = json.loads(chunk["bytes"])
-            if data["type"] == "content_block_delta":
-                yield data["delta"].get("text", "")
-
 
 @app.after_request
 def add_cors(response):
@@ -56,7 +31,7 @@ def add_cors(response):
 @app.route("/", methods=["POST", "OPTIONS"])
 def handler():
     if request.method == "OPTIONS":
-        return Response("", status=200, headers=CORS_HEADERS)
+        return Response("", status=200)
 
     data = request.get_json(force=True)
     income = data.get("income", "")
@@ -65,11 +40,22 @@ def handler():
 
     prompt = f"Based on the user's income: {income}, expenses: {expenses}, and assets: {assets}, generate a well-organized financial dashboard."
 
-    return Response(
-        stream_with_context(generate(prompt)),
-        content_type="text/plain; charset=utf-8",
-        headers=CORS_HEADERS
+    body = json.dumps({
+        "anthropic_version": "bedrock-2023-05-31",
+        "max_tokens": 2048,
+        "temperature": 0.7,
+        "system": SYSTEM_PROMPT,
+        "messages": [{"role": "user", "content": [{"type": "text", "text": prompt}]}]
+    })
+
+    response = bedrock.invoke_model(
+        modelId=MODEL_ID, body=body, contentType="application/json"
     )
+
+    result = json.loads(response["body"].read())
+    full_text = "".join(block["text"] for block in result["content"] if block["type"] == "text")
+
+    return jsonify({"response": full_text}), 200
 
 
 if __name__ == "__main__":
