@@ -109,6 +109,54 @@ textarea.input-field::placeholder { color: rgba(255,255,255,0.25); line-height: 
 .sc-value.teal { color: #2dd4bf; }
 .sc-value.gold { color: #fbbf24; }
 
+/* Pie Chart */
+.pie-container { display: flex; align-items: center; gap: 30px; flex-wrap: wrap; justify-content: center; }
+.pie-svg { width: 220px; height: 220px; }
+.pie-legend { list-style: none; }
+.pie-legend li { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 0.8rem; color: rgba(255,255,255,0.7); }
+.pie-legend .dot { width: 12px; height: 12px; border-radius: 3px; }
+
+/* Progress Bar */
+.progress-container { margin-bottom: 16px; }
+.progress-label { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 6px; color: rgba(255,255,255,0.7); }
+.progress-bar { height: 20px; background: rgba(255,255,255,0.06); border-radius: 10px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 10px; transition: width 0.5s ease; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 600; color: #fff; }
+
+/* Comparison */
+.compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.compare-col h3 { font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-bottom: 12px; text-align: center; }
+.compare-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 0.8rem; }
+.compare-item .label { color: rgba(255,255,255,0.5); }
+.compare-item .value { font-weight: 600; }
+
+/* Light theme */
+body.light { background: #f0f2f8; color: #333; }
+body.light .sidebar { background: #fff; border-right-color: #e0e0e0; }
+body.light .sidebar-brand { color: #222; }
+body.light .sidebar-tagline { color: #888; }
+body.light .sidebar-nav a { color: #666; }
+body.light .sidebar-nav a:hover { background: rgba(124,111,247,0.08); color: #333; }
+body.light .sidebar-nav a.active { color: #fff; }
+body.light .main { background: #f5f7fc; }
+body.light .page-header h1 { color: #222; }
+body.light .page-header p { color: #666; }
+body.light .card { background: #fff; border-color: #e8e8f0; }
+body.light .card-title { color: #444; }
+body.light textarea.input-field { background: #f9f9fc; border-color: #ddd; color: #333; }
+body.light textarea.input-field::placeholder { color: #999; }
+body.light .summary-card { background: #fff; border-color: #e8e8f0; }
+body.light .sc-label { color: #777; }
+body.light .ai-output { background: #f9f9fc; border-color: #e8e8f0; color: #333; }
+body.light .ai-output h1, body.light .ai-output h2, body.light .ai-output h3 { color: #222; }
+body.light .ai-output strong { color: #333; }
+body.light .welcome-card { background: #fff; border-color: #e8e8f0; }
+body.light .welcome-card h3 { color: #222; }
+body.light .welcome-card p { color: #777; }
+body.light .pie-legend li { color: #555; }
+body.light .progress-bar { background: #e8e8f0; }
+body.light .compare-item { border-color: #e8e8f0; }
+body.light .compare-item .label { color: #777; }
+
 /* Responsive */
 @media (max-width: 900px) {
   .sidebar { width: 100%; height: auto; position: relative; flex-direction: row; padding: 12px; overflow-x: auto; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); }
@@ -140,6 +188,12 @@ textarea.input-field::placeholder { color: rgba(255,255,255,0.25); line-height: 
       <li><a onclick="showPage('health')" data-page="health"><span class="nav-icon">&#128200;</span>Health Report<span class="nav-step">Step 5</span></a></li>
       <li><a onclick="showPage('subscription')" data-page="subscription"><span class="nav-icon">&#128276;</span>Subscriptions<span class="nav-step">Step 6</span></a></li>
       <li><a onclick="showPage('advisor')" data-page="advisor"><span class="nav-icon">&#129302;</span>AI Advisor<span class="nav-step">Step 7</span></a></li>
+      <li style="margin-top:16px;padding:0 10px;font-size:0.65rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.5px;">Tools</li>
+      <li><a onclick="showPage('chart')" data-page="chart"><span class="nav-icon">&#128200;</span>Expense Chart</a></li>
+      <li><a onclick="showPage('savingsprogress')" data-page="savingsprogress"><span class="nav-icon">&#127919;</span>Savings Progress</a></li>
+      <li><a onclick="showPage('comparison')" data-page="comparison"><span class="nav-icon">&#128202;</span>Monthly Compare</a></li>
+      <li><a onclick="showPage('export')" data-page="export"><span class="nav-icon">&#128196;</span>Export PDF</a></li>
+      <li><a onclick="toggleTheme()"><span class="nav-icon">&#127769;</span>Dark/Light Mode</a></li>
     </ul>
   </aside>
 
@@ -314,12 +368,88 @@ textarea.input-field::placeholder { color: rgba(255,255,255,0.25); line-height: 
       </div>
       <div class="card">
         <div class="card-title"><span class="icon">&#128172;</span> Your Question</div>
-        <textarea class="input-field" id="adviseInput" placeholder="Ask a financial scenario question:&#10;&#10;Examples:&#10;• My PTPTN loan is RM40,000. How much can I pay monthly to settle it early?&#10;• Can I afford a RM300 monthly car loan?&#10;• If I buy a RM2,000 laptop, how will it affect my budget?&#10;• If my salary increases by RM500, how should I allocate it?&#10;• What happens if I lose 20% of my income?&#10;• Can I afford a RM5,000 vacation this year?"></textarea>
+        <textarea class="input-field" id="adviseInput" placeholder="Ask a financial scenario question:&#10;&#10;Examples:&#10;ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ My PTPTN loan is RM40,000. How much can I pay monthly to settle it early?&#10;ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ Can I afford a RM300 monthly car loan?&#10;ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ If I buy a RM2,000 laptop, how will it affect my budget?&#10;ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ If my salary increases by RM500, how should I allocate it?&#10;ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ What happens if I lose 20% of my income?&#10;ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ Can I afford a RM5,000 vacation this year?"></textarea>
       </div>
       <div class="btn-group">
         <button class="btn btn-primary" onclick="runFeature('advisor')">&#9654; Get AI Analysis</button>
       </div>
       <div class="ai-output" id="outputAdvisor"><span class="placeholder">Type your financial question above and click "Get AI Analysis".<br>The AI uses all your financial data to provide personalized advice.</span></div>
+    </div>
+
+    <!-- PAGE: Expense Chart -->
+    <div class="page" id="page-chart">
+      <div class="page-header">
+        <h1>&#128200; Expense Breakdown Chart</h1>
+        <p>Visual pie chart showing where your money goes each month. Parsed from your expense input.</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">&#128201;</span> Spending by Category</div>
+        <div class="pie-container" id="pieChart">
+          <p style="color:rgba(255,255,255,0.3);text-align:center;width:100%;padding:40px;">Enter expenses in Step 1 to see your chart.</p>
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="generatePieChart()">&#9654; Generate Chart</button>
+        <button class="btn btn-secondary" onclick="showPage('inputs')">&#8592; Edit Expenses</button>
+      </div>
+    </div>
+
+    <!-- PAGE: Savings Progress -->
+    <div class="page" id="page-savingsprogress">
+      <div class="page-header">
+        <h1>&#127919; Savings Goal Progress</h1>
+        <p>Track how close you are to reaching your savings goal with a visual progress bar.</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">&#127942;</span> Your Progress</div>
+        <div id="savingsProgressArea">
+          <p style="color:rgba(255,255,255,0.3);text-align:center;padding:40px;">Fill in Savings Goal Planner (Step 5) to see your progress.</p>
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="generateSavingsProgress()">&#9654; Calculate Progress</button>
+        <button class="btn btn-secondary" onclick="showPage('health')">&#8592; Edit Savings Goal</button>
+      </div>
+    </div>
+
+    <!-- PAGE: Monthly Comparison -->
+    <div class="page" id="page-comparison">
+      <div class="page-header">
+        <h1>&#128202; Monthly Comparison</h1>
+        <p>Compare two months of financial data side by side. Enter data for both months below.</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">&#128197;</span> Month A (e.g., Last Month)</div>
+        <textarea class="input-field" id="monthAInput" style="min-height:120px;" placeholder="Enter last month's data:&#10;Income RM4500&#10;Food RM500&#10;Transport RM300&#10;Rental RM800&#10;Utilities RM150"></textarea>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">&#128197;</span> Month B (e.g., This Month)</div>
+        <textarea class="input-field" id="monthBInput" style="min-height:120px;" placeholder="Enter this month's data:&#10;Income RM4800&#10;Food RM600&#10;Transport RM350&#10;Rental RM800&#10;Utilities RM180"></textarea>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="generateComparison()">&#9654; Compare</button>
+      </div>
+      <div class="card" id="comparisonResult" style="margin-top:20px;display:none;"></div>
+    </div>
+
+    <!-- PAGE: Export PDF -->
+    <div class="page" id="page-export">
+      <div class="page-header">
+        <h1>&#128196; Export Financial Report</h1>
+        <p>Download a text summary of all your financial data and AI analysis as a report.</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">&#128190;</span> What's Included</div>
+        <ul style="list-style:none;font-size:0.83rem;color:rgba(255,255,255,0.6);line-height:2;">
+          <li>&#9989; Income, Expenses, Assets summary</li>
+          <li>&#9989; Financial health score &amp; savings rate</li>
+          <li>&#9989; Budget plan &amp; savings goal</li>
+          <li>&#9989; Any AI analysis you've generated</li>
+        </ul>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="exportReport()">&#128190; Download Report (.txt)</button>
+      </div>
     </div>
 
   </main>
@@ -456,6 +586,111 @@ function runFeature(feature) {
       }, 'outputAdvisor');
       break;
   }
+}
+
+// ========== NEW FEATURES ==========
+
+// Dark/Light Mode Toggle
+function toggleTheme() {
+  document.body.classList.toggle('light');
+  localStorage.setItem('theme', document.body.classList.contains('light') ? 'light' : 'dark');
+}
+if (localStorage.getItem('theme') === 'light') document.body.classList.add('light');
+
+// Expense Pie Chart
+function generatePieChart() {
+  const text = document.getElementById('expenseInput').value;
+  if (!text.trim()) { alert('Please enter your expenses in Step 1 first.'); showPage('inputs'); return; }
+  const categories = {};
+  text.split('\n').forEach(line => {
+    const match = line.match(/(.+?)\s+RM\s?([\d,]+(\.\d+)?)/i);
+    if (match) {
+      const cat = match[1].trim();
+      const amt = parseFloat(match[2].replace(/,/g, ''));
+      if (!isNaN(amt)) categories[cat] = (categories[cat] || 0) + amt;
+    }
+  });
+  const entries = Object.entries(categories).sort((a, b) => b[1] - a[1]);
+  if (entries.length === 0) { alert('Could not parse. Use format: Category RM Amount'); return; }
+  const total = entries.reduce((s, e) => s + e[1], 0);
+  const colors = ['#7c6ff7','#f87171','#4ade80','#fbbf24','#60a5fa','#f472b6','#2dd4bf','#fb923c','#a78bfa','#34d399'];
+  let cum = 0, paths = '';
+  entries.forEach((entry, i) => {
+    const angle = (entry[1] / total) * 360;
+    const s = cum, e2 = cum + angle;
+    const la = angle > 180 ? 1 : 0;
+    const x1 = 110 + 90 * Math.cos((s - 90) * Math.PI / 180);
+    const y1 = 110 + 90 * Math.sin((s - 90) * Math.PI / 180);
+    const x2 = 110 + 90 * Math.cos((e2 - 90) * Math.PI / 180);
+    const y2 = 110 + 90 * Math.sin((e2 - 90) * Math.PI / 180);
+    paths += '<path d="M110,110 L'+x1+','+y1+' A90,90 0 '+la+',1 '+x2+','+y2+' Z" fill="'+colors[i%colors.length]+'"/>';
+    cum = e2;
+  });
+  let legend = '<ul class="pie-legend">';
+  entries.forEach((e, i) => {
+    legend += '<li><span class="dot" style="background:'+colors[i%colors.length]+'"></span>'+e[0]+' ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â RM'+e[1].toLocaleString()+' ('+((e[1]/total)*100).toFixed(1)+'%)</li>';
+  });
+  legend += '</ul>';
+  document.getElementById('pieChart').innerHTML = '<svg class="pie-svg" viewBox="0 0 220 220">'+paths+'</svg>'+legend;
+}
+
+// Savings Progress
+function generateSavingsProgress() {
+  const text = document.getElementById('savingsInput').value;
+  if (!text.trim()) { alert('Fill in Savings Goal in Step 5.'); showPage('health'); return; }
+  let target = 0, current = 0, monthly = 0, goal = 'Savings Goal';
+  const tm = text.match(/target.*?RM\s?([\d,]+)/i); if (tm) target = parseFloat(tm[1].replace(/,/g,''));
+  const cm = text.match(/current.*?RM\s?([\d,]+)/i); if (cm) current = parseFloat(cm[1].replace(/,/g,''));
+  const mm = text.match(/monthly.*?RM\s?([\d,]+)/i); if (mm) monthly = parseFloat(mm[1].replace(/,/g,''));
+  const gm = text.match(/saving for[:\s]*(.+)/i); if (gm) goal = gm[1].trim().slice(0,30);
+  if (target <= 0) { alert('Include "Target Amount: RM50000"'); return; }
+  const pct = Math.min(100, (current / target) * 100);
+  const remaining = Math.max(0, target - current);
+  const monthsLeft = monthly > 0 ? Math.ceil(remaining / monthly) : null;
+  const color = pct >= 75 ? '#4ade80' : pct >= 40 ? '#fbbf24' : '#f87171';
+  document.getElementById('savingsProgressArea').innerHTML = `
+    <div class="progress-container"><div class="progress-label"><span>${goal}</span><span>${pct.toFixed(1)}%</span></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${color};">RM${current.toLocaleString()}</div></div>
+    <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:rgba(255,255,255,0.4);margin-top:6px;"><span>RM0</span><span>Target: RM${target.toLocaleString()}</span></div></div>
+    <div style="margin-top:16px;font-size:0.83rem;color:rgba(255,255,255,0.6);">
+    <p>Remaining: <strong style="color:#fff;">RM${remaining.toLocaleString()}</strong></p>
+    ${monthly > 0 ? '<p>Monthly: <strong style="color:#fff;">RM'+monthly.toLocaleString()+'</strong></p>' : ''}
+    ${monthsLeft ? '<p>ETA: <strong style="color:#fff;">'+monthsLeft+' months</strong></p>' : ''}</div>`;
+}
+
+// Monthly Comparison
+function generateComparison() {
+  const textA = document.getElementById('monthAInput').value;
+  const textB = document.getElementById('monthBInput').value;
+  if (!textA.trim() || !textB.trim()) { alert('Enter data for both months.'); return; }
+  const totalA = parseAmounts(textA), totalB = parseAmounts(textB);
+  const diff = totalB - totalA;
+  const diffPct = totalA > 0 ? ((diff / totalA) * 100).toFixed(1) : '0';
+  const el = document.getElementById('comparisonResult');
+  el.style.display = 'block';
+  el.innerHTML = `<div class="card-title">Comparison Result</div>
+    <div class="compare-grid"><div class="compare-col"><h3>Month A</h3><div class="compare-item"><span class="label">Total</span><span class="value" style="color:#60a5fa;">RM${totalA.toLocaleString()}</span></div></div>
+    <div class="compare-col"><h3>Month B</h3><div class="compare-item"><span class="label">Total</span><span class="value" style="color:#a78bfa;">RM${totalB.toLocaleString()}</span></div></div></div>
+    <div style="text-align:center;margin-top:16px;padding:12px;background:rgba(255,255,255,0.03);border-radius:10px;">
+    <p style="font-size:0.8rem;color:rgba(255,255,255,0.5);">Difference</p>
+    <p style="font-size:1.3rem;font-weight:700;color:${diff>=0?'#f87171':'#4ade80'};">${diff>=0?'+':''}RM${Math.abs(diff).toLocaleString()} (${diff>=0?'+':''}${diffPct}%)</p>
+    <p style="font-size:0.75rem;color:rgba(255,255,255,0.4);margin-top:4px;">${diff>0?'Spending increased':diff<0?'Spending decreased!':'No change'}</p></div>`;
+}
+
+// Export Report
+function exportReport() {
+  const income = document.getElementById('incomeInput').value || '(not entered)';
+  const expenses = document.getElementById('expenseInput').value || '(not entered)';
+  const assets = document.getElementById('assetInput').value || '(not entered)';
+  const subs = document.getElementById('subscriptionInput').value || '(not entered)';
+  const budget = document.getElementById('budgetInput').value || '(not entered)';
+  const savings = document.getElementById('savingsInput').value || '(not entered)';
+  const ti = parseAmounts(income), te = parseAmounts(expenses), ta = parseAmounts(assets);
+  const bal = ti - te, sr = ti > 0 ? ((bal/ti)*100).toFixed(1) : '0';
+  const report = `AI PERSONAL FINANCE ADVISOR - REPORT\nGenerated: ${new Date().toLocaleString()}\n${'='.repeat(50)}\n\nFINANCIAL SUMMARY\nTotal Income: RM${ti.toLocaleString()}\nTotal Expenses: RM${te.toLocaleString()}\nBalance: RM${bal.toLocaleString()}\nAssets: RM${ta.toLocaleString()}\nSavings Rate: ${sr}%\n\nINCOME:\n${income}\n\nEXPENSES:\n${expenses}\n\nASSETS:\n${assets}\n\nSUBSCRIPTIONS:\n${subs}\n\nBUDGET PLAN:\n${budget}\n\nSAVINGS GOAL:\n${savings}\n\n${'='.repeat(50)}\nEnd of Report`;
+  const blob = new Blob([report], { type: 'text/plain' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'Financial_Report_' + new Date().toISOString().split('T')[0] + '.txt'; a.click();
 }
 </script>
 
