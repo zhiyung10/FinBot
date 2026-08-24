@@ -271,6 +271,20 @@ body.sr-optimized .sc-value.purple::before { content: 'Assets: '; font-size: 0.7
 body.sr-optimized .sc-value.teal::before { content: 'Savings: '; font-size: 0.7rem; font-weight: 400; }
 body.sr-optimized .sc-value.gold::before { content: 'Health: '; font-size: 0.7rem; font-weight: 400; }
 
+/* Quick Input Bars */
+.quick-add-bar { margin-bottom: 12px; }
+.quick-add-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.quick-add-select { padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: #1e2139; color: #e0e4f0; font-size: 0.82rem; min-width: 160px; cursor: pointer; }
+.quick-add-select:focus { outline: none; border-color: #7c6ff7; }
+.quick-add-custom { padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: #1e2139; color: #e0e4f0; font-size: 0.82rem; width: 140px; }
+.quick-add-custom:focus { outline: none; border-color: #7c6ff7; }
+.quick-add-amount { padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: #1e2139; color: #e0e4f0; font-size: 0.82rem; width: 120px; }
+.quick-add-amount:focus { outline: none; border-color: #7c6ff7; }
+.quick-add-freq { padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: #1e2139; color: #e0e4f0; font-size: 0.82rem; width: 110px; }
+.quick-add-btn { padding: 10px 16px !important; font-size: 0.8rem !important; min-height: auto !important; border-radius: 8px !important; white-space: nowrap; }
+body.light .quick-add-select, body.light .quick-add-custom, body.light .quick-add-amount, body.light .quick-add-freq { background: #f9f9fc; border-color: #ddd; color: #333; }
+@media (max-width: 600px) { .quick-add-row { flex-direction: column; } .quick-add-select, .quick-add-amount, .quick-add-freq, .quick-add-custom { width: 100%; } }
+
 /* Voice Recognition */
 .voice-mic-btn { min-width: 44px; min-height: 44px; font-size: 1.1rem; border-radius: 50%; padding: 8px; transition: all 0.2s; }
 .voice-mic-btn.voice-active { background: #ef4444 !important; color: #fff !important; animation: voicePulse 1s infinite; }
@@ -1126,6 +1140,8 @@ if (ocrZone) {
 <script src="js/receipt-ocr.js"></script>
 <!-- Voice Recognition Module -->
 <script src="js/voice-control.js"></script>
+<!-- Quick Input Module -->
+<script src="js/quick-input.js"></script>
 
 </body>
 </html>
