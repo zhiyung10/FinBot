@@ -923,7 +923,7 @@ function generatePieChart() {
   });
   let legend = '<ul class="pie-legend">';
   entries.forEach((e, i) => {
-    legend += '<li><span class="dot" style="background:'+colors[i%colors.length]+'"></span>'+e[0]+' ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â RM'+e[1].toLocaleString()+' ('+((e[1]/total)*100).toFixed(1)+'%)</li>';
+    legend += '<li><span class="dot" style="background:'+colors[i%colors.length]+'"></span>'+e[0]+' RM'+e[1].toLocaleString()+' ('+((e[1]/total)*100).toFixed(1)+'%)</li>';
   });
   legend += '</ul>';
   document.getElementById('pieChart').innerHTML = '<svg class="pie-svg" viewBox="0 0 220 220">'+paths+'</svg>'+legend;
