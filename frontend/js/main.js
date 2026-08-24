@@ -140,13 +140,81 @@ async function fetchAI(url, body, panelId) {
       console.error('[FinBot] AI Error:', { url: url.replace(/https?:\/\/[^/]+/, '[endpoint]'), error: data.error });
       throw new Error(data.error);
     }
-    panel.innerHTML = renderMarkdown(data.response||'');
+
+    // Handle structured insight (from dashboard)
+    if (data.insight && panelId === 'outputDashboard') {
+      panel.innerHTML = renderInsight(data.insight);
+    } else {
+      // Other AI features still use markdown
+      panel.innerHTML = renderMarkdown(data.response || '');
+    }
+
     panel.setAttribute('aria-busy','false');
     announce('AI analysis complete.');
   } catch (err) {
     panel.innerHTML = '<div class="error">⚠ Error: '+err.message+'</div>';
     panel.setAttribute('aria-busy','false');
     announce('Error: '+err.message);
+  }
+}
+
+/**
+ * Render structured AI insight (no Markdown)
+ */
+function renderInsight(insight) {
+  try {
+    const score = insight.healthScore || 50;
+    const status = insight.healthStatus || 'Fair';
+    const summary = insight.summary || 'Financial data received.';
+    const priority = insight.priorityInsight || null;
+    const recs = (insight.recommendations || []).slice(0, 3);
+
+    // Score color
+    let scoreColor = 'var(--green, #10b981)';
+    if (score < 40) scoreColor = 'var(--red, #ef4444)';
+    else if (score < 60) scoreColor = 'var(--yellow, #f59e0b)';
+    else if (score < 75) scoreColor = 'var(--blue, #6366f1)';
+
+    // Priority type icon
+    let prIcon = '✓', prColor = 'var(--green, #10b981)';
+    if (priority && priority.type === 'warning') { prIcon = '⚠'; prColor = 'var(--yellow, #f59e0b)'; }
+    if (priority && priority.type === 'critical') { prIcon = '⛔'; prColor = 'var(--red, #ef4444)'; }
+
+    let html = '<div class="insight-result">';
+
+    // Health score
+    html += '<div class="insight-score" style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">';
+    html += '<div style="width:56px;height:56px;border-radius:50%;border:3px solid '+scoreColor+';display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:700;color:'+scoreColor+';">'+score+'</div>';
+    html += '<div><div style="font-size:0.9rem;font-weight:600;color:var(--text, #e0e4f0);">Financial Health: '+status+'</div>';
+    html += '<div style="font-size:0.82rem;color:var(--text-secondary, rgba(255,255,255,0.6));margin-top:2px;">'+summary+'</div></div>';
+    html += '</div>';
+
+    // Priority insight
+    if (priority && priority.title) {
+      html += '<div style="padding:12px 16px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);margin-bottom:14px;">';
+      html += '<div style="font-size:0.85rem;font-weight:600;color:'+prColor+';margin-bottom:4px;">'+prIcon+' '+priority.title+'</div>';
+      html += '<div style="font-size:0.82rem;color:var(--text-secondary, rgba(255,255,255,0.6));">'+(priority.message || '')+'</div>';
+      html += '</div>';
+    }
+
+    // Recommendations
+    if (recs.length > 0) {
+      html += '<div style="font-size:0.78rem;font-weight:600;color:var(--text-secondary, rgba(255,255,255,0.5));text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Recommendations</div>';
+      html += '<ul style="list-style:none;padding:0;margin:0;">';
+      recs.forEach(r => {
+        html += '<li style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:0.83rem;">';
+        html += '<strong style="color:var(--text, #e0e4f0);">'+r.title+'</strong><br>';
+        html += '<span style="color:var(--text-secondary, rgba(255,255,255,0.6));">'+(r.description || '')+'</span>';
+        html += '</li>';
+      });
+      html += '</ul>';
+    }
+
+    html += '</div>';
+    return html;
+  } catch (e) {
+    console.error('[FinBot] renderInsight error:', e);
+    return '<p style="font-size:0.85rem;color:var(--text-secondary);">FinBot is preparing your financial insight.</p>';
   }
 }
 
@@ -259,13 +327,34 @@ function generateHomeInsight(forceRefresh) {
     body: JSON.stringify({ income, expenses, assets })
   }).then(r => r.json()).then(data => {
     if (data.error) throw new Error(data.error);
-    // Extract first 3-4 sentences as insight
-    const fullText = data.response || '';
-    const sentences = fullText.split(/[.!]\s/).slice(0, 4).join('. ') + '.';
-    const html = '<p style="font-size:0.85rem;color:var(--text);line-height:1.7;">' + sentences + '</p>';
-    document.getElementById('aiInsightContent').innerHTML = html;
-    localStorage.setItem(INSIGHT_KEY, html);
-    localStorage.setItem(INSIGHT_DATA_KEY, dataHash);
+
+    // Handle structured insight JSON
+    if (data.insight) {
+      const i = data.insight;
+      let html = '<p style="font-size:0.85rem;color:var(--text);line-height:1.7;">';
+      const scoreColor = i.healthScore >= 75 ? 'var(--green)' : i.healthScore >= 50 ? 'var(--yellow)' : 'var(--red)';
+      html += '<strong style="color:'+scoreColor+';">Health Score: ' + i.healthScore + '/100 — ' + (i.healthStatus || '') + '</strong><br>';
+      html += (i.summary || '') + '<br><br>';
+      if (i.priorityInsight && i.priorityInsight.title) {
+        html += '<strong>' + i.priorityInsight.title + '</strong><br>' + (i.priorityInsight.message || '') + '<br><br>';
+      }
+      if (i.recommendations && i.recommendations.length > 0) {
+        html += '<em>Recommendations:</em><br>';
+        i.recommendations.slice(0, 3).forEach(r => { html += '• ' + r.title + '<br>'; });
+      }
+      html += '</p>';
+      document.getElementById('aiInsightContent').innerHTML = html;
+      localStorage.setItem(INSIGHT_KEY, html);
+      localStorage.setItem(INSIGHT_DATA_KEY, dataHash);
+    } else {
+      // Fallback: old-style response text (strip markdown artifacts)
+      const fullText = (data.response || '').replace(/[#*|`]/g, '').replace(/---+/g, '').trim();
+      const sentences = fullText.split(/[.!]\s/).slice(0, 4).join('. ') + '.';
+      const html = '<p style="font-size:0.85rem;color:var(--text);line-height:1.7;">' + sentences + '</p>';
+      document.getElementById('aiInsightContent').innerHTML = html;
+      localStorage.setItem(INSIGHT_KEY, html);
+      localStorage.setItem(INSIGHT_DATA_KEY, dataHash);
+    }
   }).catch(err => {
     // Fallback to local insight on error
     generateHomeInsight.localFallback = true;
