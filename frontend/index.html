@@ -263,6 +263,38 @@ body.light .a11y-switch { background: #ddd; }
 /* Respect system preferences */
 @media (prefers-contrast: more) { body { --force-high-contrast: 1; } }
 
+/* Screen reader optimized mode */
+body.sr-optimized .sc-value.green::before { content: 'Income: '; font-size: 0.7rem; font-weight: 400; }
+body.sr-optimized .sc-value.red::before { content: 'Expense: '; font-size: 0.7rem; font-weight: 400; }
+body.sr-optimized .sc-value.blue::before { content: 'Balance: '; font-size: 0.7rem; font-weight: 400; }
+body.sr-optimized .sc-value.purple::before { content: 'Assets: '; font-size: 0.7rem; font-weight: 400; }
+body.sr-optimized .sc-value.teal::before { content: 'Savings: '; font-size: 0.7rem; font-weight: 400; }
+body.sr-optimized .sc-value.gold::before { content: 'Health: '; font-size: 0.7rem; font-weight: 400; }
+
+/* Voice Recognition */
+.voice-mic-btn { min-width: 44px; min-height: 44px; font-size: 1.1rem; border-radius: 50%; padding: 8px; transition: all 0.2s; }
+.voice-mic-btn.voice-active { background: #ef4444 !important; color: #fff !important; animation: voicePulse 1s infinite; }
+@keyframes voicePulse { 0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); } 50% { box-shadow: 0 0 0 8px rgba(239,68,68,0); } }
+.voice-feedback { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 10px; font-size: 0.85rem; font-weight: 500; z-index: 9999; max-width: 90vw; text-align: center; display: none; }
+.voice-feedback-success { background: #166534; color: #4ade80; border: 1px solid #22c55e; }
+.voice-feedback-error { background: #7f1d1d; color: #fca5a5; border: 1px solid #ef4444; }
+.voice-feedback-info { background: #1e3a5f; color: #93c5fd; border: 1px solid #3b82f6; }
+body.light .voice-feedback-success { background: #dcfce7; color: #166534; }
+body.light .voice-feedback-error { background: #fef2f2; color: #991b1b; }
+body.light .voice-feedback-info { background: #eff6ff; color: #1e40af; }
+.voice-confirm-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9998; align-items: center; justify-content: center; padding: 20px; }
+.voice-confirm-box { background: #252842; border-radius: 16px; padding: 24px; max-width: 400px; width: 100%; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
+.voice-confirm-box p { font-size: 0.9rem; color: rgba(255,255,255,0.8); margin-bottom: 20px; }
+.voice-confirm-box .btn-group { justify-content: center; }
+body.light .voice-confirm-box { background: #fff; border-color: #e0e0e0; }
+body.light .voice-confirm-box p { color: #333; }
+.voice-command-bar { position: fixed; bottom: 70px; right: 20px; z-index: 200; }
+.voice-command-btn { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #7c6ff7, #5b4ee8); color: #fff; border: none; font-size: 1.4rem; cursor: pointer; box-shadow: 0 4px 20px rgba(124,111,247,0.4); transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+.voice-command-btn:hover { transform: scale(1.05); }
+.voice-command-btn:focus-visible { outline: 3px solid #fbbf24; outline-offset: 3px; }
+.voice-command-btn.voice-active { background: linear-gradient(135deg, #ef4444, #dc2626); animation: voicePulse 1s infinite; }
+.voice-indicator { font-size: 0.7rem; color: rgba(255,255,255,0.5); text-align: center; margin-top: 4px; }
+
 /* OCR Receipt Scanner */
 .ocr-upload-zone { border: 2px dashed rgba(255,255,255,0.15); border-radius: 12px; padding: 40px 20px; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
 .ocr-upload-zone:hover, .ocr-upload-zone:focus { border-color: #7c6ff7; background: rgba(124,111,247,0.05); }
@@ -663,9 +695,40 @@ body.light .ocr-raw-text { background: #f5f5f5; color: #666; }
           </div>
         </div>
       </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">&#127908;</span> Voice &amp; Screen Reader</div>
+        <div class="a11y-toggle-group">
+          <div class="a11y-toggle">
+            <div><div class="a11y-toggle-label">Voice Recognition</div><div class="a11y-toggle-desc">Control the app with voice commands. Uses browser Speech API (no audio uploaded).</div></div>
+            <button class="a11y-switch" id="toggleVoice" onclick="toggleVoiceFeature()" role="switch" aria-checked="false" aria-label="Toggle voice recognition"></button>
+          </div>
+          <div class="a11y-toggle">
+            <div><div class="a11y-toggle-label">Screen Reader Optimization</div><div class="a11y-toggle-desc">Enhanced descriptions and announcements for screen reader users</div></div>
+            <button class="a11y-switch" id="toggleScreenReader" onclick="toggleA11y('sr-optimized')" role="switch" aria-checked="false" aria-label="Toggle screen reader optimization"></button>
+          </div>
+        </div>
+      </div>
     </div>
 
   </main>
+</div>
+
+<!-- Voice Recognition UI Elements -->
+<div class="voice-command-bar" id="voiceCommandBar">
+  <button class="voice-command-btn" id="voiceMainBtn" onclick="startVoiceInput('command')" aria-label="Start voice command" title="Voice Command (say 'Open dashboard', 'Analyze budget', etc.)">🎤</button>
+  <div class="voice-indicator" id="voiceMainIndicator" aria-hidden="true">🎤</div>
+</div>
+
+<div id="voiceFeedback" class="voice-feedback" role="status" aria-live="polite" aria-atomic="true"></div>
+
+<div class="voice-confirm-overlay" id="voiceConfirmModal" role="dialog" aria-labelledby="voiceConfirmMessage" aria-modal="true">
+  <div class="voice-confirm-box">
+    <p id="voiceConfirmMessage">Confirm action?</p>
+    <div class="btn-group">
+      <button class="btn btn-primary voice-confirm-yes" onclick="confirmVoiceAction()" aria-label="Confirm action">Confirm</button>
+      <button class="btn btn-secondary" onclick="cancelVoiceAction()" aria-label="Cancel action">Cancel</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -892,6 +955,42 @@ function updateSwitch(id, active) {
   }
 })();
 
+// Voice feature toggle (show/hide floating button)
+function toggleVoiceFeature() {
+  const bar = document.getElementById('voiceCommandBar');
+  const btn = document.getElementById('toggleVoice');
+  const isActive = bar.style.display !== 'none';
+  
+  if (isActive) {
+    bar.style.display = 'none';
+    if (btn) { btn.classList.remove('active'); btn.setAttribute('aria-checked', 'false'); }
+    localStorage.removeItem('a11y-voice');
+    announce('Voice recognition disabled.');
+  } else {
+    if (!isVoiceSupported()) {
+      alert('Voice recognition is not supported in your browser. Please use Chrome or Edge.');
+      return;
+    }
+    bar.style.display = 'block';
+    if (btn) { btn.classList.add('active'); btn.setAttribute('aria-checked', 'true'); }
+    localStorage.setItem('a11y-voice', '1');
+    announce('Voice recognition enabled. Click the microphone button or say a command.');
+  }
+}
+
+// Load voice preference
+(function loadVoicePref() {
+  const bar = document.getElementById('voiceCommandBar');
+  if (bar) {
+    if (localStorage.getItem('a11y-voice') === '1' && isVoiceSupported()) {
+      bar.style.display = 'block';
+      updateSwitch('toggleVoice', true);
+    } else {
+      bar.style.display = 'none';
+    }
+  }
+})();
+
 // Expense Pie Chart
 function generatePieChart() {
   const text = document.getElementById('expenseInput').value;
@@ -1023,6 +1122,8 @@ if (ocrZone) {
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <!-- Receipt OCR Module -->
 <script src="js/receipt-ocr.js"></script>
+<!-- Voice Recognition Module -->
+<script src="js/voice-control.js"></script>
 
 </body>
 </html>
