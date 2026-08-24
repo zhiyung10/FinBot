@@ -88,34 +88,66 @@ function initAutoSave() {
 
 // ========== 2. CURRENCY CONVERTER ==========
 
-const EXCHANGE_RATES = {
-  // Approximate rates (RM base)
-  'USD': 0.21,
-  'SGD': 0.28,
-  'GBP': 0.17,
-  'EUR': 0.20,
-  'IDR': 3300,
-  'THB': 7.5,
-  'JPY': 32,
-  'AUD': 0.32,
-  'CNY': 1.53,
-};
+// (Removed - feature was not needed)
 
-function convertCurrency() {
-  const amount = parseFloat(document.getElementById('convertAmount').value);
-  const targetCurrency = document.getElementById('convertTo').value;
-  const resultEl = document.getElementById('convertResult');
+// ========== BUDGET QUICK-SELECT ==========
+
+/**
+ * Set budget from the dropdown selector
+ */
+function setBudgetFromSelect() {
+  const type = document.getElementById('budgetType').value;
+  const amount = parseFloat(document.getElementById('budgetAmountInput').value);
 
   if (isNaN(amount) || amount <= 0) {
-    resultEl.textContent = 'Enter a valid amount.';
+    alert('Please enter a valid budget amount greater than 0.');
+    document.getElementById('budgetAmountInput').focus();
     return;
   }
 
-  const rate = EXCHANGE_RATES[targetCurrency];
-  if (!rate) { resultEl.textContent = 'Currency not supported.'; return; }
+  const typeLabels = { daily: 'Daily', weekly: 'Weekly', monthly: 'Monthly' };
+  const label = typeLabels[type] || 'Monthly';
 
-  const converted = (amount * rate).toFixed(2);
-  resultEl.innerHTML = `<strong>RM${amount.toLocaleString()}</strong> = <strong>${targetCurrency} ${parseFloat(converted).toLocaleString()}</strong><br><span style="font-size:0.75rem;color:rgba(255,255,255,0.4);">Rate: 1 RM = ${rate} ${targetCurrency} (approximate)</span>`;
+  // Build the budget text and set it in the textarea
+  const budgetText = `${label} Limit: RM${amount.toFixed(2)}`;
+  const textarea = document.getElementById('budgetInput');
+
+  // Append or replace
+  if (textarea.value.trim() && !textarea.value.includes('Limit:')) {
+    textarea.value = budgetText + '\n' + textarea.value;
+  } else {
+    textarea.value = budgetText;
+  }
+
+  // Calculate breakdowns
+  let daily, weekly, monthly;
+  if (type === 'monthly') {
+    monthly = amount;
+    weekly = (amount / 4.33).toFixed(2);
+    daily = (amount / 30).toFixed(2);
+  } else if (type === 'weekly') {
+    weekly = amount;
+    monthly = (amount * 4.33).toFixed(2);
+    daily = (amount / 7).toFixed(2);
+  } else {
+    daily = amount;
+    weekly = (amount * 7).toFixed(2);
+    monthly = (amount * 30).toFixed(2);
+  }
+
+  // Show the display
+  const display = document.getElementById('budgetDisplay');
+  display.style.display = 'block';
+  display.innerHTML = `
+    <strong>&#9989; Budget Set: ${label} Limit RM${amount.toFixed(2)}</strong><br>
+    <span style="font-size:0.8rem;opacity:0.8;">
+      Daily: RM${daily} &nbsp;|&nbsp; Weekly: RM${weekly} &nbsp;|&nbsp; Monthly: RM${monthly}
+    </span>
+  `;
+
+  // Save
+  if (typeof saveAllData === 'function') saveAllData();
+  if (typeof announce === 'function') announce('Budget set: ' + label + ' limit RM' + amount.toFixed(2));
 }
 
 // ========== 3. SPENDING TRENDS (Multi-month) ==========

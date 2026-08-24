@@ -277,6 +277,20 @@ body.sr-optimized .sc-value.gold::before { content: 'Health: '; font-size: 0.7re
 .budget-prog-fill { height: 100%; border-radius: 6px; transition: width 0.5s ease; }
 .budget-prog-info { display: flex; justify-content: space-between; font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-top: 6px; }
 
+/* Budget Selector */
+.budget-select-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.budget-select { padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: #1e2139; color: #e0e4f0; font-size: 0.85rem; cursor: pointer; }
+.budget-select:focus { outline: none; border-color: #7c6ff7; }
+.budget-amount-wrap { display: flex; align-items: center; gap: 0; }
+.budget-rm-label { padding: 10px 10px; background: rgba(124,111,247,0.15); color: #a89ff7; border-radius: 8px 0 0 8px; font-size: 0.85rem; font-weight: 600; border: 1px solid rgba(255,255,255,0.1); border-right: none; }
+.budget-amount-input { padding: 10px 14px; border-radius: 0 8px 8px 0; border: 1px solid rgba(255,255,255,0.1); background: #1e2139; color: #e0e4f0; font-size: 0.85rem; width: 140px; }
+.budget-amount-input:focus { outline: none; border-color: #7c6ff7; }
+.budget-display { margin-top: 14px; padding: 12px 16px; background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.2); border-radius: 10px; font-size: 0.85rem; color: #4ade80; }
+body.light .budget-select, body.light .budget-amount-input { background: #f9f9fc; border-color: #ddd; color: #333; }
+body.light .budget-rm-label { background: rgba(124,111,247,0.08); border-color: #ddd; }
+body.light .budget-display { background: #f0fdf4; border-color: #86efac; color: #166534; }
+@media (max-width: 600px) { .budget-select-row { flex-direction: column; align-items: stretch; } .budget-amount-wrap { width: 100%; } .budget-amount-input { flex: 1; } }
+
 /* Trends Chart */
 .trends-empty { color: rgba(255,255,255,0.3); text-align: center; padding: 30px; font-size: 0.85rem; }
 .trends-grid { display: flex; align-items: flex-end; gap: 8px; height: 160px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
@@ -420,7 +434,6 @@ body.light .ocr-raw-text { background: #f5f5f5; color: #666; }
       <li><a onclick="showPage('export')" data-page="export" tabindex="0" role="button" aria-label="Export financial report"><span class="nav-icon" aria-hidden="true">&#128196;</span>Export PDF</a></li>
       <li><a onclick="showPage('receipt')" data-page="receipt" tabindex="0" role="button" aria-label="Scan receipt to extract expenses"><span class="nav-icon" aria-hidden="true">&#128247;</span>Receipt OCR</a></li>
       <li><a onclick="showPage('trends')" data-page="trends" tabindex="0" role="button" aria-label="View spending trends over time"><span class="nav-icon" aria-hidden="true">&#128200;</span>Spending Trends</a></li>
-      <li><a onclick="showPage('converter')" data-page="converter" tabindex="0" role="button" aria-label="Currency converter"><span class="nav-icon" aria-hidden="true">&#128177;</span>Currency Convert</a></li>
       <li><a onclick="toggleTheme()" tabindex="0" role="button" aria-label="Toggle dark and light mode"><span class="nav-icon" aria-hidden="true">&#127769;</span>Dark/Light Mode</a></li>
       <li><a onclick="showPage('accessibility')" data-page="accessibility" tabindex="0" role="button" aria-label="Accessibility settings"><span class="nav-icon">&#9855;</span>Accessibility</a></li>
     </ul>
@@ -541,13 +554,29 @@ body.light .ocr-raw-text { background: #f5f5f5; color: #666; }
         <p>Set spending limits and get AI-powered budget alerts and recommendations.</p>
       </div>
       <div class="card">
-        <div class="card-title"><span class="icon">&#128203;</span> Expense Limit Planner</div>
-        <textarea class="input-field" id="budgetInput" placeholder="Set your budget plan:&#10;&#10;Option 1 - Automatic:&#10;Monthly Budget: RM3000&#10;Breakdown: Daily&#10;&#10;Option 2 - Manual:&#10;Daily Limit: RM100&#10;Weekly Limit: RM600&#10;Monthly Limit: RM2500"></textarea>
+        <div class="card-title"><span class="icon">&#128203;</span> Set Your Budget Limit</div>
+        <div class="budget-select-row">
+          <select class="budget-select" id="budgetType" aria-label="Select budget limit type">
+            <option value="daily">Daily Limit</option>
+            <option value="weekly">Weekly Limit</option>
+            <option value="monthly" selected>Monthly Limit</option>
+          </select>
+          <div class="budget-amount-wrap">
+            <span class="budget-rm-label">RM</span>
+            <input type="number" class="budget-amount-input" id="budgetAmountInput" placeholder="Enter amount" min="0" step="0.01" aria-label="Budget limit amount in Ringgit">
+          </div>
+          <button class="btn btn-primary" onclick="setBudgetFromSelect()" aria-label="Set this budget limit">Set Limit</button>
+        </div>
+        <div id="budgetDisplay" class="budget-display" style="display:none;"></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">&#128221;</span> Additional Budget Notes (Optional)</div>
+        <textarea class="input-field" id="budgetInput" style="min-height:100px;" placeholder="Optional: Add extra budget details here.&#10;&#10;Example:&#10;Monthly Budget: RM3000&#10;Breakdown: Daily"></textarea>
       </div>
       <div class="btn-group">
         <button class="btn btn-primary" onclick="runFeature('budget')">&#9654; Analyze Budget</button>
       </div>
-      <div class="ai-output" id="outputBudget"><span class="placeholder">Set your budget limits above, then click "Analyze Budget".<br>Requires: Expenses + Budget Plan.</span></div>
+      <div class="ai-output" id="outputBudget"><span class="placeholder">Set your budget limit above, then click "Analyze Budget".<br>Requires: Expenses (Step 1) + Budget Limit.</span></div>
     </div>
 
     <!-- PAGE: AI Recommendation -->
@@ -701,34 +730,6 @@ body.light .ocr-raw-text { background: #f5f5f5; color: #666; }
       <div class="card">
         <div class="card-title"><span class="icon" aria-hidden="true">&#128202;</span> Monthly Income vs Expenses</div>
         <div id="trendsChart"></div>
-      </div>
-    </div>
-
-    <!-- PAGE: Currency Converter -->
-    <div class="page" id="page-converter">
-      <div class="page-header">
-        <h1>&#128177; Currency Converter</h1>
-        <p>Quick conversion from Malaysian Ringgit (RM) to other currencies. Rates are approximate.</p>
-      </div>
-      <div class="card">
-        <div class="card-title"><span class="icon" aria-hidden="true">&#128178;</span> Convert from RM</div>
-        <div class="converter-row">
-          <input type="number" class="converter-input" id="convertAmount" placeholder="Amount (RM)" min="0" step="0.01" aria-label="Amount in Ringgit to convert">
-          <span style="color:rgba(255,255,255,0.5);">&#8594;</span>
-          <select class="converter-select" id="convertTo" aria-label="Target currency">
-            <option value="USD">USD (US Dollar)</option>
-            <option value="SGD">SGD (Singapore Dollar)</option>
-            <option value="GBP">GBP (British Pound)</option>
-            <option value="EUR">EUR (Euro)</option>
-            <option value="IDR">IDR (Indonesian Rupiah)</option>
-            <option value="THB">THB (Thai Baht)</option>
-            <option value="JPY">JPY (Japanese Yen)</option>
-            <option value="AUD">AUD (Australian Dollar)</option>
-            <option value="CNY">CNY (Chinese Yuan)</option>
-          </select>
-          <button class="btn btn-primary" onclick="convertCurrency()" aria-label="Convert currency">Convert</button>
-        </div>
-        <div class="converter-result" id="convertResult"></div>
       </div>
     </div>
 
