@@ -3,414 +3,221 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="AI Personal Finance Advisor - Manage income, expenses, assets, and get AI-powered financial recommendations">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%237c6ff7'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-size='18' font-weight='bold' fill='white' font-family='Arial'%3E$%3C/text%3E%3C/svg%3E">
-<title>AI Personal Finance Advisor</title>
+<meta name="description" content="FinBot - AI Personal Finance Advisor. Manage income, expenses, assets, and get AI-powered financial insights.">
+<title>FinBot — AI Personal Finance Advisor</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #1a1d2e; color: #e0e4f0; line-height: 1.6; min-height: 100vh; }
+:root {
+  --bg: #f5f7fa; --card: #ffffff; --text: #1a1a2e; --text-secondary: #6b7280;
+  --accent: #6366f1; --accent-light: #eef2ff; --green: #10b981; --red: #ef4444;
+  --yellow: #f59e0b; --border: #e5e7eb; --shadow: 0 1px 3px rgba(0,0,0,0.06);
+  --radius: 16px; --sidebar-width: 240px;
+}
+body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; font-size: 14px; }
+
+/* Skip link & SR */
+.skip-link { position: absolute; top: -100px; left: 0; background: var(--accent); color: #fff; padding: 12px 24px; z-index: 9999; font-weight: 600; border-radius: 0 0 8px 0; }
+.skip-link:focus { top: 0; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
 /* Layout */
 .app { display: flex; min-height: 100vh; }
 
 /* Sidebar */
-.sidebar { width: 250px; background: #141625; padding: 20px 14px; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; overflow-y: auto; z-index: 100; border-right: 1px solid rgba(255,255,255,0.06); }
-.sidebar-brand { font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 8px; padding: 0 10px; }
-.sidebar-brand span { color: #7c6ff7; }
-.sidebar-tagline { font-size: 0.72rem; color: rgba(255,255,255,0.4); padding: 0 10px; margin-bottom: 24px; }
+.sidebar { width: var(--sidebar-width); background: var(--card); border-right: 1px solid var(--border); padding: 20px 12px; position: fixed; top: 0; left: 0; height: 100vh; overflow-y: auto; z-index: 100; display: flex; flex-direction: column; }
+.sidebar-brand { font-size: 1.2rem; font-weight: 800; color: var(--accent); padding: 0 12px 20px; }
 .sidebar-nav { list-style: none; flex: 1; }
 .sidebar-nav li { margin-bottom: 2px; }
-.sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 11px 12px; border-radius: 10px; color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.82rem; font-weight: 500; transition: all 0.2s; cursor: pointer; }
-.sidebar-nav a:hover { color: #fff; background: rgba(124,111,247,0.1); }
-.sidebar-nav a.active { color: #fff; background: #7c6ff7; box-shadow: 0 4px 15px rgba(124,111,247,0.3); }
-.sidebar-nav .nav-icon { width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; }
-.sidebar-nav .nav-step { font-size: 0.65rem; background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.5); padding: 1px 6px; border-radius: 4px; margin-left: auto; }
+.sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; color: var(--text-secondary); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: all 0.15s; cursor: pointer; }
+.sidebar-nav a:hover { color: var(--text); background: var(--accent-light); }
+.sidebar-nav a.active { color: var(--accent); background: var(--accent-light); font-weight: 600; }
+.sidebar-nav .nav-icon { font-size: 1.1rem; width: 22px; text-align: center; }
+.sidebar-nav .nav-divider { padding: 12px 12px 6px; font-size: 0.68rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
 
-/* Main Content */
-.main { margin-left: 250px; flex: 1; padding: 28px 36px; background: #1e2139; min-height: 100vh; }
+/* Main */
+.main { margin-left: var(--sidebar-width); flex: 1; padding: 24px 32px; min-height: 100vh; }
 
-/* Page views */
-.page { display: none; animation: pageIn 0.3s ease; }
+/* Pages */
+.page { display: none; animation: fadeIn 0.2s ease; max-width: 1100px; }
 .page.active { display: block; }
-@keyframes pageIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-/* Page header */
-.page-header { margin-bottom: 24px; }
-.page-header h1 { font-size: 1.4rem; color: #fff; font-weight: 700; margin-bottom: 6px; }
-.page-header p { font-size: 0.82rem; color: rgba(255,255,255,0.5); max-width: 600px; }
-.page-header .step-badge { display: inline-block; background: rgba(124,111,247,0.15); color: #a89ff7; padding: 3px 10px; border-radius: 6px; font-size: 0.72rem; font-weight: 600; margin-bottom: 8px; }
+/* Dashboard Header */
+.dash-header { margin-bottom: 28px; }
+.dash-header h1 { font-size: 1.5rem; font-weight: 700; color: var(--text); }
+.dash-header p { color: var(--text-secondary); font-size: 0.88rem; margin-top: 4px; }
 
 /* Cards */
-.card { background: #252842; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06); padding: 20px; margin-bottom: 20px; }
-.card-title { font-size: 0.88rem; font-weight: 600; color: rgba(255,255,255,0.8); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-.card-title .icon { font-size: 1.05rem; }
+.card { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); padding: 20px; box-shadow: var(--shadow); margin-bottom: 16px; }
+.card-sm { padding: 16px; }
+.card-title { font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 8px; }
+.card-value { font-size: 1.8rem; font-weight: 700; color: var(--text); }
+.card-value.green { color: var(--green); }
+.card-value.red { color: var(--red); }
+.card-change { font-size: 0.75rem; margin-top: 4px; }
+.card-change.up { color: var(--green); }
+.card-change.down { color: var(--red); }
+
+/* Grid layouts */
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 20px; }
+
+/* Page headers */
+.page-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 6px; }
+.page-desc { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 20px; max-width: 600px; }
+
+/* Tabs */
+.tabs { display: flex; gap: 4px; margin-bottom: 20px; background: #f0f1f5; border-radius: 10px; padding: 4px; }
+.tab { padding: 8px 16px; border-radius: 8px; font-size: 0.82rem; font-weight: 500; color: var(--text-secondary); cursor: pointer; transition: all 0.15s; border: none; background: none; }
+.tab.active { background: var(--card); color: var(--text); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.tab:hover:not(.active) { color: var(--text); }
 
 /* Inputs */
-textarea.input-field { width: 100%; min-height: 180px; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px 16px; font-size: 0.83rem; font-family: inherit; resize: vertical; background: #1e2139; color: #e0e4f0; transition: border-color 0.2s, box-shadow 0.2s; }
-textarea.input-field:focus { outline: none; border-color: #7c6ff7; box-shadow: 0 0 0 3px rgba(124,111,247,0.15); }
-textarea.input-field::placeholder { color: rgba(255,255,255,0.25); line-height: 1.5; }
+textarea.input-field { width: 100%; min-height: 160px; border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; font-size: 0.85rem; font-family: inherit; resize: vertical; background: var(--bg); color: var(--text); transition: border-color 0.2s; }
+textarea.input-field:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+textarea.input-field::placeholder { color: #9ca3af; }
 
 /* Buttons */
-.btn { border: none; padding: 12px 28px; border-radius: 10px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
-.btn-primary { background: linear-gradient(135deg, #7c6ff7, #5b4ee8); color: #fff; box-shadow: 0 4px 15px rgba(124,111,247,0.3); }
-.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(124,111,247,0.4); }
-.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-.btn-secondary { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7); }
-.btn-secondary:hover { background: rgba(255,255,255,0.1); color: #fff; }
-.btn-group { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+.btn { border: none; padding: 10px 20px; border-radius: 10px; font-weight: 600; font-size: 0.82rem; cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: #4f46e5; }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-secondary { background: var(--bg); color: var(--text-secondary); border: 1px solid var(--border); }
+.btn-secondary:hover { background: #e5e7eb; color: var(--text); }
+.btn-group { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
 
 /* AI Output */
-.ai-output { min-height: 200px; max-height: 500px; overflow-y: auto; padding: 16px; font-size: 0.83rem; background: #1a1d2e; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); color: #ccd0e0; margin-top: 16px; }
+.ai-output { min-height: 120px; max-height: 500px; overflow-y: auto; padding: 16px; font-size: 0.85rem; background: var(--bg); border-radius: 12px; border: 1px solid var(--border); color: var(--text); margin-top: 12px; line-height: 1.7; }
 .ai-output::-webkit-scrollbar { width: 4px; }
-.ai-output::-webkit-scrollbar-track { background: transparent; }
-.ai-output::-webkit-scrollbar-thumb { background: rgba(124,111,247,0.3); border-radius: 2px; }
-.ai-output .placeholder { color: rgba(255,255,255,0.2); text-align: center; padding: 60px 20px; font-size: 0.85rem; }
-.ai-output .error { color: #f76f6f; padding: 16px; }
+.ai-output::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 2px; }
+.ai-output .placeholder { color: #9ca3af; text-align: center; padding: 40px 20px; }
+.ai-output .error { color: var(--red); }
+.ai-output h1,.ai-output h2,.ai-output h3 { margin: 12px 0 6px; color: var(--text); }
+.ai-output h2 { font-size: 1rem; } .ai-output h3 { font-size: 0.9rem; }
+.ai-output strong { color: var(--text); }
+.ai-output code { background: var(--accent-light); padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; color: var(--accent); }
+.ai-output table { border-collapse: collapse; width: 100%; margin: 8px 0; font-size: 0.8rem; }
+.ai-output th,.ai-output td { border: 1px solid var(--border); padding: 8px; text-align: left; }
+.ai-output th { background: var(--bg); font-weight: 600; }
+.ai-output ul,.ai-output ol { margin: 6px 0 6px 18px; }
+.ai-output li { margin-bottom: 3px; }
+.ai-output hr { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
 
-/* Streaming */
-.md-line { display: block; animation: fadeIn 0.15s ease-in; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: translateY(0); } }
-.cursor-blink { display: inline-block; width: 2px; height: 1em; background: #7c6ff7; animation: blink 0.7s infinite; vertical-align: text-bottom; margin-left: 2px; }
-@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+/* Progress */
+.progress-track { height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
+.progress-fill.green { background: var(--green); }
+.progress-fill.yellow { background: var(--yellow); }
+.progress-fill.red { background: var(--red); }
 
-/* Markdown */
-.ai-output h1, .ai-output h2, .ai-output h3 { margin: 14px 0 8px; color: #fff; }
-.ai-output h1 { font-size: 1.1rem; } .ai-output h2 { font-size: 0.98rem; } .ai-output h3 { font-size: 0.9rem; }
-.ai-output strong { font-weight: 700; color: #e8e8f8; }
-.ai-output em { font-style: italic; color: #b0b4d0; }
-.ai-output code { background: rgba(124,111,247,0.1); padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; color: #a89ff7; }
-.ai-output ul, .ai-output ol { margin: 8px 0 8px 20px; }
-.ai-output li { margin-bottom: 4px; }
-.ai-output hr { border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 12px 0; }
-.ai-output table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 0.8rem; }
-.ai-output th, .ai-output td { border: 1px solid rgba(255,255,255,0.1); padding: 8px 10px; text-align: left; }
-.ai-output th { background: rgba(124,111,247,0.08); font-weight: 600; color: #c8c4f0; }
+/* Budget card */
+.budget-ring { width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1rem; }
 
 /* Spinner */
-.spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.15); border-top-color: #7c6ff7; border-radius: 50%; animation: spin 0.6s linear infinite; margin-right: 8px; vertical-align: middle; }
+.spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #e5e7eb; border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; margin-right: 6px; }
 @keyframes spin { to { transform: rotate(360deg); } }
-.loading-msg { color: rgba(255,255,255,0.4); font-size: 0.83rem; padding: 40px; text-align: center; }
+.loading-msg { color: var(--text-secondary); font-size: 0.85rem; padding: 30px; text-align: center; }
 
-/* Welcome page */
-.welcome-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 20px; }
-.welcome-card { background: #252842; border-radius: 14px; padding: 20px; border: 1px solid rgba(255,255,255,0.06); cursor: pointer; transition: all 0.2s; }
-.welcome-card:hover { border-color: rgba(124,111,247,0.3); transform: translateY(-2px); }
-.welcome-card .wc-icon { font-size: 1.8rem; margin-bottom: 10px; }
-.welcome-card h3 { font-size: 0.9rem; color: #fff; margin-bottom: 6px; }
-.welcome-card p { font-size: 0.75rem; color: rgba(255,255,255,0.4); }
+/* FAB (Quick Add) */
+.fab { position: fixed; bottom: 24px; right: 24px; width: 56px; height: 56px; border-radius: 50%; background: var(--accent); color: #fff; border: none; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 16px rgba(99,102,241,0.3); z-index: 200; display: flex; align-items: center; justify-content: center; transition: transform 0.15s; }
+.fab:hover { transform: scale(1.05); }
+.fab-menu { position: fixed; bottom: 90px; right: 24px; background: var(--card); border-radius: 12px; padding: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.12); border: 1px solid var(--border); z-index: 200; display: none; min-width: 180px; }
+.fab-menu.open { display: block; }
+.fab-menu a { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; color: var(--text); text-decoration: none; cursor: pointer; }
+.fab-menu a:hover { background: var(--accent-light); color: var(--accent); }
 
-/* Summary Cards */
-.summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 20px; }
-.summary-card { background: #252842; border-radius: 14px; padding: 18px; border: 1px solid rgba(255,255,255,0.06); text-align: center; }
-.sc-label { font-size: 0.72rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-.sc-value { font-size: 1.4rem; font-weight: 700; }
-.sc-value.green { color: #4ade80; }
-.sc-value.red { color: #f87171; }
-.sc-value.blue { color: #60a5fa; }
-.sc-value.purple { color: #a78bfa; }
-.sc-value.teal { color: #2dd4bf; }
-.sc-value.gold { color: #fbbf24; }
+/* Save status */
+.save-status { position: fixed; top: 12px; right: 12px; padding: 8px 16px; background: #dcfce7; color: #166534; border-radius: 8px; font-size: 0.78rem; font-weight: 500; z-index: 9000; display: none; border: 1px solid #86efac; }
 
-/* Pie Chart */
-.pie-container { display: flex; align-items: center; gap: 30px; flex-wrap: wrap; justify-content: center; }
-.pie-svg { width: 220px; height: 220px; }
+/* Voice */
+.voice-feedback { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); padding: 10px 20px; border-radius: 10px; font-size: 0.82rem; z-index: 9999; display: none; }
+.voice-feedback-success { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+.voice-feedback-error { background: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; }
+.voice-feedback-info { background: #eff6ff; color: #1e40af; border: 1px solid #93c5fd; }
+.voice-command-bar { position: fixed; bottom: 24px; left: 24px; z-index: 200; display: none; }
+.voice-command-btn { width: 48px; height: 48px; border-radius: 50%; background: var(--accent); color: #fff; border: none; font-size: 1.2rem; cursor: pointer; box-shadow: 0 4px 12px rgba(99,102,241,0.25); }
+.voice-mic-btn { min-width: 36px; min-height: 36px; border-radius: 50%; padding: 6px; font-size: 1rem; background: var(--bg); border: 1px solid var(--border); cursor: pointer; }
+.voice-mic-btn.voice-active { background: var(--red) !important; color: #fff !important; border-color: var(--red); animation: voicePulse 1s infinite; }
+@keyframes voicePulse { 0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.3); } 50% { box-shadow: 0 0 0 6px rgba(239,68,68,0); } }
+.voice-confirm-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 9998; align-items: center; justify-content: center; padding: 20px; }
+.voice-confirm-box { background: var(--card); border-radius: 16px; padding: 24px; max-width: 360px; width: 100%; text-align: center; }
+.voice-confirm-box p { margin-bottom: 16px; }
+.voice-indicator { font-size: 0.65rem; color: var(--text-secondary); text-align: center; margin-top: 4px; }
+
+/* Quick input */
+.quick-add-bar { margin-bottom: 10px; }
+.quick-add-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.quick-add-select,.quick-add-custom,.quick-add-amount,.quick-add-freq { padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 0.82rem; }
+.quick-add-select:focus,.quick-add-amount:focus { outline: none; border-color: var(--accent); }
+.quick-add-btn { padding: 8px 14px !important; font-size: 0.78rem !important; border-radius: 8px !important; }
+@media (max-width: 600px) { .quick-add-row { flex-direction: column; } .quick-add-select,.quick-add-amount,.quick-add-freq,.quick-add-custom { width: 100%; } }
+
+/* OCR */
+.ocr-upload-zone { border: 2px dashed var(--border); border-radius: 12px; padding: 30px; text-align: center; cursor: pointer; transition: border-color 0.2s; }
+.ocr-upload-zone:hover { border-color: var(--accent); }
+.ocr-total { background: #ecfdf5; border: 1px solid #6ee7b7; border-radius: 10px; padding: 12px; text-align: center; margin-bottom: 12px; }
+.ocr-total-value { font-size: 1.4rem; font-weight: 700; color: var(--green); }
+.ocr-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.ocr-chip { padding: 5px 12px; border-radius: 6px; font-size: 0.8rem; background: var(--bg); border: 1px solid var(--border); cursor: pointer; }
+.ocr-chip.selected { background: var(--accent); color: #fff; border-color: var(--accent); }
+.ocr-input { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); font-size: 0.85rem; margin-bottom: 8px; }
+
+/* Accessibility */
+*:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+body.high-contrast { --bg: #000; --card: #111; --text: #fff; --text-secondary: #ccc; --border: #555; }
+body.color-blind .card-value.green::after { content: ' (Income)'; font-size: 0.6rem; font-weight: 400; }
+body.color-blind .card-value.red::after { content: ' (Expense)'; font-size: 0.6rem; font-weight: 400; }
+body.large-text { font-size: 16px; }
+body.xl-text { font-size: 18px; }
+body.reduced-motion *,body.reduced-motion *::before,body.reduced-motion *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+body.enhanced-focus *:focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; }
+body.simplified .nav-icon { display: none; }
+body.sr-optimized .card-value::before { font-size: 0.6rem; font-weight: 400; color: var(--text-secondary); }
+@media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; } }
+@media print { .sidebar,.fab,.fab-menu,.voice-command-bar,.skip-link { display: none !important; } .main { margin-left: 0 !important; } body { background: #fff; } }
+
+/* A11y toggles */
+.a11y-toggle-group { display: flex; flex-direction: column; gap: 10px; }
+.a11y-toggle { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: var(--bg); border-radius: 10px; }
+.a11y-toggle-label { font-size: 0.85rem; font-weight: 500; }
+.a11y-toggle-desc { font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px; }
+.a11y-switch { width: 40px; height: 22px; background: #d1d5db; border-radius: 11px; cursor: pointer; border: none; position: relative; transition: background 0.2s; }
+.a11y-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; background: #fff; border-radius: 50%; transition: transform 0.2s; }
+.a11y-switch.active { background: var(--accent); }
+.a11y-switch.active::after { transform: translateX(18px); }
+
+/* Trends */
+.trends-grid { display: flex; align-items: flex-end; gap: 6px; height: 120px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+.trends-month { flex: 1; display: flex; flex-direction: column; align-items: center; }
+.trends-bars { display: flex; gap: 2px; align-items: flex-end; height: 100px; }
+.trends-bar { width: 12px; border-radius: 3px 3px 0 0; min-height: 3px; }
+.trends-bar.trends-income { background: var(--green); }
+.trends-bar.trends-expense { background: var(--red); }
+.trends-label { font-size: 0.6rem; color: var(--text-secondary); margin-top: 4px; }
+.trends-legend { display: flex; gap: 12px; justify-content: center; margin-top: 8px; font-size: 0.72rem; color: var(--text-secondary); }
+.trends-dot { width: 8px; height: 8px; border-radius: 2px; display: inline-block; margin-right: 4px; }
+
+/* Pie chart */
+.pie-container { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; justify-content: center; }
+.pie-svg { width: 160px; height: 160px; }
 .pie-legend { list-style: none; }
-.pie-legend li { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 0.8rem; color: rgba(255,255,255,0.7); }
-.pie-legend .dot { width: 12px; height: 12px; border-radius: 3px; }
-
-/* Progress Bar */
-.progress-container { margin-bottom: 16px; }
-.progress-label { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 6px; color: rgba(255,255,255,0.7); }
-.progress-bar { height: 20px; background: rgba(255,255,255,0.06); border-radius: 10px; overflow: hidden; }
-.progress-fill { height: 100%; border-radius: 10px; transition: width 0.5s ease; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 600; color: #fff; }
-
-/* Comparison */
-.compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.compare-col h3 { font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-bottom: 12px; text-align: center; }
-.compare-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 0.8rem; }
-.compare-item .label { color: rgba(255,255,255,0.5); }
-.compare-item .value { font-weight: 600; }
-
-/* Light theme */
-body.light { background: #f0f2f8; color: #333; }
-body.light .sidebar { background: #fff; border-right-color: #e0e0e0; }
-body.light .sidebar-brand { color: #222; }
-body.light .sidebar-tagline { color: #888; }
-body.light .sidebar-nav a { color: #666; }
-body.light .sidebar-nav a:hover { background: rgba(124,111,247,0.08); color: #333; }
-body.light .sidebar-nav a.active { color: #fff; }
-body.light .main { background: #f5f7fc; }
-body.light .page-header h1 { color: #222; }
-body.light .page-header p { color: #666; }
-body.light .card { background: #fff; border-color: #e8e8f0; }
-body.light .card-title { color: #444; }
-body.light textarea.input-field { background: #f9f9fc; border-color: #ddd; color: #333; }
-body.light textarea.input-field::placeholder { color: #999; }
-body.light .summary-card { background: #fff; border-color: #e8e8f0; }
-body.light .sc-label { color: #777; }
-body.light .ai-output { background: #f9f9fc; border-color: #e8e8f0; color: #333; }
-body.light .ai-output h1, body.light .ai-output h2, body.light .ai-output h3 { color: #222; }
-body.light .ai-output strong { color: #333; }
-body.light .welcome-card { background: #fff; border-color: #e8e8f0; }
-body.light .welcome-card h3 { color: #222; }
-body.light .welcome-card p { color: #777; }
-body.light .pie-legend li { color: #555; }
-body.light .progress-bar { background: #e8e8f0; }
-body.light .compare-item { border-color: #e8e8f0; }
-body.light .compare-item .label { color: #777; }
+.pie-legend li { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; font-size: 0.78rem; }
+.pie-legend .dot { width: 10px; height: 10px; border-radius: 3px; }
 
 /* Responsive */
 @media (max-width: 900px) {
-  .sidebar { width: 100%; height: auto; position: relative; flex-direction: row; padding: 12px; overflow-x: auto; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); }
-  .sidebar-brand, .sidebar-tagline { display: none; }
-  .sidebar-nav { display: flex; gap: 4px; flex: none; }
-  .sidebar-nav li { margin: 0; }
-  .sidebar-nav a { padding: 8px 12px; white-space: nowrap; font-size: 0.75rem; }
-  .sidebar-nav .nav-step { display: none; }
+  .sidebar { display: none; }
   .main { margin-left: 0; padding: 16px; }
-  .app { flex-direction: column; }
-  .welcome-grid { grid-template-columns: 1fr 1fr; }
+  .grid-3 { grid-template-columns: 1fr; }
+  .grid-2,.grid-2-1 { grid-template-columns: 1fr; }
+  .mobile-nav { display: flex !important; }
 }
-@media (max-width: 500px) { .welcome-grid { grid-template-columns: 1fr; } }
-
-/* ========== ACCESSIBILITY ========== */
-
-/* Screen reader only - visually hidden */
-.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-
-/* Skip to content link */
-.skip-link { position: absolute; top: -100px; left: 0; background: #7c6ff7; color: #fff; padding: 12px 24px; z-index: 9999; font-size: 0.9rem; font-weight: 600; border-radius: 0 0 8px 0; transition: top 0.2s; }
-.skip-link:focus { top: 0; }
-
-/* Focus indicators (default) */
-*:focus-visible { outline: 2px solid #7c6ff7; outline-offset: 2px; border-radius: 4px; }
-
-/* Enhanced focus mode */
-body.enhanced-focus *:focus-visible { outline: 3px solid #fbbf24; outline-offset: 3px; box-shadow: 0 0 0 5px rgba(251,191,36,0.3); }
-
-/* High contrast mode */
-body.high-contrast { background: #000 !important; color: #fff !important; }
-body.high-contrast .sidebar { background: #0a0a0a !important; border-color: #fff !important; }
-body.high-contrast .main { background: #111 !important; }
-body.high-contrast .card { background: #1a1a1a !important; border-color: #888 !important; }
-body.high-contrast .summary-card { background: #1a1a1a !important; border-color: #888 !important; }
-body.high-contrast .welcome-card { background: #1a1a1a !important; border-color: #888 !important; }
-body.high-contrast .ai-output { background: #0a0a0a !important; border-color: #888 !important; color: #fff !important; }
-body.high-contrast textarea.input-field { background: #1a1a1a !important; border-color: #aaa !important; color: #fff !important; }
-body.high-contrast .page-header p { color: #ccc !important; }
-body.high-contrast .sc-label { color: #ccc !important; }
-body.high-contrast .sidebar-nav a { color: #ccc !important; }
-body.high-contrast .sidebar-nav a.active { background: #fff !important; color: #000 !important; }
-body.high-contrast .btn-primary { background: #fff !important; color: #000 !important; box-shadow: none !important; }
-body.high-contrast .btn-secondary { background: #333 !important; color: #fff !important; border: 1px solid #888 !important; }
-
-/* Color blind mode - add text indicators */
-body.color-blind .sc-value.green::after { content: ' (Income)'; font-size: 0.6rem; font-weight: 400; }
-body.color-blind .sc-value.red::after { content: ' (Expense)'; font-size: 0.6rem; font-weight: 400; }
-body.color-blind .sc-value.blue::after { content: ' (Balance)'; font-size: 0.6rem; font-weight: 400; }
-body.color-blind .sc-value.purple::after { content: ' (Assets)'; font-size: 0.6rem; font-weight: 400; }
-body.color-blind .sc-value.teal::after { content: ' (Rate)'; font-size: 0.6rem; font-weight: 400; }
-body.color-blind .sc-value.gold::after { content: ' (Score)'; font-size: 0.6rem; font-weight: 400; }
-body.color-blind .sc-value { text-decoration: underline; text-decoration-style: dotted; }
-
-/* Large text */
-body.large-text { font-size: 1.1rem; }
-body.large-text .sidebar-nav a { font-size: 0.92rem; padding: 13px 14px; }
-body.large-text textarea.input-field { font-size: 0.95rem; }
-body.large-text .btn { font-size: 0.95rem; padding: 14px 30px; }
-body.large-text .ai-output { font-size: 0.95rem; }
-body.large-text .sc-value { font-size: 1.6rem; }
-
-/* Extra large text */
-body.xl-text { font-size: 1.3rem; }
-body.xl-text .sidebar-nav a { font-size: 1rem; padding: 14px 16px; }
-body.xl-text textarea.input-field { font-size: 1.1rem; min-height: 220px; }
-body.xl-text .btn { font-size: 1.05rem; padding: 16px 34px; }
-body.xl-text .ai-output { font-size: 1.05rem; max-height: 600px; }
-body.xl-text .sc-value { font-size: 1.8rem; }
-body.xl-text .page-header h1 { font-size: 1.7rem; }
-
-/* Reduced motion */
-body.reduced-motion *, body.reduced-motion *::before, body.reduced-motion *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; } }
-
-/* Simplified interface */
-body.simplified .welcome-card .wc-icon { display: none; }
-body.simplified .nav-icon { display: none; }
-body.simplified .nav-step { display: none; }
-body.simplified .step-badge { display: none; }
-body.simplified .sidebar-tagline { display: none; }
-body.simplified .card { padding: 24px; margin-bottom: 24px; }
-body.simplified .page-header { margin-bottom: 32px; }
-body.simplified .page-header p { font-size: 0.9rem; line-height: 1.8; }
-body.simplified .summary-grid { gap: 20px; }
-body.simplified .welcome-grid { gap: 20px; }
-
-/* Accessibility settings toggle styles */
-.a11y-toggle-group { display: flex; flex-direction: column; gap: 14px; }
-.a11y-toggle { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); }
-.a11y-toggle-label { font-size: 0.85rem; color: rgba(255,255,255,0.8); }
-.a11y-toggle-desc { font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 2px; }
-.a11y-switch { position: relative; width: 44px; height: 24px; background: rgba(255,255,255,0.15); border-radius: 12px; cursor: pointer; transition: background 0.2s; border: none; padding: 0; flex-shrink: 0; }
-.a11y-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; background: #fff; border-radius: 50%; transition: transform 0.2s; pointer-events: none; }
-.a11y-switch.active { background: #7c6ff7; }
-.a11y-switch.active::after { transform: translateX(20px); }
-.a11y-switch:focus-visible { outline: 2px solid #fbbf24; outline-offset: 2px; }
-body.light .a11y-toggle { background: rgba(0,0,0,0.03); border-color: #e0e0e0; }
-body.light .a11y-toggle-label { color: #333; }
-body.light .a11y-toggle-desc { color: #888; }
-body.light .a11y-switch { background: #ddd; }
-
-/* Respect system preferences */
-@media (prefers-contrast: more) { body { --force-high-contrast: 1; } }
-
-/* Screen reader optimized mode */
-body.sr-optimized .sc-value.green::before { content: 'Income: '; font-size: 0.7rem; font-weight: 400; }
-body.sr-optimized .sc-value.red::before { content: 'Expense: '; font-size: 0.7rem; font-weight: 400; }
-body.sr-optimized .sc-value.blue::before { content: 'Balance: '; font-size: 0.7rem; font-weight: 400; }
-body.sr-optimized .sc-value.purple::before { content: 'Assets: '; font-size: 0.7rem; font-weight: 400; }
-body.sr-optimized .sc-value.teal::before { content: 'Savings: '; font-size: 0.7rem; font-weight: 400; }
-body.sr-optimized .sc-value.gold::before { content: 'Health: '; font-size: 0.7rem; font-weight: 400; }
-body.sr-optimized .card { border-left: 3px solid #7c6ff7; }
-body.sr-optimized .ai-output { border-left: 3px solid #4ade80; }
-body.sr-optimized .page-header h1::before { content: '📄 '; }
-body.sr-optimized .summary-card { border-left: 3px solid rgba(124,111,247,0.4); }
-body.sr-optimized .sidebar-nav a.active::before { content: '▶ '; }
-
-/* Budget Progress Bar */
-.budget-prog-header { display: flex; justify-content: space-between; font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-bottom: 6px; }
-.budget-prog-track { height: 12px; background: rgba(255,255,255,0.06); border-radius: 6px; overflow: hidden; }
-.budget-prog-fill { height: 100%; border-radius: 6px; transition: width 0.5s ease; }
-.budget-prog-info { display: flex; justify-content: space-between; font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-top: 6px; }
-
-/* Budget Selector */
-.budget-select-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-.budget-select { padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: #1e2139; color: #e0e4f0; font-size: 0.85rem; cursor: pointer; }
-.budget-select:focus { outline: none; border-color: #7c6ff7; }
-.budget-amount-wrap { display: flex; align-items: center; gap: 0; }
-.budget-rm-label { padding: 10px 10px; background: rgba(124,111,247,0.15); color: #a89ff7; border-radius: 8px 0 0 8px; font-size: 0.85rem; font-weight: 600; border: 1px solid rgba(255,255,255,0.1); border-right: none; }
-.budget-amount-input { padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: #1e2139; color: #e0e4f0; font-size: 0.85rem; width: 140px; }
-.budget-amount-input:focus { outline: none; border-color: #7c6ff7; }
-.budget-display { margin-top: 14px; padding: 12px 16px; background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.2); border-radius: 10px; font-size: 0.85rem; color: #4ade80; }
-body.light .budget-select, body.light .budget-amount-input { background: #f9f9fc; border-color: #ddd; color: #333; }
-body.light .budget-rm-label { background: rgba(124,111,247,0.08); border-color: #ddd; }
-body.light .budget-display { background: #f0fdf4; border-color: #86efac; color: #166534; }
-@media (max-width: 600px) { .budget-select-row { flex-direction: column; align-items: stretch; } .budget-amount-wrap { width: 100%; } .budget-amount-input { flex: 1; } }
-
-/* Trends Chart */
-.trends-empty { color: rgba(255,255,255,0.3); text-align: center; padding: 30px; font-size: 0.85rem; }
-.trends-grid { display: flex; align-items: flex-end; gap: 8px; height: 160px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
-.trends-month { flex: 1; display: flex; flex-direction: column; align-items: center; }
-.trends-bars { display: flex; gap: 3px; align-items: flex-end; height: 130px; }
-.trends-bar { width: 16px; border-radius: 4px 4px 0 0; min-height: 4px; transition: height 0.3s ease; }
-.trends-bar.trends-income { background: #4ade80; }
-.trends-bar.trends-expense { background: #f87171; }
-.trends-label { font-size: 0.65rem; color: rgba(255,255,255,0.5); margin-top: 6px; text-align: center; }
-.trends-legend { display: flex; gap: 16px; justify-content: center; margin-top: 12px; font-size: 0.75rem; color: rgba(255,255,255,0.5); }
-.trends-legend-item { display: flex; align-items: center; gap: 5px; }
-.trends-dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
-.trends-dot.trends-income { background: #4ade80; }
-.trends-dot.trends-expense { background: #f87171; }
-.trends-details { margin-top: 12px; }
-.trends-details summary { font-size: 0.78rem; color: rgba(255,255,255,0.4); cursor: pointer; }
-.trends-table { width: 100%; margin-top: 8px; font-size: 0.78rem; border-collapse: collapse; }
-.trends-table th, .trends-table td { padding: 6px 10px; border: 1px solid rgba(255,255,255,0.08); text-align: left; }
-.trends-table th { background: rgba(124,111,247,0.08); color: #c8c4f0; }
-
-/* Currency Converter */
-.converter-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.converter-input { padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: #1e2139; color: #e0e4f0; font-size: 0.85rem; width: 140px; }
-.converter-input:focus { outline: none; border-color: #7c6ff7; }
-.converter-select { padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: #1e2139; color: #e0e4f0; font-size: 0.85rem; }
-.converter-result { margin-top: 12px; font-size: 0.9rem; color: rgba(255,255,255,0.8); }
-body.light .converter-input, body.light .converter-select { background: #f9f9fc; border-color: #ddd; color: #333; }
-body.light .budget-prog-track { background: #e8e8f0; }
-body.light .trends-grid { border-color: #e0e0e0; }
-body.light .trends-table th, body.light .trends-table td { border-color: #e0e0e0; }
-
-/* Save Status */
-.save-status { position: fixed; top: 12px; right: 12px; padding: 8px 16px; background: #166534; color: #4ade80; border-radius: 8px; font-size: 0.78rem; font-weight: 500; z-index: 9000; display: none; border: 1px solid #22c55e; }
-body.light .save-status { background: #dcfce7; color: #166534; border-color: #86efac; }
-
-/* Print */
-@media print {
-  .sidebar, .skip-link, .voice-command-bar, .voice-feedback, .btn-group, .quick-add-bar, .voice-mic-btn, .a11y-switch { display: none !important; }
-  .main { margin-left: 0 !important; padding: 10px !important; }
-  .page { display: block !important; page-break-after: always; }
-  .page:not(.active) { display: none !important; }
-  body { background: #fff !important; color: #000 !important; }
-  .card { border: 1px solid #ccc !important; background: #fff !important; }
-  .ai-output { max-height: none !important; overflow: visible !important; border: 1px solid #ccc !important; background: #fff !important; color: #000 !important; }
-  .summary-card { background: #f9f9f9 !important; border: 1px solid #ccc !important; }
-  .sc-value { color: #000 !important; }
-}
-
-/* Quick Input Bars */
-.quick-add-bar { margin-bottom: 12px; }
-.quick-add-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-.quick-add-select { padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: #1e2139; color: #e0e4f0; font-size: 0.82rem; min-width: 160px; cursor: pointer; }
-.quick-add-select:focus { outline: none; border-color: #7c6ff7; }
-.quick-add-custom { padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: #1e2139; color: #e0e4f0; font-size: 0.82rem; width: 140px; }
-.quick-add-custom:focus { outline: none; border-color: #7c6ff7; }
-.quick-add-amount { padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: #1e2139; color: #e0e4f0; font-size: 0.82rem; width: 120px; }
-.quick-add-amount:focus { outline: none; border-color: #7c6ff7; }
-.quick-add-freq { padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: #1e2139; color: #e0e4f0; font-size: 0.82rem; width: 110px; }
-.quick-add-btn { padding: 10px 16px !important; font-size: 0.8rem !important; min-height: auto !important; border-radius: 8px !important; white-space: nowrap; }
-body.light .quick-add-select, body.light .quick-add-custom, body.light .quick-add-amount, body.light .quick-add-freq { background: #f9f9fc; border-color: #ddd; color: #333; }
-@media (max-width: 600px) { .quick-add-row { flex-direction: column; } .quick-add-select, .quick-add-amount, .quick-add-freq, .quick-add-custom { width: 100%; } }
-
-/* Voice Recognition */
-.voice-mic-btn { min-width: 44px; min-height: 44px; font-size: 1.1rem; border-radius: 50%; padding: 8px; transition: all 0.2s; }
-.voice-mic-btn.voice-active { background: #ef4444 !important; color: #fff !important; animation: voicePulse 1s infinite; }
-@keyframes voicePulse { 0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); } 50% { box-shadow: 0 0 0 8px rgba(239,68,68,0); } }
-.voice-feedback { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 10px; font-size: 0.85rem; font-weight: 500; z-index: 9999; max-width: 90vw; text-align: center; display: none; }
-.voice-feedback-success { background: #166534; color: #4ade80; border: 1px solid #22c55e; }
-.voice-feedback-error { background: #7f1d1d; color: #fca5a5; border: 1px solid #ef4444; }
-.voice-feedback-info { background: #1e3a5f; color: #93c5fd; border: 1px solid #3b82f6; }
-body.light .voice-feedback-success { background: #dcfce7; color: #166534; }
-body.light .voice-feedback-error { background: #fef2f2; color: #991b1b; }
-body.light .voice-feedback-info { background: #eff6ff; color: #1e40af; }
-.voice-confirm-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9998; align-items: center; justify-content: center; padding: 20px; }
-.voice-confirm-box { background: #252842; border-radius: 16px; padding: 24px; max-width: 400px; width: 100%; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
-.voice-confirm-box p { font-size: 0.9rem; color: rgba(255,255,255,0.8); margin-bottom: 20px; }
-.voice-confirm-box .btn-group { justify-content: center; }
-body.light .voice-confirm-box { background: #fff; border-color: #e0e0e0; }
-body.light .voice-confirm-box p { color: #333; }
-.voice-command-bar { position: fixed; bottom: 70px; right: 20px; z-index: 200; }
-.voice-command-btn { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #7c6ff7, #5b4ee8); color: #fff; border: none; font-size: 1.4rem; cursor: pointer; box-shadow: 0 4px 20px rgba(124,111,247,0.4); transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
-.voice-command-btn:hover { transform: scale(1.05); }
-.voice-command-btn:focus-visible { outline: 3px solid #fbbf24; outline-offset: 3px; }
-.voice-command-btn.voice-active { background: linear-gradient(135deg, #ef4444, #dc2626); animation: voicePulse 1s infinite; }
-.voice-indicator { font-size: 0.7rem; color: rgba(255,255,255,0.5); text-align: center; margin-top: 4px; }
-
-/* OCR Receipt Scanner */
-.ocr-upload-zone { border: 2px dashed rgba(255,255,255,0.15); border-radius: 12px; padding: 40px 20px; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
-.ocr-upload-zone:hover, .ocr-upload-zone:focus { border-color: #7c6ff7; background: rgba(124,111,247,0.05); }
-.ocr-upload-text { font-size: 1rem; color: rgba(255,255,255,0.6); margin-bottom: 6px; }
-.ocr-upload-hint { font-size: 0.75rem; color: rgba(255,255,255,0.3); }
-.ocr-total { background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.3); border-radius: 10px; padding: 14px; margin-bottom: 14px; text-align: center; }
-.ocr-total-label { font-size: 0.75rem; color: #4ade80; margin-bottom: 4px; }
-.ocr-total-value { font-size: 1.6rem; font-weight: 700; color: #4ade80; }
-.ocr-amounts-label { font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
-.ocr-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
-.ocr-chip { padding: 6px 14px; border-radius: 8px; font-size: 0.82rem; font-weight: 600; background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: all 0.2s; }
-.ocr-chip:hover { border-color: #7c6ff7; color: #fff; }
-.ocr-chip.selected { background: #7c6ff7; color: #fff; border-color: #7c6ff7; }
-.ocr-no-results { color: rgba(255,255,255,0.4); font-size: 0.85rem; padding: 16px 0; }
-.ocr-add-section { margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.08); }
-.ocr-form-label { display: block; font-size: 0.78rem; color: rgba(255,255,255,0.5); margin-bottom: 4px; margin-top: 10px; }
-.ocr-input { width: 100%; padding: 10px 14px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; background: #1e2139; color: #e0e4f0; font-size: 0.85rem; margin-bottom: 12px; }
-.ocr-input:focus { outline: none; border-color: #7c6ff7; box-shadow: 0 0 0 3px rgba(124,111,247,0.15); }
-.ocr-raw-details { margin-top: 16px; }
-.ocr-raw-details summary { font-size: 0.8rem; color: rgba(255,255,255,0.4); cursor: pointer; }
-.ocr-raw-text { font-size: 0.75rem; color: rgba(255,255,255,0.5); white-space: pre-wrap; max-height: 200px; overflow-y: auto; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 6px; margin-top: 8px; }
-body.light .ocr-upload-zone { border-color: #ddd; }
-body.light .ocr-upload-zone:hover { border-color: #7c6ff7; background: rgba(124,111,247,0.03); }
-body.light .ocr-upload-text { color: #666; }
-body.light .ocr-upload-hint { color: #999; }
-body.light .ocr-chip { background: #f0f0f5; color: #555; border-color: #ddd; }
-body.light .ocr-input { background: #f9f9fc; border-color: #ddd; color: #333; }
-body.light .ocr-raw-text { background: #f5f5f5; color: #666; }
+/* Mobile bottom nav */
+.mobile-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); border-top: 1px solid var(--border); padding: 8px 0; z-index: 150; justify-content: space-around; }
+.mobile-nav a { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 0.65rem; color: var(--text-secondary); text-decoration: none; padding: 4px 8px; }
+.mobile-nav a.active { color: var(--accent); }
+.mobile-nav .mn-icon { font-size: 1.2rem; }
 </style>
 </head>
 <body>
@@ -422,419 +229,220 @@ body.light .ocr-raw-text { background: #f5f5f5; color: #666; }
 <div class="app">
   <!-- Sidebar -->
   <aside class="sidebar" role="complementary" aria-label="Main navigation">
-    <div class="sidebar-brand"><span>AI</span> Finance Advisor</div>
-    <div class="sidebar-tagline">Smart personal finance management</div>
+    <div class="sidebar-brand">FinBot</div>
     <ul class="sidebar-nav" role="navigation" aria-label="Application pages">
-      <li><a onclick="showPage('welcome')" data-page="welcome" class="active" tabindex="0" role="button" aria-label="Home page" aria-current="page"><span class="nav-icon" aria-hidden="true">&#127968;</span>Home</a></li>
-      <li><a onclick="showPage('inputs')" data-page="inputs" tabindex="0" role="button" aria-label="Enter your financial information - Step 1"><span class="nav-icon" aria-hidden="true">&#9999;&#65039;</span>My Finances<span class="nav-step">Step 1</span></a></li>
-      <li><a onclick="showPage('dashboard')" data-page="dashboard" tabindex="0" role="button" aria-label="Financial dashboard - Step 2"><span class="nav-icon" aria-hidden="true">&#128202;</span>Dashboard<span class="nav-step">Step 2</span></a></li>
-      <li><a onclick="showPage('budget')" data-page="budget" tabindex="0" role="button" aria-label="Budget monitor - Step 3"><span class="nav-icon" aria-hidden="true">&#128176;</span>Budget Monitor<span class="nav-step">Step 3</span></a></li>
-      <li><a onclick="showPage('recommendation')" data-page="recommendation" tabindex="0" role="button" aria-label="AI recommendations - Step 4"><span class="nav-icon" aria-hidden="true">&#129504;</span>Recommendations<span class="nav-step">Step 4</span></a></li>
-      <li><a onclick="showPage('health')" data-page="health" tabindex="0" role="button" aria-label="Financial health report - Step 5"><span class="nav-icon" aria-hidden="true">&#128200;</span>Health Report<span class="nav-step">Step 5</span></a></li>
-      <li><a onclick="showPage('subscription')" data-page="subscription" tabindex="0" role="button" aria-label="Subscription reminders - Step 6"><span class="nav-icon" aria-hidden="true">&#128276;</span>Subscriptions<span class="nav-step">Step 6</span></a></li>
-      <li><a onclick="showPage('advisor')" data-page="advisor" tabindex="0" role="button" aria-label="AI financial advisor - Step 7"><span class="nav-icon" aria-hidden="true">&#129302;</span>AI Advisor<span class="nav-step">Step 7</span></a></li>
-      <li style="margin-top:16px;padding:0 10px;font-size:0.65rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.5px;" aria-hidden="true">Tools</li>
-      <li><a onclick="showPage('chart')" data-page="chart" tabindex="0" role="button" aria-label="Expense breakdown chart"><span class="nav-icon" aria-hidden="true">&#128200;</span>Expense Chart</a></li>
-      <li><a onclick="showPage('savingsprogress')" data-page="savingsprogress" tabindex="0" role="button" aria-label="Savings goal progress"><span class="nav-icon" aria-hidden="true">&#127919;</span>Savings Progress</a></li>
-      <li><a onclick="showPage('comparison')" data-page="comparison" tabindex="0" role="button" aria-label="Monthly financial comparison"><span class="nav-icon" aria-hidden="true">&#128202;</span>Monthly Compare</a></li>
-      <li><a onclick="showPage('export')" data-page="export" tabindex="0" role="button" aria-label="Export financial report"><span class="nav-icon" aria-hidden="true">&#128196;</span>Export PDF</a></li>
-      <li><a onclick="showPage('receipt')" data-page="receipt" tabindex="0" role="button" aria-label="Scan receipt to extract expenses"><span class="nav-icon" aria-hidden="true">&#128247;</span>Receipt OCR</a></li>
-      <li><a onclick="showPage('trends')" data-page="trends" tabindex="0" role="button" aria-label="View spending trends over time"><span class="nav-icon" aria-hidden="true">&#128200;</span>Spending Trends</a></li>
-      <li><a onclick="toggleTheme()" tabindex="0" role="button" aria-label="Toggle dark and light mode"><span class="nav-icon" aria-hidden="true">&#127769;</span>Dark/Light Mode</a></li>
-      <li><a onclick="showPage('accessibility')" data-page="accessibility" tabindex="0" role="button" aria-label="Accessibility settings"><span class="nav-icon">&#9855;</span>Accessibility</a></li>
+      <li><a onclick="showPage('home')" data-page="home" class="active" tabindex="0" role="button" aria-current="page"><span class="nav-icon">🏠</span>Home</a></li>
+      <li><a onclick="showPage('money')" data-page="money" tabindex="0" role="button"><span class="nav-icon">💳</span>Money</a></li>
+      <li><a onclick="showPage('plan')" data-page="plan" tabindex="0" role="button"><span class="nav-icon">🎯</span>Plan</a></li>
+      <li><a onclick="showPage('ai')" data-page="ai" tabindex="0" role="button"><span class="nav-icon">🤖</span>AI Advisor</a></li>
+      <li><a onclick="showPage('insights')" data-page="insights" tabindex="0" role="button"><span class="nav-icon">📊</span>Insights</a></li>
+      <li class="nav-divider">More</li>
+      <li><a onclick="showPage('receipt')" data-page="receipt" tabindex="0" role="button"><span class="nav-icon">📷</span>Receipt OCR</a></li>
+      <li><a onclick="showPage('accessibility')" data-page="accessibility" tabindex="0" role="button"><span class="nav-icon">♿</span>Accessibility</a></li>
+      <li><a onclick="toggleTheme()" tabindex="0" role="button"><span class="nav-icon">🌙</span>Dark/Light</a></li>
     </ul>
   </aside>
 
   <!-- Main Content -->
   <main class="main" role="main" id="main-content">
 
-    <!-- PAGE: Welcome -->
-    <div class="page active" id="page-welcome">
-      <div class="page-header">
-        <h1>Welcome to AI Finance Advisor &#128075;</h1>
-        <p>Your AI-powered personal finance assistant. Follow the steps below or click any feature to get started.</p>
-      </div>
-      <div class="welcome-grid">
-        <div class="welcome-card" onclick="showPage('inputs')">
-          <div class="wc-icon">&#9999;&#65039;</div>
-          <h3>Step 1: Enter Your Finances</h3>
-          <p>Add your income, expenses, assets, and subscriptions.</p>
-        </div>
-        <div class="welcome-card" onclick="showPage('dashboard')">
-          <div class="wc-icon">&#128202;</div>
-          <h3>Step 2: Financial Dashboard</h3>
-          <p>See your income summary, savings rate, and health score.</p>
-        </div>
-        <div class="welcome-card" onclick="showPage('budget')">
-          <div class="wc-icon">&#128176;</div>
-          <h3>Step 3: Budget Monitor</h3>
-          <p>Set spending limits and track your budget in real-time.</p>
-        </div>
-        <div class="welcome-card" onclick="showPage('recommendation')">
-          <div class="wc-icon">&#129504;</div>
-          <h3>Step 4: AI Recommendations</h3>
-          <p>Get personalized advice on saving, investing, and spending.</p>
-        </div>
-        <div class="welcome-card" onclick="showPage('health')">
-          <div class="wc-icon">&#128200;</div>
-          <h3>Step 5: Health Report</h3>
-          <p>Comprehensive financial health analysis with action plan.</p>
-        </div>
-        <div class="welcome-card" onclick="showPage('subscription')">
-          <div class="wc-icon">&#128276;</div>
-          <h3>Step 6: Subscription Alerts</h3>
-          <p>Track subscriptions and find cheaper alternatives.</p>
-        </div>
-        <div class="welcome-card" onclick="showPage('advisor')">
-          <div class="wc-icon">&#129302;</div>
-          <h3>Step 7: What-If Advisor</h3>
-          <p>Ask scenario questions like "Can I afford a car loan?"</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- PAGE: My Finances (All Inputs) -->
-    <div class="page" id="page-inputs">
-      <div class="page-header">
-        <span class="step-badge">Step 1</span>
-        <h1>&#9999;&#65039; Enter Your Financial Information</h1>
-        <p>Fill in your monthly income, expenses, assets, and subscriptions. This data powers all AI features.</p>
-      </div>
-      <div class="card">
-        <div class="card-title"><span class="icon">&#128181;</span> Monthly Income</div>
-        <textarea class="input-field" id="incomeInput" placeholder="Enter your monthly income sources.&#10;&#10;Example:&#10;Salary : RM4500&#10;Freelance : RM800&#10;Passive Income : RM300"></textarea>
-      </div>
-      <div class="card">
-        <div class="card-title"><span class="icon">&#128179;</span> Monthly Expenses</div>
-        <textarea class="input-field" id="expenseInput" placeholder="List all monthly expenses.&#10;&#10;Example:&#10;Food RM600&#10;Transport RM350&#10;Rental RM800&#10;Entertainment RM200&#10;Insurance RM250&#10;Shopping RM300&#10;Utilities RM180"></textarea>
-      </div>
-      <div class="card">
-        <div class="card-title"><span class="icon">&#127974;</span> Current Assets</div>
-        <textarea class="input-field" id="assetInput" placeholder="List all your current assets.&#10;&#10;Example:&#10;Savings RM12000&#10;EPF RM30000&#10;Stocks RM5000&#10;Gold RM2000&#10;Vehicle RM45000"></textarea>
-      </div>
-      <div class="card">
-        <div class="card-title"><span class="icon">&#128179;</span> Subscriptions</div>
-        <textarea class="input-field" id="subscriptionInput" placeholder="Enter all recurring subscriptions.&#10;&#10;Example:&#10;Netflix RM55 Monthly&#10;Spotify RM16 Monthly&#10;Adobe RM90 Monthly&#10;Google One RM10 Monthly"></textarea>
-      </div>
-      <div class="btn-group">
-        <button class="btn btn-primary" onclick="showPage('dashboard')">Next: View Dashboard &#8594;</button>
-        <button class="btn btn-secondary" onclick="saveAllData()" aria-label="Manually save all data">&#128190; Save Data</button>
-        <button class="btn btn-secondary" onclick="clearSavedData()" aria-label="Clear all saved financial data" style="color:#f87171;">&#128465; Clear All</button>
-      </div>
-    </div>
-
-    <!-- PAGE: Dashboard -->
-    <div class="page" id="page-dashboard">
-      <div class="page-header">
-        <span class="step-badge">Step 2</span>
-        <h1>&#128202; Financial Dashboard</h1>
-        <p>Your financial overview at a glance. Summary cards are calculated instantly from your inputs.</p>
+    <!-- ========== HOME DASHBOARD ========== -->
+    <div class="page active" id="page-home">
+      <div class="dash-header">
+        <h1>Welcome to FinBot 👋</h1>
+        <p>Here's your financial overview. Enter your data in the Money section to get started.</p>
       </div>
 
-      <!-- Local Summary Cards -->
-      <div class="summary-grid" id="summaryCards">
-        <div class="summary-card"><div class="sc-label">Total Income</div><div class="sc-value green" id="scIncome">RM0</div></div>
-        <div class="summary-card"><div class="sc-label">Total Expenses</div><div class="sc-value red" id="scExpenses">RM0</div></div>
-        <div class="summary-card"><div class="sc-label">Current Balance</div><div class="sc-value blue" id="scBalance">RM0</div></div>
-        <div class="summary-card"><div class="sc-label">Total Assets</div><div class="sc-value purple" id="scAssets">RM0</div></div>
-        <div class="summary-card"><div class="sc-label">Savings Rate</div><div class="sc-value teal" id="scSavingsRate">0%</div></div>
-        <div class="summary-card"><div class="sc-label">Health Score</div><div class="sc-value gold" id="scHealthScore">--</div></div>
+      <!-- Summary Cards -->
+      <div class="grid-3">
+        <div class="card card-sm" onclick="showPage('money')" style="cursor:pointer;">
+          <div class="card-title">Current Balance</div>
+          <div class="card-value" id="scBalance">RM 0</div>
+          <div class="card-change" id="scBalanceChange"></div>
+        </div>
+        <div class="card card-sm" onclick="showPage('money')" style="cursor:pointer;">
+          <div class="card-title">Income</div>
+          <div class="card-value green" id="scIncome">RM 0</div>
+        </div>
+        <div class="card card-sm" onclick="showPage('money')" style="cursor:pointer;">
+          <div class="card-title">Expenses</div>
+          <div class="card-value red" id="scExpenses">RM 0</div>
+        </div>
       </div>
 
-      <div class="btn-group">
-        <button class="btn btn-primary" onclick="runFeature('dashboard')">&#9654; Get AI Analysis</button>
-        <button class="btn btn-secondary" onclick="showPage('inputs')">&#8592; Edit Inputs</button>
-      </div>
-      <!-- Budget Progress Bar -->
-      <div class="card" id="budgetProgressBar" style="margin-top:20px;">
-        <p style="font-size:0.8rem;color:rgba(255,255,255,0.4);">Set a budget in Step 3 to see progress here.</p>
-      </div>
-      <div class="ai-output" id="outputDashboard"><span class="placeholder">Click "Get AI Analysis" for a detailed AI-powered dashboard breakdown.</span></div>
-    </div>
-
-    <!-- PAGE: Budget Monitor -->
-    <div class="page" id="page-budget">
-      <div class="page-header">
-        <span class="step-badge">Step 3</span>
-        <h1>&#128176; Budget Monitor</h1>
-        <p>Set spending limits and get AI-powered budget alerts and recommendations.</p>
-      </div>
-      <div class="card">
-        <div class="card-title"><span class="icon">&#128203;</span> Set Your Budget Limit</div>
-        <div class="budget-select-row">
-          <select class="budget-select" id="budgetType" aria-label="Select budget limit type">
-            <option value="daily">Daily Limit</option>
-            <option value="weekly">Weekly Limit</option>
-            <option value="monthly" selected>Monthly Limit</option>
-          </select>
-          <div class="budget-amount-wrap">
-            <!--<span class="budget-rm-label">RM</span> -->
-            <input type="number" class="budget-amount-input" id="budgetAmountInput" placeholder="Enter amount" min="0" step="0.01" aria-label="Budget limit amount in Ringgit">
+      <!-- Budget + Assets -->
+      <div class="grid-2">
+        <div class="card" onclick="showPage('plan')" style="cursor:pointer;">
+          <div class="card-title">Monthly Budget</div>
+          <div id="budgetProgressBar">
+            <p style="color:var(--text-secondary);font-size:0.85rem;">Set a budget in the Plan section to track progress.</p>
           </div>
-          <button class="btn btn-primary" onclick="setBudgetFromSelect()" aria-label="Set this budget limit">Set Limit</button>
         </div>
-        <div id="budgetDisplay" class="budget-display" style="display:none;"></div>
-      </div>
-      <div class="card">
-        <div class="card-title"><span class="icon">&#128221;</span> Additional Budget Notes (Optional)</div>
-        <textarea class="input-field" id="budgetInput" style="min-height:100px;" placeholder="Optional: Add extra budget details here.&#10;&#10;Example:&#10;Monthly Budget: RM3000&#10;Breakdown: Daily"></textarea>
-      </div>
-      <div class="btn-group">
-        <button class="btn btn-primary" onclick="runFeature('budget')">&#9654; Analyze Budget</button>
-      </div>
-      <div class="ai-output" id="outputBudget"><span class="placeholder">Set your budget limit above, then click "Analyze Budget".<br>Requires: Expenses (Step 1) + Budget Limit.</span></div>
-    </div>
-
-    <!-- PAGE: AI Recommendation -->
-    <div class="page" id="page-recommendation">
-      <div class="page-header">
-        <span class="step-badge">Step 4</span>
-        <h1>&#129504; AI Financial Recommendation</h1>
-        <p>Personalized advice on income growth, expense optimization, savings, investments, and market outlook.</p>
-      </div>
-      <div class="btn-group">
-        <button class="btn btn-primary" onclick="runFeature('recommendation')">&#9654; Get Recommendations</button>
-      </div>
-      <div class="ai-output" id="outputRecommendation"><span class="placeholder">Click "Get Recommendations" for personalized financial advice.<br>Requires: Income, Expenses, Assets.</span></div>
-    </div>
-
-    <!-- PAGE: Health Report -->
-    <div class="page" id="page-health">
-      <div class="page-header">
-        <span class="step-badge">Step 5</span>
-        <h1>&#128200; Financial Health Report</h1>
-        <p>Comprehensive analysis including health score, risk assessment, strengths, and action plan.</p>
-      </div>
-      <div class="card">
-        <div class="card-title"><span class="icon">&#127919;</span> Savings Goal Planner</div>
-        <textarea class="input-field" id="savingsInput" placeholder="Describe your savings goal:&#10;&#10;- What are you saving for? (House, Car, Emergency Fund, Wedding)&#10;- Target Amount (e.g. RM50000)&#10;- Current Savings (e.g. RM5000)&#10;- Monthly Contribution (e.g. RM500)"></textarea>
-      </div>
-      <div class="btn-group">
-        <button class="btn btn-primary" onclick="runFeature('health')">&#9654; Generate Health Report</button>
-      </div>
-      <div class="ai-output" id="outputHealthReport"><span class="placeholder">Click "Generate Health Report" for a full financial analysis.<br>For best results, fill in all inputs including your savings goal.</span></div>
-    </div>
-
-    <!-- PAGE: Subscription Reminder -->
-    <div class="page" id="page-subscription">
-      <div class="page-header">
-        <span class="step-badge">Step 6</span>
-        <h1>&#128276; Subscription Reminder</h1>
-        <p>Payment alerts, cost analysis, and cheaper alternatives for your subscriptions.</p>
-      </div>
-      <div class="btn-group">
-        <button class="btn btn-primary" onclick="runFeature('subscription')">&#9654; Analyze Subscriptions</button>
-        <button class="btn btn-secondary" onclick="showPage('inputs')">&#8592; Edit Subscriptions</button>
-      </div>
-      <div class="ai-output" id="outputSubscription"><span class="placeholder">Click "Analyze Subscriptions" to see payment reminders and savings tips.<br>Requires: Subscription Input.</span></div>
-    </div>
-
-    <!-- PAGE: AI Advisor -->
-    <div class="page" id="page-advisor">
-      <div class="page-header">
-        <span class="step-badge">Step 7</span>
-        <h1>&#129302; AI Financial Advisor</h1>
-        <p>Ask any what-if question and get a detailed scenario analysis based on your actual finances.</p>
-      </div>
-      <div class="card">
-        <div class="card-title"><span class="icon">&#128172;</span> Your Question</div>
-        <textarea class="input-field" id="adviseInput" placeholder="Ask a financial scenario question:&#10;&#10;Examples:&#10; My PTPTN loan is RM40,000. How much can I pay monthly to settle it early?&#10; Can I afford a RM300 monthly car loan?&#10; If I buy a RM2,000 laptop, how will it affect my budget?&#10; If my salary increases by RM500, how should I allocate it?&#10; What happens if I lose 20% of my income?&#10; Can I afford a RM5,000 vacation this year?"></textarea>
-      </div>
-      <div class="btn-group">
-        <button class="btn btn-primary" onclick="runFeature('advisor')">&#9654; Get AI Analysis</button>
-      </div>
-      <div class="ai-output" id="outputAdvisor"><span class="placeholder">Type your financial question above and click "Get AI Analysis".<br>The AI uses all your financial data to provide personalized advice.</span></div>
-    </div>
-
-    <!-- PAGE: Expense Chart -->
-    <div class="page" id="page-chart">
-      <div class="page-header">
-        <h1>&#128200; Expense Breakdown Chart</h1>
-        <p>Visual pie chart showing where your money goes each month. Parsed from your expense input.</p>
-      </div>
-      <div class="card">
-        <div class="card-title"><span class="icon">&#128201;</span> Spending by Category</div>
-        <div class="pie-container" id="pieChart">
-          <p style="color:rgba(255,255,255,0.3);text-align:center;width:100%;padding:40px;">Enter expenses in Step 1 to see your chart.</p>
+        <div class="card">
+          <div class="card-title">Total Assets</div>
+          <div class="card-value" id="scAssets" style="font-size:1.4rem;">RM 0</div>
+          <div style="margin-top:8px;font-size:0.78rem;color:var(--text-secondary);">Savings Rate: <strong id="scSavingsRate">0%</strong></div>
         </div>
       </div>
-      <div class="btn-group">
-        <button class="btn btn-primary" onclick="generatePieChart()">&#9654; Generate Chart</button>
-        <button class="btn btn-secondary" onclick="showPage('inputs')">&#8592; Edit Expenses</button>
-      </div>
-    </div>
 
-    <!-- PAGE: Savings Progress -->
-    <div class="page" id="page-savingsprogress">
-      <div class="page-header">
-        <h1>&#127919; Savings Goal Progress</h1>
-        <p>Track how close you are to reaching your savings goal with a visual progress bar.</p>
-      </div>
+      <!-- AI Insight -->
       <div class="card">
-        <div class="card-title"><span class="icon">&#127942;</span> Your Progress</div>
-        <div id="savingsProgressArea">
-          <p style="color:rgba(255,255,255,0.3);text-align:center;padding:40px;">Fill in Savings Goal Planner (Step 5) to see your progress.</p>
+        <div class="card-title">🤖 FinBot Insight</div>
+        <p style="font-size:0.85rem;color:var(--text-secondary);" id="aiInsightText">Enter your financial data in the Money section to receive AI-powered insights.</p>
+        <div class="btn-group">
+          <button class="btn btn-secondary" onclick="showPage('ai')">Ask FinBot →</button>
         </div>
       </div>
-      <div class="btn-group">
-        <button class="btn btn-primary" onclick="generateSavingsProgress()">&#9654; Calculate Progress</button>
-        <button class="btn btn-secondary" onclick="showPage('health')">&#8592; Edit Savings Goal</button>
+
+      <!-- Spending Breakdown -->
+      <div class="card">
+        <div class="card-title">Spending Breakdown</div>
+        <div id="homePieChart">
+          <p style="color:var(--text-secondary);font-size:0.85rem;">Add expenses to see your spending breakdown.</p>
+        </div>
       </div>
     </div>
 
-    <!-- PAGE: Monthly Comparison -->
-    <div class="page" id="page-comparison">
-      <div class="page-header">
-        <h1>&#128202; Monthly Comparison</h1>
-        <p>Compare two months of financial data side by side. Enter data for both months below.</p>
-      </div>
-      <div class="card">
-        <div class="card-title"><span class="icon">&#128197;</span> Month A (e.g., Last Month)</div>
-        <textarea class="input-field" id="monthAInput" style="min-height:120px;" placeholder="Enter last month's data:&#10;Income RM4500&#10;Food RM500&#10;Transport RM300&#10;Rental RM800&#10;Utilities RM150"></textarea>
-      </div>
-      <div class="card">
-        <div class="card-title"><span class="icon">&#128197;</span> Month B (e.g., This Month)</div>
-        <textarea class="input-field" id="monthBInput" style="min-height:120px;" placeholder="Enter this month's data:&#10;Income RM4800&#10;Food RM600&#10;Transport RM350&#10;Rental RM800&#10;Utilities RM180"></textarea>
-      </div>
-      <div class="btn-group">
-        <button class="btn btn-primary" onclick="generateComparison()">&#9654; Compare</button>
-      </div>
-      <div class="card" id="comparisonResult" style="margin-top:20px;display:none;"></div>
-    </div>
+    <!-- ========== MONEY ========== -->
+    <div class="page" id="page-money">
+      <h2 class="page-title">💳 Money</h2>
+      <p class="page-desc">Manage your income, expenses, assets, and subscriptions.</p>
 
-    <!-- PAGE: Export PDF -->
-    <div class="page" id="page-export">
-      <div class="page-header">
-        <h1>&#128196; Export Financial Report</h1>
-        <p>Download a text summary of all your financial data and AI analysis as a report.</p>
+      <div class="tabs" id="moneyTabs">
+        <button class="tab active" onclick="showMoneyTab('income')">Income</button>
+        <button class="tab" onclick="showMoneyTab('expenses')">Expenses</button>
+        <button class="tab" onclick="showMoneyTab('assets')">Assets</button>
+        <button class="tab" onclick="showMoneyTab('subscriptions')">Subscriptions</button>
       </div>
-      <div class="card">
-        <div class="card-title"><span class="icon">&#128190;</span> What's Included</div>
-        <ul style="list-style:none;font-size:0.83rem;color:rgba(255,255,255,0.6);line-height:2;">
-          <li>&#9989; Income, Expenses, Assets summary</li>
-          <li>&#9989; Financial health score &amp; savings rate</li>
-          <li>&#9989; Budget plan &amp; savings goal</li>
-          <li>&#9989; Any AI analysis you've generated</li>
-        </ul>
+
+      <div id="moneyTab-income" class="money-tab">
+        <div class="card"><div class="card-title">Monthly Income</div>
+        <textarea class="input-field" id="incomeInput" placeholder="Enter your monthly income sources.&#10;&#10;Example:&#10;Salary RM4500&#10;Freelance RM800&#10;Passive Income RM300"></textarea></div>
       </div>
+      <div id="moneyTab-expenses" class="money-tab" style="display:none;">
+        <div class="card"><div class="card-title">Monthly Expenses</div>
+        <textarea class="input-field" id="expenseInput" placeholder="List all monthly expenses.&#10;&#10;Example:&#10;Food RM600&#10;Transport RM350&#10;Rental RM800&#10;Entertainment RM200"></textarea></div>
+      </div>
+      <div id="moneyTab-assets" class="money-tab" style="display:none;">
+        <div class="card"><div class="card-title">Current Assets</div>
+        <textarea class="input-field" id="assetInput" placeholder="List all your current assets.&#10;&#10;Example:&#10;Savings RM12000&#10;EPF RM30000&#10;Stocks RM5000"></textarea></div>
+      </div>
+      <div id="moneyTab-subscriptions" class="money-tab" style="display:none;">
+        <div class="card"><div class="card-title">Subscriptions</div>
+        <textarea class="input-field" id="subscriptionInput" placeholder="Enter all recurring subscriptions.&#10;&#10;Example:&#10;Netflix RM55 Monthly&#10;Spotify RM16 Monthly"></textarea></div>
+      </div>
+
       <div class="btn-group">
-        <button class="btn btn-primary" onclick="exportReport()" aria-label="Download financial report as text file">&#128190; Download Report (.txt)</button>
+        <button class="btn btn-primary" onclick="saveAllData(); updateLocalDashboard(); showPage('home');">Save & View Dashboard</button>
       </div>
     </div>
 
-    <!-- PAGE: Spending Trends -->
-    <div class="page" id="page-trends">
-      <div class="page-header">
-        <h1>&#128200; Spending Trends</h1>
-        <p>Track your income and expenses over time. Save a snapshot each month to build your trend chart.</p>
+    <!-- ========== PLAN ========== -->
+    <div class="page" id="page-plan">
+      <h2 class="page-title">🎯 Plan</h2>
+      <p class="page-desc">Set budgets, savings goals, and track subscriptions.</p>
+
+      <div class="card"><div class="card-title">Budget Limits</div>
+      <textarea class="input-field" id="budgetInput" placeholder="Set your budget limits.&#10;&#10;Example:&#10;Monthly Limit RM3000&#10;Food Budget RM600&#10;Transport Budget RM350"></textarea></div>
+
+      <div class="card"><div class="card-title">Savings Goal</div>
+      <textarea class="input-field" id="savingsInput" placeholder="Describe your savings goal:&#10;&#10;- What are you saving for?&#10;- Target Amount (e.g. RM50000)&#10;- Current Savings (e.g. RM5000)&#10;- Monthly Contribution (e.g. RM500)"></textarea></div>
+
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="runFeature('budget')">Analyze Budget</button>
+        <button class="btn btn-secondary" onclick="runFeature('health')">Health Report</button>
       </div>
-      <div class="btn-group" style="margin-bottom:20px;">
-        <button class="btn btn-primary" onclick="saveMonthSnapshot()" aria-label="Save this month's data as a snapshot">&#128190; Save This Month</button>
-        <button class="btn btn-secondary" onclick="clearTrends()" aria-label="Clear all trend history">Clear History</button>
-        <button class="btn btn-secondary" onclick="printReport()" aria-label="Print this page">&#128424; Print</button>
-      </div>
+      <div class="ai-output" id="outputBudget"><span class="placeholder">Set your budget limits and click "Analyze Budget".</span></div>
+      <div class="ai-output" id="outputHealthReport" style="display:none;"><span class="placeholder">Click "Health Report" for comprehensive analysis.</span></div>
+    </div>
+
+    <!-- ========== AI ADVISOR ========== -->
+    <div class="page" id="page-ai">
+      <h2 class="page-title">🤖 AI Advisor</h2>
+      <p class="page-desc">Ask FinBot anything about your finances. Get insights, recommendations, and scenario analysis.</p>
+
       <div class="card">
-        <div class="card-title"><span class="icon" aria-hidden="true">&#128202;</span> Monthly Income vs Expenses</div>
+        <div class="card-title">Ask FinBot</div>
+        <textarea class="input-field" id="adviseInput" style="min-height:100px;" placeholder="Ask a financial question:&#10;&#10;• Can I afford a RM300 monthly car loan?&#10;• How much should I save each month?&#10;• What happens if I lose 20% of my income?"></textarea>
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="runFeature('advisor')">Get AI Analysis</button>
+          <button class="btn btn-secondary" onclick="runFeature('recommendation')">Recommendations</button>
+          <button class="btn btn-secondary" onclick="runFeature('dashboard')">Dashboard Analysis</button>
+        </div>
+      </div>
+      <div class="ai-output" id="outputAdvisor"><span class="placeholder">Ask a question above to get personalized financial advice.</span></div>
+      <div class="ai-output" id="outputRecommendation" style="display:none;"><span class="placeholder">Click "Recommendations" for personalized advice.</span></div>
+      <div class="ai-output" id="outputDashboard" style="display:none;"><span class="placeholder">Click "Dashboard Analysis" for AI overview.</span></div>
+    </div>
+
+    <!-- ========== INSIGHTS ========== -->
+    <div class="page" id="page-insights">
+      <h2 class="page-title">📊 Insights</h2>
+      <p class="page-desc">Understand your financial behaviour with charts and analysis.</p>
+
+      <div class="card"><div class="card-title">Expense Breakdown</div>
+        <div class="pie-container" id="pieChart"><p style="color:var(--text-secondary);">Add expenses in Money section first.</p></div>
+        <div class="btn-group"><button class="btn btn-secondary" onclick="generatePieChart()">Generate Chart</button></div>
+      </div>
+
+      <div class="card"><div class="card-title">Spending Trends</div>
         <div id="trendsChart"></div>
+        <div class="btn-group">
+          <button class="btn btn-secondary" onclick="saveMonthSnapshot()">Save This Month</button>
+          <button class="btn btn-secondary" onclick="runFeature('subscription')">Subscription Analysis</button>
+        </div>
       </div>
+      <div class="ai-output" id="outputSubscription" style="display:none;"><span class="placeholder">Click "Subscription Analysis".</span></div>
     </div>
 
-    <!-- PAGE: Receipt OCR Scanner -->
+    <!-- ========== RECEIPT OCR ========== -->
     <div class="page" id="page-receipt">
-      <div class="page-header">
-        <h1>&#128247; Receipt Scanner</h1>
-        <p>Upload a receipt photo to extract amounts using OCR. Detected expenses can be added directly to your expense list.</p>
-      </div>
+      <h2 class="page-title">📷 Receipt Scanner</h2>
+      <p class="page-desc">Upload a receipt photo to extract amounts using OCR.</p>
       <div class="card">
-        <div class="card-title"><span class="icon" aria-hidden="true">&#128193;</span> Upload Receipt Image</div>
-        <div class="ocr-upload-zone" id="ocrUploadZone" onclick="document.getElementById('ocrFileInput').click()" tabindex="0" role="button" aria-label="Click or press Enter to upload a receipt image">
-          <p class="ocr-upload-text">&#128247; Click here to select a receipt image</p>
-          <p class="ocr-upload-hint">Supports JPG, PNG, WEBP. You can also use your phone camera.</p>
+        <div class="ocr-upload-zone" id="ocrUploadZone" onclick="document.getElementById('ocrFileInput').click()" tabindex="0" role="button" aria-label="Click to upload receipt image">
+          <p style="font-size:1rem;">📷 Click here to upload a receipt</p>
+          <p style="font-size:0.75rem;color:var(--text-secondary);">Supports JPG, PNG, WEBP</p>
         </div>
-        <input type="file" id="ocrFileInput" accept="image/*" capture="environment" onchange="handleReceiptFile(event)" style="display:none;" aria-label="Select receipt image file">
+        <input type="file" id="ocrFileInput" accept="image/*" capture="environment" onchange="handleReceiptFile(event)" style="display:none;">
       </div>
-
-      <!-- Preview -->
       <div class="card" id="ocrPreview" style="display:none;text-align:center;"></div>
-
-      <!-- Progress -->
-      <div class="progress-container" id="ocrProgress" style="display:none;margin-bottom:16px;">
-        <div class="progress-bar"><div class="progress-fill" style="width:0%;background:#7c6ff7;"></div></div>
-      </div>
-
-      <!-- Status -->
-      <p id="ocrStatus" style="display:none;font-size:0.85rem;color:rgba(255,255,255,0.6);margin-bottom:12px;" role="status" aria-live="polite"></p>
-
-      <!-- Scan button -->
+      <div class="progress-track" id="ocrProgress" style="display:none;margin-bottom:12px;"><div class="progress-fill green" style="width:0%;"></div></div>
+      <p id="ocrStatus" style="display:none;font-size:0.85rem;color:var(--text-secondary);margin-bottom:12px;" role="status" aria-live="polite"></p>
       <div class="btn-group">
-        <button class="btn btn-primary" id="ocrScanBtn" onclick="scanReceipt()" style="display:none;" aria-label="Start OCR scan on uploaded receipt">&#128270; Scan Receipt</button>
-        <button class="btn btn-secondary" onclick="clearOCRResults()" aria-label="Clear receipt and start over">Clear</button>
+        <button class="btn btn-primary" id="ocrScanBtn" onclick="scanReceipt()" style="display:none;">Scan Receipt</button>
+        <button class="btn btn-secondary" onclick="clearOCRResults()">Clear</button>
       </div>
-
-      <!-- Results -->
-      <div class="card" id="ocrResults" style="display:none;margin-top:16px;"></div>
+      <div class="card" id="ocrResults" style="display:none;margin-top:12px;"></div>
     </div>
 
-    <!-- PAGE: Accessibility Settings -->
+    <!-- ========== ACCESSIBILITY ========== -->
     <div class="page" id="page-accessibility">
-      <div class="page-header">
-        <h1>&#9855; Accessibility Settings</h1>
-        <p>Customize the app to make it more comfortable for your needs. All preferences are saved automatically.</p>
-      </div>
-      <div class="card">
-        <div class="card-title"><span class="icon">&#127912;</span> Display &amp; Vision</div>
+      <h2 class="page-title">♿ Accessibility</h2>
+      <p class="page-desc">Customize the app for your needs. Preferences are saved automatically.</p>
+      <div class="card"><div class="card-title">Display & Vision</div>
         <div class="a11y-toggle-group">
-          <div class="a11y-toggle">
-            <div><div class="a11y-toggle-label">High Contrast Mode</div><div class="a11y-toggle-desc">Increase contrast between text and background</div></div>
-            <button class="a11y-switch" id="toggleHighContrast" onclick="toggleA11y('high-contrast')" role="switch" aria-checked="false" aria-label="Toggle high contrast mode"></button>
-          </div>
-          <div class="a11y-toggle">
-            <div><div class="a11y-toggle-label">Color Blind Friendly Mode</div><div class="a11y-toggle-desc">Add text labels alongside color indicators</div></div>
-            <button class="a11y-switch" id="toggleColorBlind" onclick="toggleA11y('color-blind')" role="switch" aria-checked="false" aria-label="Toggle color blind friendly mode"></button>
-          </div>
-          <div class="a11y-toggle">
-            <div><div class="a11y-toggle-label">Enhanced Focus Indicators</div><div class="a11y-toggle-desc">Show thicker, more visible focus outlines for keyboard users</div></div>
-            <button class="a11y-switch" id="toggleEnhancedFocus" onclick="toggleA11y('enhanced-focus')" role="switch" aria-checked="false" aria-label="Toggle enhanced focus indicators"></button>
-          </div>
+          <div class="a11y-toggle"><div><div class="a11y-toggle-label">High Contrast</div><div class="a11y-toggle-desc">Increase contrast for better visibility</div></div><button class="a11y-switch" id="toggleHighContrast" onclick="toggleA11y('high-contrast')" role="switch" aria-checked="false"></button></div>
+          <div class="a11y-toggle"><div><div class="a11y-toggle-label">Color Blind Mode</div><div class="a11y-toggle-desc">Add text labels to color-coded values</div></div><button class="a11y-switch" id="toggleColorBlind" onclick="toggleA11y('color-blind')" role="switch" aria-checked="false"></button></div>
+          <div class="a11y-toggle"><div><div class="a11y-toggle-label">Enhanced Focus</div><div class="a11y-toggle-desc">Thicker focus outlines for keyboard navigation</div></div><button class="a11y-switch" id="toggleEnhancedFocus" onclick="toggleA11y('enhanced-focus')" role="switch" aria-checked="false"></button></div>
         </div>
       </div>
-      <div class="card">
-        <div class="card-title"><span class="icon">&#128221;</span> Text &amp; Readability</div>
+      <div class="card"><div class="card-title">Text & Readability</div>
         <div class="a11y-toggle-group">
-          <div class="a11y-toggle">
-            <div><div class="a11y-toggle-label">Large Text</div><div class="a11y-toggle-desc">Increase font size for easier reading</div></div>
-            <button class="a11y-switch" id="toggleLargeText" onclick="toggleA11y('large-text')" role="switch" aria-checked="false" aria-label="Toggle large text"></button>
-          </div>
-          <div class="a11y-toggle">
-            <div><div class="a11y-toggle-label">Extra Large Text</div><div class="a11y-toggle-desc">Maximum font size for low vision users</div></div>
-            <button class="a11y-switch" id="toggleXLText" onclick="toggleA11y('xl-text')" role="switch" aria-checked="false" aria-label="Toggle extra large text"></button>
-          </div>
+          <div class="a11y-toggle"><div><div class="a11y-toggle-label">Large Text</div></div><button class="a11y-switch" id="toggleLargeText" onclick="toggleA11y('large-text')" role="switch" aria-checked="false"></button></div>
+          <div class="a11y-toggle"><div><div class="a11y-toggle-label">Extra Large Text</div></div><button class="a11y-switch" id="toggleXLText" onclick="toggleA11y('xl-text')" role="switch" aria-checked="false"></button></div>
         </div>
       </div>
-      <div class="card">
-        <div class="card-title"><span class="icon">&#129504;</span> Cognitive &amp; Motion</div>
+      <div class="card"><div class="card-title">Motion & Cognitive</div>
         <div class="a11y-toggle-group">
-          <div class="a11y-toggle">
-            <div><div class="a11y-toggle-label">Reduced Motion</div><div class="a11y-toggle-desc">Disable animations and transitions</div></div>
-            <button class="a11y-switch" id="toggleReducedMotion" onclick="toggleA11y('reduced-motion')" role="switch" aria-checked="false" aria-label="Toggle reduced motion"></button>
-          </div>
-          <div class="a11y-toggle">
-            <div><div class="a11y-toggle-label">Simplified Interface</div><div class="a11y-toggle-desc">Remove decorative elements, increase spacing, reduce clutter</div></div>
-            <button class="a11y-switch" id="toggleSimplified" onclick="toggleA11y('simplified')" role="switch" aria-checked="false" aria-label="Toggle simplified interface"></button>
-          </div>
+          <div class="a11y-toggle"><div><div class="a11y-toggle-label">Reduced Motion</div></div><button class="a11y-switch" id="toggleReducedMotion" onclick="toggleA11y('reduced-motion')" role="switch" aria-checked="false"></button></div>
+          <div class="a11y-toggle"><div><div class="a11y-toggle-label">Simplified Interface</div></div><button class="a11y-switch" id="toggleSimplified" onclick="toggleA11y('simplified')" role="switch" aria-checked="false"></button></div>
+          <div class="a11y-toggle"><div><div class="a11y-toggle-label">Screen Reader Optimized</div></div><button class="a11y-switch" id="toggleScreenReader" onclick="toggleA11y('sr-optimized')" role="switch" aria-checked="false"></button></div>
         </div>
       </div>
-      <div class="card">
-        <div class="card-title"><span class="icon">&#127908;</span> Voice &amp; Screen Reader</div>
+      <div class="card"><div class="card-title">Voice</div>
         <div class="a11y-toggle-group">
-          <div class="a11y-toggle">
-            <div><div class="a11y-toggle-label">Voice Recognition</div><div class="a11y-toggle-desc">Control the app with voice commands. Uses browser Speech API (no audio uploaded).</div></div>
-            <button class="a11y-switch" id="toggleVoice" onclick="toggleVoiceFeature()" role="switch" aria-checked="false" aria-label="Toggle voice recognition"></button>
-          </div>
-          <div class="a11y-toggle">
-            <div><div class="a11y-toggle-label">Screen Reader Optimization</div><div class="a11y-toggle-desc">Enhanced descriptions and announcements for screen reader users</div></div>
-            <button class="a11y-switch" id="toggleScreenReader" onclick="toggleA11y('sr-optimized')" role="switch" aria-checked="false" aria-label="Toggle screen reader optimization"></button>
-          </div>
+          <div class="a11y-toggle"><div><div class="a11y-toggle-label">Voice Recognition</div><div class="a11y-toggle-desc">Control with voice commands (Chrome/Edge)</div></div><button class="a11y-switch" id="toggleVoice" onclick="toggleVoiceFeature()" role="switch" aria-checked="false"></button></div>
         </div>
       </div>
     </div>
@@ -842,23 +450,28 @@ body.light .ocr-raw-text { background: #f5f5f5; color: #666; }
   </main>
 </div>
 
-<!-- Voice Recognition UI Elements -->
-<div class="voice-command-bar" id="voiceCommandBar">
-  <button class="voice-command-btn" id="voiceMainBtn" onclick="startVoiceInput('command')" aria-label="Start voice command" title="Voice Command (say 'Open dashboard', 'Analyze budget', etc.)">🎤</button>
-  <div class="voice-indicator" id="voiceMainIndicator" aria-hidden="true">🎤</div>
+<!-- FAB Quick Add -->
+<button class="fab" onclick="toggleFab()" aria-label="Quick add">+</button>
+<div class="fab-menu" id="fabMenu">
+  <a onclick="showPage('money'); showMoneyTab('income'); closeFab();">💰 Add Income</a>
+  <a onclick="showPage('money'); showMoneyTab('expenses'); closeFab();">💸 Add Expense</a>
+  <a onclick="showPage('money'); showMoneyTab('assets'); closeFab();">🏦 Add Asset</a>
+  <a onclick="showPage('receipt'); closeFab();">📷 Scan Receipt</a>
 </div>
 
-<div id="voiceFeedback" class="voice-feedback" role="status" aria-live="polite" aria-atomic="true"></div>
+<!-- Mobile Bottom Nav -->
+<nav class="mobile-nav" aria-label="Mobile navigation">
+  <a onclick="showPage('home')" data-page="home" class="active"><span class="mn-icon">🏠</span>Home</a>
+  <a onclick="showPage('money')" data-page="money"><span class="mn-icon">💳</span>Money</a>
+  <a onclick="showPage('ai')" data-page="ai"><span class="mn-icon">🤖</span>AI</a>
+  <a onclick="showPage('plan')" data-page="plan"><span class="mn-icon">🎯</span>Plan</a>
+  <a onclick="showPage('insights')" data-page="insights"><span class="mn-icon">📊</span>More</a>
+</nav>
 
-<div class="voice-confirm-overlay" id="voiceConfirmModal" role="dialog" aria-labelledby="voiceConfirmMessage" aria-modal="true">
-  <div class="voice-confirm-box">
-    <p id="voiceConfirmMessage">Confirm action?</p>
-    <div class="btn-group">
-      <button class="btn btn-primary voice-confirm-yes" onclick="confirmVoiceAction()" aria-label="Confirm action">Confirm</button>
-      <button class="btn btn-secondary" onclick="cancelVoiceAction()" aria-label="Cancel action">Cancel</button>
-    </div>
-  </div>
-</div>
+<!-- Voice UI -->
+<div class="voice-command-bar" id="voiceCommandBar"><button class="voice-command-btn" onclick="startVoiceInput('command')" aria-label="Voice command">🎤</button><div class="voice-indicator">🎤</div></div>
+<div id="voiceFeedback" class="voice-feedback" role="status" aria-live="polite"></div>
+<div class="voice-confirm-overlay" id="voiceConfirmModal" role="dialog" aria-modal="true"><div class="voice-confirm-box"><p id="voiceConfirmMessage"></p><div class="btn-group" style="justify-content:center;"><button class="btn btn-primary" onclick="confirmVoiceAction()">Confirm</button><button class="btn btn-secondary" onclick="cancelVoiceAction()">Cancel</button></div></div></div>
 
 <script>
 const STREAM_URLS = {
@@ -870,394 +483,170 @@ const STREAM_URLS = {
   ai_financial_advisor_discussions: '__URL_AI_FINANCIAL_ADVISOR_DISCUSSIONS__',
 };
 
-// Page Navigation
+// Navigation
 function showPage(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + pageId).classList.add('active');
-  document.querySelectorAll('.sidebar-nav a').forEach(a => { a.classList.remove('active'); a.removeAttribute('aria-current'); });
-  const navLink = document.querySelector('[data-page="' + pageId + '"]');
-  if (navLink) { navLink.classList.add('active'); navLink.setAttribute('aria-current', 'page'); }
+  document.querySelectorAll('.sidebar-nav a, .mobile-nav a').forEach(a => { a.classList.remove('active'); a.removeAttribute('aria-current'); });
+  document.querySelectorAll('[data-page="' + pageId + '"]').forEach(a => { a.classList.add('active'); a.setAttribute('aria-current', 'page'); });
   window.scrollTo(0, 0);
-  if (pageId === 'dashboard') updateLocalDashboard();
-  // Announce page change to screen readers
-  const pageEl = document.getElementById('page-' + pageId);
-  const heading = pageEl ? pageEl.querySelector('h1') : null;
-  if (heading) announce('Navigated to ' + heading.textContent.replace(/[^\w\s]/g, '').trim());
+  if (pageId === 'home') updateLocalDashboard();
+  if (pageId === 'insights') { renderTrendsChart(); }
+  announce('Navigated to ' + pageId);
 }
 
-// Parse RM amounts from text
+function showMoneyTab(tab) {
+  document.querySelectorAll('.money-tab').forEach(t => t.style.display = 'none');
+  document.getElementById('moneyTab-' + tab).style.display = 'block';
+  document.querySelectorAll('#moneyTabs .tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+// FAB
+function toggleFab() { document.getElementById('fabMenu').classList.toggle('open'); }
+function closeFab() { document.getElementById('fabMenu').classList.remove('open'); }
+document.addEventListener('click', e => { if (!e.target.closest('.fab') && !e.target.closest('.fab-menu')) closeFab(); });
+
+// Parse amounts
 function parseAmounts(text) {
   const matches = text.match(/RM\s?[\d,]+(\.\d+)?|\d[\d,]*(\.\d+)?/gi) || [];
-  return matches.reduce((sum, m) => {
-    const num = parseFloat(m.replace(/[RM,\s]/gi, ''));
-    return sum + (isNaN(num) ? 0 : num);
-  }, 0);
+  return matches.reduce((sum, m) => { const n = parseFloat(m.replace(/[RM,\s]/gi, '')); return sum + (isNaN(n) ? 0 : n); }, 0);
 }
 
-// Local Dashboard Calculation
+// Dashboard calculations
 function updateLocalDashboard() {
   const income = parseAmounts(document.getElementById('incomeInput').value);
   const expenses = parseAmounts(document.getElementById('expenseInput').value);
   const assets = parseAmounts(document.getElementById('assetInput').value);
   const balance = income - expenses;
-  const savingsRate = income > 0 ? ((balance / income) * 100).toFixed(1) : 0;
-  const healthScore = Math.min(100, Math.max(0, Math.round(
-    (income > 0 ? 25 : 0) +
-    (balance > 0 ? 25 : 0) +
-    (savingsRate >= 20 ? 25 : savingsRate >= 10 ? 15 : 5) +
-    (assets > 0 ? 25 : 0)
-  )));
+  const savingsRate = income > 0 ? ((balance / income) * 100).toFixed(1) : '0';
 
-  document.getElementById('scIncome').textContent = 'RM' + income.toLocaleString();
-  document.getElementById('scExpenses').textContent = 'RM' + expenses.toLocaleString();
-  document.getElementById('scBalance').textContent = (balance >= 0 ? 'RM' : '-RM') + Math.abs(balance).toLocaleString();
-  document.getElementById('scAssets').textContent = 'RM' + assets.toLocaleString();
+  document.getElementById('scIncome').textContent = 'RM ' + income.toLocaleString();
+  document.getElementById('scExpenses').textContent = 'RM ' + expenses.toLocaleString();
+  document.getElementById('scBalance').textContent = 'RM ' + balance.toLocaleString();
+  document.getElementById('scAssets').textContent = 'RM ' + assets.toLocaleString();
   document.getElementById('scSavingsRate').textContent = savingsRate + '%';
-  document.getElementById('scHealthScore').textContent = healthScore + '/100';
+
+  updateBudgetProgress();
+  updateHomePieChart();
 }
 
-// Markdown Rendering
-function renderMarkdown(text) {
-  return text.split('\n').map(line => {
-    if (line.match(/^---+$/)) return '<hr>';
-    if (line.match(/^### /)) return '<h3>' + renderInline(line.slice(4)) + '</h3>';
-    if (line.match(/^## /)) return '<h2>' + renderInline(line.slice(3)) + '</h2>';
-    if (line.match(/^# /)) return '<h1>' + renderInline(line.slice(2)) + '</h1>';
-    if (line.match(/^\d+\.\s/)) return '<li>' + renderInline(line.replace(/^\d+\.\s/, '')) + '</li>';
-    if (line.match(/^[-*]\s/)) return '<li>' + renderInline(line.slice(2)) + '</li>';
-    if (line.trim() === '') return '<br>';
-    return '<p>' + renderInline(line) + '</p>';
-  }).join('');
-}
-function renderInline(text) {
-  text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
-  text = text.replace(/`(.+?)`/g, '<code>$1</code>');
-  return text;
-}
-
-// Fetch AI response (buffered JSON)
-async function fetchAI(url, body, panelId) {
-  const panel = document.getElementById(panelId);
-  panel.setAttribute('aria-busy', 'true');
-  panel.innerHTML = '<div class="loading-msg"><span class="spinner"></span>Generating AI response... (may take 10-20 seconds)</div>';
-  announce('Generating AI response, please wait.');
-  try {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-    if (!res.ok) throw new Error('HTTP ' + res.status + ' - ' + (await res.text()).slice(0, 200));
-    const data = await res.json();
-    if (data.error) throw new Error(data.error);
-    panel.innerHTML = renderMarkdown(data.response || '');
-    panel.scrollTop = 0;
-    panel.setAttribute('aria-busy', 'false');
-    announce('AI analysis complete. Results are now displayed.');
-  } catch (err) {
-    panel.innerHTML = '<div class="error" role="alert">&#9888; Error: ' + err.message + '</div>';
-    panel.setAttribute('aria-busy', 'false');
-    announce('Error: ' + err.message);
-  }
-}
-
-// Run individual features
-function runFeature(feature) {
-  const income = document.getElementById('incomeInput').value;
-  const expenses = document.getElementById('expenseInput').value;
-  const assets = document.getElementById('assetInput').value;
-  const subscriptions = document.getElementById('subscriptionInput').value;
-  const budgetPlan = document.getElementById('budgetInput').value;
-  const savingsGoal = document.getElementById('savingsInput').value;
-  const adviseQuestion = document.getElementById('adviseInput').value;
-
-  switch (feature) {
-    case 'dashboard':
-      if (!income && !expenses && !assets) { alert('Please enter your Income, Expenses, or Assets first (Step 1).'); showPage('inputs'); return; }
-      fetchAI(STREAM_URLS.financial_dashboard, { income, expenses, assets }, 'outputDashboard');
-      break;
-    case 'budget':
-      if (!expenses || !budgetPlan) { alert('Please enter your Expenses (Step 1) and Budget Plan above.'); return; }
-      fetchAI(STREAM_URLS.budget_monitor, { expenses, budget_plan: budgetPlan }, 'outputBudget');
-      break;
-    case 'recommendation':
-      if (!income && !expenses && !assets) { alert('Please enter your financial data first (Step 1).'); showPage('inputs'); return; }
-      fetchAI(STREAM_URLS.ai_financial_recommendation, { income, expenses, assets, budget_plan: budgetPlan }, 'outputRecommendation');
-      break;
-    case 'health':
-      if (!income && !expenses && !assets) { alert('Please enter your financial data first (Step 1).'); showPage('inputs'); return; }
-      fetchAI(STREAM_URLS.financial_health_report, { income, expenses, assets, budget_plan: budgetPlan, savings_goal: savingsGoal }, 'outputHealthReport');
-      break;
-    case 'subscription':
-      if (!subscriptions) { alert('Please enter your Subscriptions first (Step 1).'); showPage('inputs'); return; }
-      fetchAI(STREAM_URLS.subscription_reminder, { subscriptions }, 'outputSubscription');
-      break;
-    case 'advisor':
-      if (!adviseQuestion) { alert('Please type your financial question above.'); return; }
-      fetchAI(STREAM_URLS.ai_financial_advisor_discussions, {
-        income, expenses, assets, budget_plan: budgetPlan,
-        savings_goal: savingsGoal, subscriptions, question: adviseQuestion
-      }, 'outputAdvisor');
-      break;
-  }
-}
-
-// ========== NEW FEATURES ==========
-
-// Dark/Light Mode Toggle
-function toggleTheme() {
-  document.body.classList.toggle('light');
-  localStorage.setItem('theme', document.body.classList.contains('light') ? 'light' : 'dark');
-  announce('Theme changed to ' + (document.body.classList.contains('light') ? 'light' : 'dark') + ' mode');
-}
-if (localStorage.getItem('theme') === 'light') document.body.classList.add('light');
-
-// ========== ACCESSIBILITY ==========
-function announce(msg) {
-  const el = document.getElementById('a11y-announce');
-  if (el) { el.textContent = ''; setTimeout(() => { el.textContent = msg; }, 50); }
-}
-
-function toggleA11y(mode) {
-  // Handle mutually exclusive text sizes
-  if (mode === 'large-text' && document.body.classList.contains('xl-text')) {
-    document.body.classList.remove('xl-text');
-    updateSwitch('toggleXLText', false);
-    localStorage.removeItem('a11y-xl-text');
-  }
-  if (mode === 'xl-text' && document.body.classList.contains('large-text')) {
-    document.body.classList.remove('large-text');
-    updateSwitch('toggleLargeText', false);
-    localStorage.removeItem('a11y-large-text');
-  }
-
-  document.body.classList.toggle(mode);
-  const isActive = document.body.classList.contains(mode);
-
-  // Map mode to switch ID
-  const switchMap = {
-    'high-contrast': 'toggleHighContrast',
-    'color-blind': 'toggleColorBlind',
-    'enhanced-focus': 'toggleEnhancedFocus',
-    'large-text': 'toggleLargeText',
-    'xl-text': 'toggleXLText',
-    'reduced-motion': 'toggleReducedMotion',
-    'simplified': 'toggleSimplified',
-    'sr-optimized': 'toggleScreenReader'
-  };
-  updateSwitch(switchMap[mode], isActive);
-
-  // Save to localStorage
-  if (isActive) { localStorage.setItem('a11y-' + mode, '1'); }
-  else { localStorage.removeItem('a11y-' + mode); }
-
-  announce(mode.replace(/-/g, ' ') + (isActive ? ' enabled' : ' disabled'));
-}
-
-function updateSwitch(id, active) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  if (active) { el.classList.add('active'); el.setAttribute('aria-checked', 'true'); }
-  else { el.classList.remove('active'); el.setAttribute('aria-checked', 'false'); }
-}
-
-// Load saved accessibility preferences
-(function loadA11yPrefs() {
-  const modes = ['high-contrast','color-blind','enhanced-focus','large-text','xl-text','reduced-motion','simplified','sr-optimized'];
-  const switchMap = {
-    'high-contrast': 'toggleHighContrast', 'color-blind': 'toggleColorBlind',
-    'enhanced-focus': 'toggleEnhancedFocus', 'large-text': 'toggleLargeText',
-    'xl-text': 'toggleXLText', 'reduced-motion': 'toggleReducedMotion',
-    'simplified': 'toggleSimplified', 'sr-optimized': 'toggleScreenReader'
-  };
-  modes.forEach(mode => {
-    if (localStorage.getItem('a11y-' + mode) === '1') {
-      document.body.classList.add(mode);
-      updateSwitch(switchMap[mode], true);
-    }
-  });
-  // Respect system preferences
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    document.body.classList.add('reduced-motion');
-  }
-  if (window.matchMedia('(prefers-contrast: more)').matches) {
-    document.body.classList.add('high-contrast');
-  }
-})();
-
-// Voice feature toggle (show/hide floating button)
-function toggleVoiceFeature() {
-  const bar = document.getElementById('voiceCommandBar');
-  const btn = document.getElementById('toggleVoice');
-  const isActive = bar.style.display !== 'none';
-  
-  if (isActive) {
-    bar.style.display = 'none';
-    if (btn) { btn.classList.remove('active'); btn.setAttribute('aria-checked', 'false'); }
-    localStorage.removeItem('a11y-voice');
-    announce('Voice recognition disabled.');
-  } else {
-    if (typeof isVoiceSupported === 'function' && !isVoiceSupported()) {
-      alert('Voice recognition is not supported in your browser. Please use Chrome or Edge.');
-      return;
-    }
-    bar.style.display = 'block';
-    if (btn) { btn.classList.add('active'); btn.setAttribute('aria-checked', 'true'); }
-    localStorage.setItem('a11y-voice', '1');
-    announce('Voice recognition enabled. Click the microphone button or say a command.');
-  }
-}
-
-// Load voice preference
-(function loadVoicePref() {
-  const bar = document.getElementById('voiceCommandBar');
-  if (bar) {
-    if (localStorage.getItem('a11y-voice') === '1' && typeof isVoiceSupported === 'function' && isVoiceSupported()) {
-      bar.style.display = 'block';
-      updateSwitch('toggleVoice', true);
-    } else {
-      bar.style.display = 'none';
-    }
-  }
-})();
-
-// Expense Pie Chart
-function generatePieChart() {
+function updateHomePieChart() {
   const text = document.getElementById('expenseInput').value;
-  if (!text.trim()) { alert('Please enter your expenses in Step 1 first.\n\nUse format:\nFood RM600\nTransport RM350\nRental RM800'); showPage('inputs'); return; }
+  if (!text.trim()) return;
   const categories = {};
   text.split('\n').forEach(line => {
     const match = line.match(/(.+?)\s*RM\s?([\d,]+(\.\d+)?)/i);
-    if (match) {
-      const cat = match[1].trim();
-      const amt = parseFloat(match[2].replace(/,/g, ''));
-      if (!isNaN(amt) && cat) categories[cat] = (categories[cat] || 0) + amt;
-    }
+    if (match) { const cat = match[1].trim(); const amt = parseFloat(match[2].replace(/,/g,'')); if (!isNaN(amt)&&cat) categories[cat]=(categories[cat]||0)+amt; }
   });
-  const entries = Object.entries(categories).sort((a, b) => b[1] - a[1]);
-  if (entries.length === 0) { alert('No expenses found. Please enter expenses in Step 1 using this format:\n\nFood RM600\nTransport RM350\nRental RM800'); showPage('inputs'); return; }
-  const total = entries.reduce((s, e) => s + e[1], 0);
-  const colors = ['#7c6ff7','#f87171','#4ade80','#fbbf24','#60a5fa','#f472b6','#2dd4bf','#fb923c','#a78bfa','#34d399'];
-  let cum = 0, paths = '';
-  entries.forEach((entry, i) => {
-    const angle = (entry[1] / total) * 360;
-    const s = cum, e2 = cum + angle;
-    const la = angle > 180 ? 1 : 0;
-    const x1 = 110 + 90 * Math.cos((s - 90) * Math.PI / 180);
-    const y1 = 110 + 90 * Math.sin((s - 90) * Math.PI / 180);
-    const x2 = 110 + 90 * Math.cos((e2 - 90) * Math.PI / 180);
-    const y2 = 110 + 90 * Math.sin((e2 - 90) * Math.PI / 180);
-    paths += '<path d="M110,110 L'+x1+','+y1+' A90,90 0 '+la+',1 '+x2+','+y2+' Z" fill="'+colors[i%colors.length]+'"/>';
-    cum = e2;
+  const entries = Object.entries(categories).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  if (entries.length===0) return;
+  const total = entries.reduce((s,e)=>s+e[1],0);
+  const colors = ['#6366f1','#ef4444','#10b981','#f59e0b','#ec4899'];
+  let html = '<div style="display:flex;flex-direction:column;gap:8px;">';
+  entries.forEach((e,i) => {
+    const pct = ((e[1]/total)*100).toFixed(0);
+    html += `<div style="display:flex;align-items:center;gap:10px;"><div style="width:10px;height:10px;border-radius:3px;background:${colors[i%5]}"></div><span style="flex:1;font-size:0.82rem;">${e[0]}</span><span style="font-size:0.82rem;font-weight:600;">RM${e[1].toLocaleString()}</span><span style="font-size:0.75rem;color:var(--text-secondary);">${pct}%</span></div>`;
   });
-  let legend = '<ul class="pie-legend">';
-  entries.forEach((e, i) => {
-    legend += '<li><span class="dot" style="background:'+colors[i%colors.length]+'"></span>'+e[0]+' RM'+e[1].toLocaleString()+' ('+((e[1]/total)*100).toFixed(1)+'%)</li>';
-  });
-  legend += '</ul>';
-  document.getElementById('pieChart').innerHTML = '<svg class="pie-svg" viewBox="0 0 220 220">'+paths+'</svg>'+legend;
+  html += '</div>';
+  document.getElementById('homePieChart').innerHTML = html;
 }
 
-// Savings Progress
-function generateSavingsProgress() {
-  const text = document.getElementById('savingsInput').value;
-  if (!text.trim()) { alert('Fill in Savings Goal in Step 5.'); showPage('health'); return; }
-  let target = 0, current = 0, monthly = 0, goal = 'Savings Goal';
-  const tm = text.match(/target.*?RM\s?([\d,]+)/i); if (tm) target = parseFloat(tm[1].replace(/,/g,''));
-  const cm = text.match(/current.*?RM\s?([\d,]+)/i); if (cm) current = parseFloat(cm[1].replace(/,/g,''));
-  const mm = text.match(/monthly.*?RM\s?([\d,]+)/i); if (mm) monthly = parseFloat(mm[1].replace(/,/g,''));
-  const gm = text.match(/saving for[:\s]*(.+)/i); if (gm) goal = gm[1].trim().slice(0,30);
-  if (target <= 0) { alert('Include "Target Amount: RM50000"'); return; }
-  const pct = Math.min(100, (current / target) * 100);
-  const remaining = Math.max(0, target - current);
-  const monthsLeft = monthly > 0 ? Math.ceil(remaining / monthly) : null;
-  const color = pct >= 75 ? '#4ade80' : pct >= 40 ? '#fbbf24' : '#f87171';
-  document.getElementById('savingsProgressArea').innerHTML = `
-    <div class="progress-container"><div class="progress-label"><span>${goal}</span><span>${pct.toFixed(1)}%</span></div>
-    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${color};">RM${current.toLocaleString()}</div></div>
-    <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:rgba(255,255,255,0.4);margin-top:6px;"><span>RM0</span><span>Target: RM${target.toLocaleString()}</span></div></div>
-    <div style="margin-top:16px;font-size:0.83rem;color:rgba(255,255,255,0.6);">
-    <p>Remaining: <strong style="color:#fff;">RM${remaining.toLocaleString()}</strong></p>
-    ${monthly > 0 ? '<p>Monthly: <strong style="color:#fff;">RM'+monthly.toLocaleString()+'</strong></p>' : ''}
-    ${monthsLeft ? '<p>ETA: <strong style="color:#fff;">'+monthsLeft+' months</strong></p>' : ''}</div>`;
+// Markdown
+function renderMarkdown(text) {
+  return text.split('\n').map(line => {
+    if (line.match(/^---+$/)) return '<hr>';
+    if (line.match(/^### /)) return '<h3>'+rl(line.slice(4))+'</h3>';
+    if (line.match(/^## /)) return '<h2>'+rl(line.slice(3))+'</h2>';
+    if (line.match(/^# /)) return '<h1>'+rl(line.slice(2))+'</h1>';
+    if (line.match(/^\d+\.\s/)) return '<li>'+rl(line.replace(/^\d+\.\s/,''))+'</li>';
+    if (line.match(/^[-*]\s/)) return '<li>'+rl(line.slice(2))+'</li>';
+    if (line.trim()==='') return '<br>';
+    return '<p>'+rl(line)+'</p>';
+  }).join('');
+}
+function rl(t) { return t.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/`(.+?)`/g,'<code>$1</code>'); }
+
+// AI Fetch
+async function fetchAI(url, body, panelId) {
+  const panel = document.getElementById(panelId);
+  panel.style.display = 'block';
+  panel.setAttribute('aria-busy','true');
+  panel.innerHTML = '<div class="loading-msg"><span class="spinner"></span>Generating AI response...</div>';
+  announce('Generating AI response.');
+  try {
+    const res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+    if (!res.ok) throw new Error('HTTP '+res.status+' - '+(await res.text()).slice(0,200));
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    panel.innerHTML = renderMarkdown(data.response||'');
+    panel.setAttribute('aria-busy','false');
+    announce('AI analysis complete.');
+  } catch (err) {
+    panel.innerHTML = '<div class="error">Error: '+err.message+'</div>';
+    panel.setAttribute('aria-busy','false');
+    announce('Error: '+err.message);
+  }
 }
 
-// Monthly Comparison
-function generateComparison() {
-  const textA = document.getElementById('monthAInput').value;
-  const textB = document.getElementById('monthBInput').value;
-  if (!textA.trim() || !textB.trim()) { alert('Enter data for both months.'); return; }
-  const totalA = parseAmounts(textA), totalB = parseAmounts(textB);
-  const diff = totalB - totalA;
-  const diffPct = totalA > 0 ? ((diff / totalA) * 100).toFixed(1) : '0';
-  const el = document.getElementById('comparisonResult');
-  el.style.display = 'block';
-  el.innerHTML = `<div class="card-title">Comparison Result</div>
-    <div class="compare-grid"><div class="compare-col"><h3>Month A</h3><div class="compare-item"><span class="label">Total</span><span class="value" style="color:#60a5fa;">RM${totalA.toLocaleString()}</span></div></div>
-    <div class="compare-col"><h3>Month B</h3><div class="compare-item"><span class="label">Total</span><span class="value" style="color:#a78bfa;">RM${totalB.toLocaleString()}</span></div></div></div>
-    <div style="text-align:center;margin-top:16px;padding:12px;background:rgba(255,255,255,0.03);border-radius:10px;">
-    <p style="font-size:0.8rem;color:rgba(255,255,255,0.5);">Difference</p>
-    <p style="font-size:1.3rem;font-weight:700;color:${diff>=0?'#f87171':'#4ade80'};">${diff>=0?'+':''}RM${Math.abs(diff).toLocaleString()} (${diff>=0?'+':''}${diffPct}%)</p>
-    <p style="font-size:0.75rem;color:rgba(255,255,255,0.4);margin-top:4px;">${diff>0?'Spending increased':diff<0?'Spending decreased!':'No change'}</p></div>`;
+// Run features
+function runFeature(feature) {
+  const income=document.getElementById('incomeInput').value, expenses=document.getElementById('expenseInput').value;
+  const assets=document.getElementById('assetInput').value, subs=document.getElementById('subscriptionInput').value;
+  const budget=document.getElementById('budgetInput').value, savings=document.getElementById('savingsInput').value;
+  const question=document.getElementById('adviseInput').value;
+
+  switch(feature) {
+    case 'dashboard': fetchAI(STREAM_URLS.financial_dashboard,{income,expenses,assets},'outputDashboard'); break;
+    case 'budget': fetchAI(STREAM_URLS.budget_monitor,{expenses,budget_plan:budget},'outputBudget'); break;
+    case 'recommendation': fetchAI(STREAM_URLS.ai_financial_recommendation,{income,expenses,assets,budget_plan:budget},'outputRecommendation'); break;
+    case 'health': fetchAI(STREAM_URLS.financial_health_report,{income,expenses,assets,budget_plan:budget,savings_goal:savings},'outputHealthReport'); break;
+    case 'subscription': fetchAI(STREAM_URLS.subscription_reminder,{subscriptions:subs},'outputSubscription'); break;
+    case 'advisor':
+      if(!question){alert('Please enter a question.');return;}
+      fetchAI(STREAM_URLS.ai_financial_advisor_discussions,{income,expenses,assets,budget_plan:budget,savings_goal:savings,subscriptions:subs,question},'outputAdvisor'); break;
+  }
 }
 
-// Export Report
-function exportReport() {
-  const income = document.getElementById('incomeInput').value || '(not entered)';
-  const expenses = document.getElementById('expenseInput').value || '(not entered)';
-  const assets = document.getElementById('assetInput').value || '(not entered)';
-  const subs = document.getElementById('subscriptionInput').value || '(not entered)';
-  const budget = document.getElementById('budgetInput').value || '(not entered)';
-  const savings = document.getElementById('savingsInput').value || '(not entered)';
-  const ti = parseAmounts(income), te = parseAmounts(expenses), ta = parseAmounts(assets);
-  const bal = ti - te, sr = ti > 0 ? ((bal/ti)*100).toFixed(1) : '0';
-  const report = `AI PERSONAL FINANCE ADVISOR - REPORT\nGenerated: ${new Date().toLocaleString()}\n${'='.repeat(50)}\n\nFINANCIAL SUMMARY\nTotal Income: RM${ti.toLocaleString()}\nTotal Expenses: RM${te.toLocaleString()}\nBalance: RM${bal.toLocaleString()}\nAssets: RM${ta.toLocaleString()}\nSavings Rate: ${sr}%\n\nINCOME:\n${income}\n\nEXPENSES:\n${expenses}\n\nASSETS:\n${assets}\n\nSUBSCRIPTIONS:\n${subs}\n\nBUDGET PLAN:\n${budget}\n\nSAVINGS GOAL:\n${savings}\n\n${'='.repeat(50)}\nEnd of Report`;
-  const blob = new Blob([report], { type: 'text/plain' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-  a.download = 'Financial_Report_' + new Date().toISOString().split('T')[0] + '.txt'; a.click();
+// Theme
+function toggleTheme() { document.body.classList.toggle('light'); localStorage.setItem('theme',document.body.classList.contains('light')?'light':'dark'); announce('Theme toggled.'); }
+if(localStorage.getItem('theme')==='light') document.body.classList.add('light');
+
+// Announce
+function announce(msg) { const el=document.getElementById('a11y-announce'); if(el){el.textContent='';setTimeout(()=>{el.textContent=msg;},50);} }
+
+// Accessibility toggles
+function toggleA11y(mode) {
+  if(mode==='large-text'&&document.body.classList.contains('xl-text')){document.body.classList.remove('xl-text');updateSwitch('toggleXLText',false);localStorage.removeItem('a11y-xl-text');}
+  if(mode==='xl-text'&&document.body.classList.contains('large-text')){document.body.classList.remove('large-text');updateSwitch('toggleLargeText',false);localStorage.removeItem('a11y-large-text');}
+  document.body.classList.toggle(mode);
+  const isActive=document.body.classList.contains(mode);
+  const map={'high-contrast':'toggleHighContrast','color-blind':'toggleColorBlind','enhanced-focus':'toggleEnhancedFocus','large-text':'toggleLargeText','xl-text':'toggleXLText','reduced-motion':'toggleReducedMotion','simplified':'toggleSimplified','sr-optimized':'toggleScreenReader'};
+  updateSwitch(map[mode],isActive);
+  if(isActive)localStorage.setItem('a11y-'+mode,'1');else localStorage.removeItem('a11y-'+mode);
+  announce(mode.replace(/-/g,' ')+(isActive?' enabled':' disabled'));
 }
+function updateSwitch(id,active){const el=document.getElementById(id);if(!el)return;if(active){el.classList.add('active');el.setAttribute('aria-checked','true');}else{el.classList.remove('active');el.setAttribute('aria-checked','false');}}
+function toggleVoiceFeature(){const bar=document.getElementById('voiceCommandBar');const btn=document.getElementById('toggleVoice');if(bar.style.display!=='none'&&bar.style.display!==''){bar.style.display='none';if(btn){btn.classList.remove('active');btn.setAttribute('aria-checked','false');}localStorage.removeItem('a11y-voice');announce('Voice disabled.');}else{bar.style.display='block';if(btn){btn.classList.add('active');btn.setAttribute('aria-checked','true');}localStorage.setItem('a11y-voice','1');announce('Voice enabled.');}}
 
-// Keyboard support for nav links (Enter/Space to activate)
-document.querySelectorAll('.sidebar-nav a[role="button"]').forEach(link => {
-  link.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.click(); }
-  });
-});
+// Load a11y prefs
+(function(){
+  const modes=['high-contrast','color-blind','enhanced-focus','large-text','xl-text','reduced-motion','simplified','sr-optimized'];
+  const map={'high-contrast':'toggleHighContrast','color-blind':'toggleColorBlind','enhanced-focus':'toggleEnhancedFocus','large-text':'toggleLargeText','xl-text':'toggleXLText','reduced-motion':'toggleReducedMotion','simplified':'toggleSimplified','sr-optimized':'toggleScreenReader'};
+  modes.forEach(m=>{if(localStorage.getItem('a11y-'+m)==='1'){document.body.classList.add(m);updateSwitch(map[m],true);}});
+  if(window.matchMedia('(prefers-reduced-motion:reduce)').matches)document.body.classList.add('reduced-motion');
+  const bar=document.getElementById('voiceCommandBar');if(bar){if(localStorage.getItem('a11y-voice')==='1'){bar.style.display='block';updateSwitch('toggleVoice',true);}else{bar.style.display='none';}}
+})();
 
-// Keyboard support for welcome cards
-document.querySelectorAll('.welcome-card').forEach(card => {
-  card.setAttribute('tabindex', '0');
-  card.setAttribute('role', 'button');
-  card.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.click(); }
-  });
-});
-
-// Add aria-live to AI output panels
-document.querySelectorAll('.ai-output').forEach(panel => {
-  panel.setAttribute('aria-live', 'polite');
-  panel.setAttribute('aria-atomic', 'false');
-});
-
-// Keyboard support for OCR upload zone
-const ocrZone = document.getElementById('ocrUploadZone');
-if (ocrZone) {
-  ocrZone.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); document.getElementById('ocrFileInput').click(); }
-  });
-}
+// Keyboard nav
+document.querySelectorAll('.sidebar-nav a[role="button"],.mobile-nav a').forEach(a=>{a.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();a.click();}});});
 </script>
 
-<!-- Tesseract.js OCR Library (CDN) -->
+<!-- External modules -->
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-<!-- Receipt OCR Module -->
 <script src="js/receipt-ocr.js"></script>
-<!-- Voice Recognition Module -->
 <script src="js/voice-control.js"></script>
-<!-- Quick Input Module -->
 <script src="js/quick-input.js"></script>
-<!-- UX Improvements Module -->
 <script src="js/improvements.js"></script>
 
 </body>
