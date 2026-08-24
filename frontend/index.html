@@ -90,6 +90,7 @@ body.light .card-sm-sub { color: rgba(255,255,255,0.7); }
 /* Grid layouts */
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.grid-2-dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; align-items: start; }
 .grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 20px; }
 
 /* Page headers */
@@ -239,7 +240,7 @@ body.sr-optimized .card-value::before { font-size: 0.6rem; font-weight: 400; col
   .sidebar { display: none; }
   .main { margin-left: 0; padding: 16px; }
   .grid-3 { grid-template-columns: 1fr; }
-  .grid-2,.grid-2-1 { grid-template-columns: 1fr; }
+  .grid-2,.grid-2-1,.grid-2-dashboard { grid-template-columns: 1fr; }
   .mobile-nav { display: flex !important; }
 }
 /* Mobile bottom nav */
@@ -328,20 +329,20 @@ body.sr-optimized .card-value::before { font-size: 0.6rem; font-weight: 400; col
         </div>
       </div>
 
-      <!-- AI Insight -->
-      <div class="card">
-        <div class="card-title">🤖 FinBot Insight</div>
-        <p style="font-size:0.85rem;color:var(--text-secondary);" id="aiInsightText">Enter your financial data in the Money section to receive AI-powered insights.</p>
-        <div class="btn-group">
-          <button class="btn btn-secondary" onclick="showPage('ai')">Ask FinBot →</button>
+      <!-- AI Insight + Spending Breakdown (side by side) -->
+      <div class="grid-2-dashboard">
+        <div class="card">
+          <div class="card-title">🤖 FinBot Insight</div>
+          <p style="font-size:0.85rem;color:var(--text-secondary);" id="aiInsightText">Enter your financial data in the Money section to receive AI-powered insights.</p>
+          <div class="btn-group">
+            <button class="btn btn-secondary" onclick="showPage('ai')">Ask FinBot →</button>
+          </div>
         </div>
-      </div>
-
-      <!-- Spending Breakdown -->
-      <div class="card">
-        <div class="card-title">Spending Breakdown</div>
-        <div id="homePieChart">
-          <p style="color:var(--text-secondary);font-size:0.85rem;">Add expenses to see your spending breakdown.</p>
+        <div class="card">
+          <div class="card-title">📊 Spending Breakdown</div>
+          <div id="homePieChart">
+            <p style="color:var(--text-secondary);font-size:0.85rem;">Add expenses to see your spending breakdown.</p>
+          </div>
         </div>
       </div>
     </div>
