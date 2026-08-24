@@ -166,7 +166,6 @@ function initQuickInputs() {
   createQuickAdd('expenseInput', 'expenses');
   createQuickAdd('assetInput', 'assets');
   createQuickAdd('subscriptionInput', 'subscriptions');
-  createQuickAdd('budgetInput', 'budget');
 }
 
 // Run after DOM is ready
