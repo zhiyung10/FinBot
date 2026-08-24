@@ -50,22 +50,22 @@ jobs:
           }
 
           URL=$(get_output FinancialDashboardUrl)
-          sed -i "s|__URL_FINANCIAL_DASHBOARD__|$URL|g" frontend/index.html
+          sed -i "s|__URL_FINANCIAL_DASHBOARD__|$URL|g" frontend/index.html frontend/js/main.js
 
           URL=$(get_output BudgetMonitorUrl)
-          sed -i "s|__URL_BUDGET_MONITOR__|$URL|g" frontend/index.html
+          sed -i "s|__URL_BUDGET_MONITOR__|$URL|g" frontend/index.html frontend/js/main.js
 
           URL=$(get_output AIFinancialRecommendationUrl)
-          sed -i "s|__URL_AI_FINANCIAL_RECOMMENDATION__|$URL|g" frontend/index.html
+          sed -i "s|__URL_AI_FINANCIAL_RECOMMENDATION__|$URL|g" frontend/index.html frontend/js/main.js
 
           URL=$(get_output FinancialHealthReportUrl)
-          sed -i "s|__URL_FINANCIAL_HEALTH_REPORT__|$URL|g" frontend/index.html
+          sed -i "s|__URL_FINANCIAL_HEALTH_REPORT__|$URL|g" frontend/index.html frontend/js/main.js
 
           URL=$(get_output SubscriptionReminderUrl)
-          sed -i "s|__URL_SUBSCRIPTION_REMINDER__|$URL|g" frontend/index.html
+          sed -i "s|__URL_SUBSCRIPTION_REMINDER__|$URL|g" frontend/index.html frontend/js/main.js
 
           URL=$(get_output AIFinancialAdvisorUrl)
-          sed -i "s|__URL_AI_FINANCIAL_ADVISOR_DISCUSSIONS__|$URL|g" frontend/index.html
+          sed -i "s|__URL_AI_FINANCIAL_ADVISOR_DISCUSSIONS__|$URL|g" frontend/index.html frontend/js/main.js
 
       - name: Deploy frontend to S3
         run: |

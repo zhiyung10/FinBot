@@ -116,18 +116,35 @@ async function fetchAI(url, body, panelId) {
   const panel = document.getElementById(panelId);
   panel.style.display = 'block';
   panel.setAttribute('aria-busy','true');
+
+  // Validate URL before making request
+  if (!url || url.includes('__URL_') || url === 'undefined' || url === '') {
+    panel.innerHTML = '<div class="error">⚠ AI backend not configured. The API URL placeholder has not been replaced during deployment.<br><br>This usually means:<br>• The GitHub Actions deploy workflow has not run yet<br>• The CloudFormation stack outputs are not available<br><br>Please re-run the deployment workflow or manually upload the frontend after deployment.</div>';
+    panel.setAttribute('aria-busy','false');
+    console.error('[FinBot] fetchAI failed: URL is a placeholder or empty.', { url, panelId });
+    announce('Error: AI backend not configured.');
+    return;
+  }
+
   panel.innerHTML = '<div class="loading-msg"><span class="spinner"></span>Generating AI response...</div>';
   announce('Generating AI response.');
   try {
     const res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
-    if (!res.ok) throw new Error('HTTP '+res.status+' - '+(await res.text()).slice(0,200));
+    if (!res.ok) {
+      const errorBody = await res.text();
+      console.error('[FinBot] API Error:', { status: res.status, url: url.replace(/https?:\/\/[^/]+/, '[endpoint]'), body: errorBody.slice(0, 500) });
+      throw new Error('HTTP '+res.status+' - '+errorBody.slice(0,200));
+    }
     const data = await res.json();
-    if (data.error) throw new Error(data.error);
+    if (data.error) {
+      console.error('[FinBot] AI Error:', { url: url.replace(/https?:\/\/[^/]+/, '[endpoint]'), error: data.error });
+      throw new Error(data.error);
+    }
     panel.innerHTML = renderMarkdown(data.response||'');
     panel.setAttribute('aria-busy','false');
     announce('AI analysis complete.');
   } catch (err) {
-    panel.innerHTML = '<div class="error">Error: '+err.message+'</div>';
+    panel.innerHTML = '<div class="error">⚠ Error: '+err.message+'</div>';
     panel.setAttribute('aria-busy','false');
     announce('Error: '+err.message);
   }
