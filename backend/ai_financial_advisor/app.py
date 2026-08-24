@@ -44,16 +44,29 @@ def handler():
         savings_goal = data.get("savings_goal", "")
         subscriptions = data.get("subscriptions", "")
         question = data.get("question", "")
+        calculated_summary = data.get("calculated_summary", "")
 
-        prompt = f"""The user has provided their current financial profile:
-- Income: {income}
-- Expenses: {expenses}
-- Assets: {assets}
-- Budget Plan: {budget_plan}
-- Savings Goal: {savings_goal}
-- Subscriptions: {subscriptions}
+        prompt = f"""{calculated_summary}
 
-The user wants to evaluate the following financial scenario:
+Income breakdown:
+{income}
+
+Expenses breakdown:
+{expenses}
+
+Assets:
+{assets}
+
+Budget plan:
+{budget_plan}
+
+Savings goal:
+{savings_goal}
+
+Subscriptions:
+{subscriptions}
+
+User's financial scenario question:
 {question}"""
 
         response = bedrock.converse(

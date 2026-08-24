@@ -43,8 +43,9 @@ def handler():
         assets = data.get("assets", "")
         budget_plan = data.get("budget_plan", "")
         savings_goal = data.get("savings_goal", "")
+        calculated_summary = data.get("calculated_summary", "")
 
-        prompt = f"Based on the user's income: {income}, expenses: {expenses}, assets: {assets}, budget plan: {budget_plan}, and savings goal: {savings_goal}, generate a comprehensive professional financial health report."
+        prompt = f"{calculated_summary}\n\nIncome:\n{income}\n\nExpenses:\n{expenses}\n\nAssets:\n{assets}\n\nBudget:\n{budget_plan}\n\nSavings goal:\n{savings_goal}\n\nGenerate financial health report."
 
         response = bedrock.converse(
             modelId=MODEL_ID,

@@ -43,8 +43,9 @@ def handler():
         data = request.get_json(force=True)
         expenses = data.get("expenses", "")
         budget_plan = data.get("budget_plan", "")
+        calculated_summary = data.get("calculated_summary", "")
 
-        prompt = f"Based on the user's expenses: {expenses} and budget plan: {budget_plan}, analyze spending against the selected budget limits."
+        prompt = f"{calculated_summary}\n\nExpenses breakdown:\n{expenses}\n\nBudget plan:\n{budget_plan}\n\nAnalyze spending against budget limits."
 
         response = bedrock.converse(
             modelId=MODEL_ID,

@@ -55,8 +55,9 @@ def handler():
         income = data.get("income", "")
         expenses = data.get("expenses", "")
         assets = data.get("assets", "")
+        calculated_summary = data.get("calculated_summary", "")
 
-        prompt = f"Analyze this financial data and return structured JSON insight:\n\nIncome:\n{income}\n\nExpenses:\n{expenses}\n\nAssets:\n{assets}"
+        prompt = f"{calculated_summary}\n\nIncome breakdown:\n{income}\n\nExpenses breakdown:\n{expenses}\n\nAssets:\n{assets}\n\nAnalyze and return structured JSON insight."
 
         response = bedrock.converse(
             modelId=MODEL_ID,

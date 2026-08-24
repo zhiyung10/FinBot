@@ -44,8 +44,9 @@ def handler():
         expenses = data.get("expenses", "")
         assets = data.get("assets", "")
         budget_plan = data.get("budget_plan", "")
+        calculated_summary = data.get("calculated_summary", "")
 
-        prompt = f"Analyze the user's complete financial profile based on their income: {income}, expenses: {expenses}, assets: {assets}, and budget plan: {budget_plan}."
+        prompt = f"{calculated_summary}\n\nIncome breakdown:\n{income}\n\nExpenses breakdown:\n{expenses}\n\nAssets:\n{assets}\n\nBudget plan:\n{budget_plan}\n\nProvide financial recommendations."
 
         response = bedrock.converse(
             modelId=MODEL_ID,

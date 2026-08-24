@@ -37,37 +37,67 @@ function parseAmounts(text) {
   return matches.reduce((sum, m) => { const n = parseFloat(m.replace(/[RM,\s]/gi, '')); return sum + (isNaN(n) ? 0 : n); }, 0);
 }
 
-// Dashboard calculations
-function updateLocalDashboard() {
-  const income = parseAmounts(document.getElementById('incomeInput').value);
-  const expenses = parseAmounts(document.getElementById('expenseInput').value);
-  const assets = parseAmounts(document.getElementById('assetInput').value);
-  const balance = income - expenses;
-  const savingsRate = income > 0 ? ((balance / income) * 100).toFixed(1) : '0';
+// ========== CENTRAL FINANCIAL SUMMARY ==========
+// Single source of truth for all financial calculations
+function getFinancialSummary() {
+  const incomeText = document.getElementById('incomeInput') ? document.getElementById('incomeInput').value : '';
+  const expenseText = document.getElementById('expenseInput') ? document.getElementById('expenseInput').value : '';
+  const assetText = document.getElementById('assetInput') ? document.getElementById('assetInput').value : '';
+  const subsText = document.getElementById('subscriptionInput') ? document.getElementById('subscriptionInput').value : '';
+  const budgetText = document.getElementById('budgetInput') ? document.getElementById('budgetInput').value : '';
+  const savingsText = document.getElementById('savingsInput') ? document.getElementById('savingsInput').value : '';
 
-  document.getElementById('scIncome').textContent = 'RM ' + income.toLocaleString();
-  document.getElementById('scExpenses').textContent = 'RM ' + expenses.toLocaleString();
-  document.getElementById('scBalance').textContent = 'RM ' + balance.toLocaleString();
-  document.getElementById('scAssets').textContent = 'RM ' + assets.toLocaleString();
-  document.getElementById('scSavingsRate').textContent = savingsRate + '%';
+  const totalIncome = Math.round(parseAmounts(incomeText) * 100) / 100;
+  const totalExpenses = Math.round(parseAmounts(expenseText) * 100) / 100;
+  const totalAssets = Math.round(parseAmounts(assetText) * 100) / 100;
+  const currentBalance = Math.round((totalIncome - totalExpenses) * 100) / 100;
+  const savingsRate = totalIncome > 0 ? Math.round(((currentBalance / totalIncome) * 100) * 10) / 10 : 0;
+  const expensePercentage = totalIncome > 0 ? Math.round(((totalExpenses / totalIncome) * 100) * 10) / 10 : 0;
+
+  return {
+    totalIncome,
+    totalExpenses,
+    totalAssets,
+    currentBalance,
+    savingsRate,
+    expensePercentage,
+    // Raw text for AI context
+    incomeText,
+    expenseText,
+    assetText,
+    subsText,
+    budgetText,
+    savingsText
+  };
+}
+
+// Dashboard calculations — uses central summary
+function updateLocalDashboard() {
+  const s = getFinancialSummary();
+
+  document.getElementById('scIncome').textContent = 'RM ' + s.totalIncome.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  document.getElementById('scExpenses').textContent = 'RM ' + s.totalExpenses.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  document.getElementById('scBalance').textContent = 'RM ' + s.currentBalance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  document.getElementById('scAssets').textContent = 'RM ' + s.totalAssets.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  document.getElementById('scSavingsRate').textContent = s.savingsRate + '%';
 
   // Mini bar chart for balance card
   const barsEl = document.getElementById('balanceMiniBars');
   if (barsEl) {
-    const vals = [income * 0.7, income * 0.85, income, income * 0.9, balance, balance * 1.1, balance];
+    const vals = [s.totalIncome * 0.7, s.totalIncome * 0.85, s.totalIncome, s.totalIncome * 0.9, s.currentBalance, s.currentBalance * 1.1, s.currentBalance];
     const max = Math.max(...vals, 1);
     barsEl.innerHTML = vals.map(v => '<div class="mini-bar" style="height:' + Math.max(4, (v / max) * 36) + 'px;"></div>').join('');
   }
 
   // Mini line for income card
   const incLine = document.getElementById('incomeLineChart');
-  if (incLine && income > 0) {
+  if (incLine && s.totalIncome > 0) {
     incLine.innerHTML = '<svg viewBox="0 0 100 40"><polyline points="0,35 15,28 30,30 45,20 60,22 75,15 100,10" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round"/></svg>';
   }
 
   // Mini line for expense card
   const expLine = document.getElementById('expenseLineChart');
-  if (expLine && expenses > 0) {
+  if (expLine && s.totalExpenses > 0) {
     expLine.innerHTML = '<svg viewBox="0 0 100 40"><polyline points="0,30 15,25 30,28 45,20 60,30 75,25 100,22" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/></svg>';
   }
 
@@ -273,22 +303,52 @@ function renderInsight(insight) {
   }
 }
 
-// Run features
+// Run features — all use centralized financial summary
 function runFeature(feature) {
-  const income=document.getElementById('incomeInput').value, expenses=document.getElementById('expenseInput').value;
-  const assets=document.getElementById('assetInput').value, subs=document.getElementById('subscriptionInput').value;
-  const budget=document.getElementById('budgetInput').value, savings=document.getElementById('savingsInput').value;
-  const question=document.getElementById('adviseInput').value;
+  const s = getFinancialSummary();
+  const question = document.getElementById('adviseInput') ? document.getElementById('adviseInput').value : '';
+
+  // Pre-calculated summary string sent to AI so it doesn't recalculate
+  const calculatedSummary = `[PRE-CALCULATED TOTALS - Use these exact values, do not recalculate]\nTotal Income: RM${s.totalIncome.toFixed(2)}\nTotal Expenses: RM${s.totalExpenses.toFixed(2)}\nCurrent Balance: RM${s.currentBalance.toFixed(2)}\nTotal Assets: RM${s.totalAssets.toFixed(2)}\nSavings Rate: ${s.savingsRate}%\nExpense Ratio: ${s.expensePercentage}%`;
 
   switch(feature) {
-    case 'dashboard': fetchAI(STREAM_URLS.financial_dashboard,{income,expenses,assets},'outputDashboard'); break;
-    case 'budget': fetchAI(STREAM_URLS.budget_monitor,{expenses,budget_plan:budget},'outputBudget'); break;
-    case 'recommendation': fetchAI(STREAM_URLS.ai_financial_recommendation,{income,expenses,assets,budget_plan:budget},'outputRecommendation'); break;
-    case 'health': fetchAI(STREAM_URLS.financial_health_report,{income,expenses,assets,budget_plan:budget,savings_goal:savings},'outputHealthReport'); break;
-    case 'subscription': fetchAI(STREAM_URLS.subscription_reminder,{subscriptions:subs},'outputSubscription'); break;
+    case 'dashboard':
+      fetchAI(STREAM_URLS.financial_dashboard, {
+        income: s.incomeText, expenses: s.expenseText, assets: s.assetText,
+        calculated_summary: calculatedSummary
+      }, 'outputDashboard');
+      break;
+    case 'budget':
+      fetchAI(STREAM_URLS.budget_monitor, {
+        expenses: s.expenseText, budget_plan: s.budgetText,
+        calculated_summary: calculatedSummary
+      }, 'outputBudget');
+      break;
+    case 'recommendation':
+      fetchAI(STREAM_URLS.ai_financial_recommendation, {
+        income: s.incomeText, expenses: s.expenseText, assets: s.assetText, budget_plan: s.budgetText,
+        calculated_summary: calculatedSummary
+      }, 'outputRecommendation');
+      break;
+    case 'health':
+      fetchAI(STREAM_URLS.financial_health_report, {
+        income: s.incomeText, expenses: s.expenseText, assets: s.assetText,
+        budget_plan: s.budgetText, savings_goal: s.savingsText,
+        calculated_summary: calculatedSummary
+      }, 'outputHealthReport');
+      break;
+    case 'subscription':
+      fetchAI(STREAM_URLS.subscription_reminder, { subscriptions: s.subsText }, 'outputSubscription');
+      break;
     case 'advisor':
-      if(!question){alert('Please enter a question.');return;}
-      fetchAI(STREAM_URLS.ai_financial_advisor_discussions,{income,expenses,assets,budget_plan:budget,savings_goal:savings,subscriptions:subs,question},'outputAdvisor'); break;
+      if (!question) { alert('Please enter a question.'); return; }
+      fetchAI(STREAM_URLS.ai_financial_advisor_discussions, {
+        income: s.incomeText, expenses: s.expenseText, assets: s.assetText,
+        budget_plan: s.budgetText, savings_goal: s.savingsText,
+        subscriptions: s.subsText, question: question,
+        calculated_summary: calculatedSummary
+      }, 'outputAdvisor');
+      break;
   }
 }
 
@@ -327,100 +387,68 @@ const INSIGHT_KEY = 'finbot_insight';
 const INSIGHT_DATA_KEY = 'finbot_insight_data_hash';
 
 function generateHomeInsight(forceRefresh) {
-  const income = document.getElementById('incomeInput') ? document.getElementById('incomeInput').value : '';
-  const expenses = document.getElementById('expenseInput') ? document.getElementById('expenseInput').value : '';
-  const assets = document.getElementById('assetInput') ? document.getElementById('assetInput').value : '';
+  const s = getFinancialSummary();
 
-  // Not enough data?
-  if (!income.trim() && !expenses.trim() && !assets.trim()) {
+  if (!s.incomeText.trim() && !s.expenseText.trim() && !s.assetText.trim()) {
     document.getElementById('aiInsightContent').innerHTML = '<p style="font-size:0.85rem;color:var(--text-secondary);">Not enough financial data yet.<br><br>Add your income and expenses in the <strong>Money</strong> section so FinBot can provide personalized insights.</p>';
     return;
   }
 
-  // Check if data changed since last insight
-  const dataHash = (income + expenses + assets).length.toString() + '_' + income.slice(0,20) + expenses.slice(0,20);
-  const savedHash = localStorage.getItem(INSIGHT_DATA_KEY);
-  const savedInsight = localStorage.getItem(INSIGHT_KEY);
+  var dataHash = s.totalIncome.toFixed(2) + '_' + s.totalExpenses.toFixed(2) + '_' + s.totalAssets.toFixed(2);
+  var savedHash = localStorage.getItem(INSIGHT_DATA_KEY);
+  var savedInsight = localStorage.getItem(INSIGHT_KEY);
 
   if (!forceRefresh && savedHash === dataHash && savedInsight) {
-    // Show cached insight
     document.getElementById('aiInsightContent').innerHTML = savedInsight;
     return;
   }
 
-  // Show loading
   document.getElementById('aiInsightContent').innerHTML = '<p style="font-size:0.85rem;color:var(--text-secondary);"><span class="spinner"></span> Analyzing your latest finances...</p>';
 
-  // Call AI
-  const url = (typeof STREAM_URLS !== 'undefined' && STREAM_URLS.financial_dashboard) ? STREAM_URLS.financial_dashboard : '';
+  var url = (typeof STREAM_URLS !== 'undefined' && STREAM_URLS.financial_dashboard) ? STREAM_URLS.financial_dashboard : '';
   if (!url || url.includes('__URL_')) {
-    // No API configured - generate local insight
-    const inc = parseAmounts(income);
-    const exp = parseAmounts(expenses);
-    const rate = inc > 0 ? ((inc - exp) / inc * 100).toFixed(0) : 0;
-    let insight = '';
-    if (exp > inc && inc > 0) {
-      insight = '<strong style="color:var(--red);">âš  Spending Alert</strong><br>Your expenses (RM' + exp.toLocaleString() + ') exceed your income (RM' + inc.toLocaleString() + ').<br><br><em>Recommendation:</em> Review non-essential expenses and reduce spending by at least RM' + (exp - inc).toLocaleString() + ' to avoid debt.';
-    } else if (rate < 10 && inc > 0) {
-      insight = '<strong style="color:var(--yellow);">ðŸ’¡ Low Savings Rate</strong><br>Your savings rate is ' + rate + '%. Financial experts recommend saving at least 20%.<br><br><em>Recommendation:</em> Try to save an additional RM' + Math.round(inc * 0.1).toLocaleString() + '/month.';
-    } else if (inc > 0) {
-      insight = '<strong style="color:var(--green);">âœ“ On Track</strong><br>You\'re saving ' + rate + '% of your income this month. Balance: RM' + (inc - exp).toLocaleString() + '.<br><br><em>Tip:</em> Consider allocating surplus to investments or emergency fund.';
+    var insight = '';
+    if (s.totalExpenses > s.totalIncome && s.totalIncome > 0) {
+      insight = '<strong style="color:var(--red);">Warning: Overspending</strong><br>Your expenses (RM' + s.totalExpenses.toFixed(2) + ') exceed your income (RM' + s.totalIncome.toFixed(2) + ').<br><br>Recommendation: Reduce spending by at least RM' + (s.totalExpenses - s.totalIncome).toFixed(2) + '.';
+    } else if (s.savingsRate < 10 && s.totalIncome > 0) {
+      insight = '<strong style="color:var(--yellow);">Low Savings Rate: ' + s.savingsRate + '%</strong><br>Financial experts recommend saving at least 20%.<br><br>Recommendation: Save an additional RM' + (s.totalIncome * 0.1).toFixed(2) + '/month.';
+    } else if (s.totalIncome > 0) {
+      insight = '<strong style="color:var(--green);">On Track (' + s.savingsRate + '% savings rate)</strong><br>Balance: RM' + s.currentBalance.toFixed(2) + '.<br><br>Tip: Consider allocating surplus to investments or emergency fund.';
     } else {
-      insight = '<strong>ðŸ“Š Data Received</strong><br>FinBot has your financial data. Use the AI Advisor for a detailed analysis.';
+      insight = '<strong>Data Received</strong><br>FinBot has your financial data. Use the AI Advisor for a detailed analysis.';
     }
-    const html = '<p style="font-size:0.85rem;color:var(--text);line-height:1.7;">' + insight + '</p>';
+    var html = '<p style="font-size:0.85rem;color:var(--text);line-height:1.7;">' + insight + '</p>';
     document.getElementById('aiInsightContent').innerHTML = html;
     localStorage.setItem(INSIGHT_KEY, html);
     localStorage.setItem(INSIGHT_DATA_KEY, dataHash);
     return;
   }
 
-  // Call real API
+  var calculatedSummary = '[PRE-CALCULATED TOTALS]\nTotal Income: RM' + s.totalIncome.toFixed(2) + '\nTotal Expenses: RM' + s.totalExpenses.toFixed(2) + '\nCurrent Balance: RM' + s.currentBalance.toFixed(2) + '\nTotal Assets: RM' + s.totalAssets.toFixed(2) + '\nSavings Rate: ' + s.savingsRate + '%';
+
   fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ income, expenses, assets })
-  }).then(r => r.json()).then(data => {
+    body: JSON.stringify({ income: s.incomeText, expenses: s.expenseText, assets: s.assetText, calculated_summary: calculatedSummary })
+  }).then(function(r) { return r.json(); }).then(function(data) {
     if (data.error) throw new Error(data.error);
-
-    // Handle structured insight JSON
+    var html = '';
     if (data.insight) {
-      const i = data.insight;
-      let html = '<p style="font-size:0.85rem;color:var(--text);line-height:1.7;">';
-      const scoreColor = i.healthScore >= 75 ? 'var(--green)' : i.healthScore >= 50 ? 'var(--yellow)' : 'var(--red)';
-      html += '<strong style="color:'+scoreColor+';">Health Score: ' + i.healthScore + '/100 — ' + (i.healthStatus || '') + '</strong><br>';
-      html += (i.summary || '') + '<br><br>';
-      if (i.priorityInsight && i.priorityInsight.title) {
-        html += '<strong>' + i.priorityInsight.title + '</strong><br>' + (i.priorityInsight.message || '') + '<br><br>';
-      }
-      if (i.recommendations && i.recommendations.length > 0) {
-        html += '<em>Recommendations:</em><br>';
-        i.recommendations.slice(0, 3).forEach(r => { html += '• ' + r.title + '<br>'; });
-      }
-      html += '</p>';
-      document.getElementById('aiInsightContent').innerHTML = html;
-      localStorage.setItem(INSIGHT_KEY, html);
-      localStorage.setItem(INSIGHT_DATA_KEY, dataHash);
+      var i = data.insight;
+      var scoreColor = i.healthScore >= 75 ? 'var(--green)' : i.healthScore >= 50 ? 'var(--yellow)' : 'var(--red)';
+      html = '<p style="font-size:0.85rem;color:var(--text);line-height:1.7;"><strong style="color:' + scoreColor + ';">Health Score: ' + i.healthScore + '/100 - ' + (i.healthStatus || '') + '</strong><br>' + (i.summary || '') + '</p>';
     } else {
-      // Fallback: old-style response text (strip markdown artifacts)
-      const fullText = (data.response || '').replace(/[#*|`]/g, '').replace(/---+/g, '').trim();
-      const sentences = fullText.split(/[.!]\s/).slice(0, 4).join('. ') + '.';
-      const html = '<p style="font-size:0.85rem;color:var(--text);line-height:1.7;">' + sentences + '</p>';
-      document.getElementById('aiInsightContent').innerHTML = html;
-      localStorage.setItem(INSIGHT_KEY, html);
-      localStorage.setItem(INSIGHT_DATA_KEY, dataHash);
+      var fullText = (data.response || '').replace(/[#*|`]/g, '').replace(/---+/g, '').trim();
+      html = '<p style="font-size:0.85rem;color:var(--text);line-height:1.7;">' + fullText.split(/[.!]\s/).slice(0, 3).join('. ') + '.</p>';
     }
-  }).catch(err => {
-    // Fallback to local insight on error
-    generateHomeInsight.localFallback = true;
-    const inc = parseAmounts(income);
-    const exp = parseAmounts(expenses);
-    const balance = inc - exp;
-    const html = '<p style="font-size:0.85rem;color:var(--text);line-height:1.7;"><strong>ðŸ“Š Financial Summary</strong><br>Income: RM' + inc.toLocaleString() + ' | Expenses: RM' + exp.toLocaleString() + ' | Balance: RM' + balance.toLocaleString() + '</p>';
+    document.getElementById('aiInsightContent').innerHTML = html;
+    localStorage.setItem(INSIGHT_KEY, html);
+    localStorage.setItem(INSIGHT_DATA_KEY, dataHash);
+  }).catch(function(err) {
+    var html = '<p style="font-size:0.85rem;color:var(--text);line-height:1.7;"><strong>Summary</strong><br>Income: RM' + s.totalIncome.toFixed(2) + ' | Expenses: RM' + s.totalExpenses.toFixed(2) + ' | Balance: RM' + s.currentBalance.toFixed(2) + '</p>';
     document.getElementById('aiInsightContent').innerHTML = html;
   });
 }
-
 // Announce
 function announce(msg) { const el=document.getElementById('a11y-announce'); if(el){el.textContent='';setTimeout(()=>{el.textContent=msg;},50);} }
 
