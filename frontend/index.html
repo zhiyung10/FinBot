@@ -996,7 +996,7 @@ function toggleVoiceFeature() {
 // Expense Pie Chart
 function generatePieChart() {
   const text = document.getElementById('expenseInput').value;
-  if (!text.trim()) { alert('Please enter your expenses in Step 1 first.'); showPage('inputs'); return; }
+  if (!text.trim()) { alert('Please enter your expenses in Step 1 first.\n\nUse format:\nFood RM600\nTransport RM350\nRental RM800'); showPage('inputs'); return; }
   const categories = {};
   text.split('\n').forEach(line => {
     const match = line.match(/(.+?)\s+RM\s?([\d,]+(\.\d+)?)/i);
@@ -1007,7 +1007,7 @@ function generatePieChart() {
     }
   });
   const entries = Object.entries(categories).sort((a, b) => b[1] - a[1]);
-  if (entries.length === 0) { alert('Could not parse. Use format: Category RM Amount'); return; }
+  if (entries.length === 0) { alert('No expenses found. Please enter expenses in Step 1 using this format:\n\nFood RM600\nTransport RM350\nRental RM800'); showPage('inputs'); return; }
   const total = entries.reduce((s, e) => s + e[1], 0);
   const colors = ['#7c6ff7','#f87171','#4ade80','#fbbf24','#60a5fa','#f472b6','#2dd4bf','#fb923c','#a78bfa','#34d399'];
   let cum = 0, paths = '';
