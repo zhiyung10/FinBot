@@ -50,6 +50,21 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
 /* Cards */
 .card { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); padding: 20px; box-shadow: var(--shadow); margin-bottom: 16px; }
 .card-sm { padding: 16px; }
+.card-gradient-blue { background: linear-gradient(135deg, #667eea, #764ba2); border: none; }
+.card-gradient-green { background: linear-gradient(135deg, #11998e, #38ef7d); border: none; }
+.card-gradient-red { background: linear-gradient(135deg, #eb3349, #f45c43); border: none; }
+.card-gradient-purple { background: linear-gradient(135deg, #7c6ff7, #a855f7); border: none; }
+.card-gradient-orange { background: linear-gradient(135deg, #f7971e, #ffd200); border: none; }
+.card-gradient-teal { background: linear-gradient(135deg, #0093E9, #80D0C7); border: none; }
+.card-sm-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.card-sm-label { font-size: 0.75rem; font-weight: 600; color: rgba(255,255,255,0.8); text-transform: uppercase; letter-spacing: 0.3px; }
+.card-sm-badge { font-size: 0.65rem; background: rgba(255,255,255,0.2); color: #fff; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+.card-sm-badge.up { background: rgba(74,222,128,0.3); }
+.card-sm-badge.down { background: rgba(248,113,113,0.3); }
+.card-sm-sub { font-size: 0.72rem; color: rgba(255,255,255,0.6); margin-top: 6px; }
+body.light .card-gradient-blue, body.light .card-gradient-green, body.light .card-gradient-red, body.light .card-gradient-purple, body.light .card-gradient-orange, body.light .card-gradient-teal { border: none; }
+body.light .card-sm-label { color: rgba(255,255,255,0.9); }
+body.light .card-sm-sub { color: rgba(255,255,255,0.7); }
 .card-title { font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 8px; }
 .card-value { font-size: 1.8rem; font-weight: 700; color: var(--text); }
 .card-value.green { color: var(--green); }
@@ -269,36 +284,47 @@ body.sr-optimized .card-value::before { font-size: 0.6rem; font-weight: 400; col
 
       <!-- Summary Cards -->
       <div class="grid-3">
-        <div class="card card-sm card-accent" onclick="showPage('money')" style="cursor:pointer;">
-          <div class="card-title" style="color:rgba(255,255,255,0.8);">Current Balance</div>
-          <div class="card-value" id="scBalance" style="color:#fff;">RM 0</div>
-          <div class="card-change" id="scBalanceChange"></div>
-          <div class="card-mini-bars" id="balanceMiniBars"></div>
+        <div class="card card-sm card-gradient-blue" onclick="showPage('money')" style="cursor:pointer;" tabindex="0" role="button" aria-label="View current balance details">
+          <div class="card-sm-top"><span class="card-sm-label">Current Balance</span><span class="card-sm-badge up">Active</span></div>
+          <div class="card-value" id="scBalance" style="color:#fff;font-size:1.6rem;">RM 0</div>
+          <div class="card-sm-sub" id="scBalanceChange">Updated now</div>
         </div>
-        <div class="card card-sm" onclick="showPage('money')" style="cursor:pointer;">
-          <div class="card-title">Income</div>
-          <div class="card-value green" id="scIncome">RM 0</div>
-          <div class="card-mini-line" id="incomeLineChart"></div>
+        <div class="card card-sm card-gradient-green" onclick="showPage('money')" style="cursor:pointer;" tabindex="0" role="button" aria-label="View income details">
+          <div class="card-sm-top"><span class="card-sm-label">Total Income</span><span class="card-sm-badge up">&#9650;</span></div>
+          <div class="card-value green" id="scIncome" style="color:#fff;font-size:1.6rem;">RM 0</div>
+          <div class="card-sm-sub">This month's income</div>
         </div>
-        <div class="card card-sm" onclick="showPage('money')" style="cursor:pointer;">
-          <div class="card-title">Expenses</div>
-          <div class="card-value red" id="scExpenses">RM 0</div>
-          <div class="card-mini-line" id="expenseLineChart"></div>
+        <div class="card card-sm card-gradient-red" onclick="showPage('money')" style="cursor:pointer;" tabindex="0" role="button" aria-label="View expense details">
+          <div class="card-sm-top"><span class="card-sm-label">Total Expenses</span><span class="card-sm-badge down">&#9660;</span></div>
+          <div class="card-value red" id="scExpenses" style="color:#fff;font-size:1.6rem;">RM 0</div>
+          <div class="card-sm-sub">This month's spending</div>
         </div>
       </div>
 
-      <!-- Budget + Assets -->
-      <div class="grid-2">
-        <div class="card" onclick="showPage('plan')" style="cursor:pointer;">
-          <div class="card-title">Monthly Budget</div>
-          <div id="budgetProgressBar">
-            <p style="color:var(--text-secondary);font-size:0.85rem;">Set a budget in the Plan section to track progress.</p>
-          </div>
+      <!-- Second row cards -->
+      <div class="grid-3">
+        <div class="card card-sm card-gradient-purple" onclick="showPage('chart')" style="cursor:pointer;" tabindex="0" role="button" aria-label="View total assets">
+          <div class="card-sm-top"><span class="card-sm-label">Total Assets</span><span class="card-sm-badge up">Portfolio</span></div>
+          <div class="card-value" id="scAssets" style="color:#fff;font-size:1.6rem;">RM 0</div>
+          <div class="card-sm-sub">Net worth estimate</div>
         </div>
-        <div class="card">
-          <div class="card-title">Total Assets</div>
-          <div class="card-value" id="scAssets" style="font-size:1.4rem;">RM 0</div>
-          <div style="margin-top:8px;font-size:0.78rem;color:var(--text-secondary);">Savings Rate: <strong id="scSavingsRate">0%</strong></div>
+        <div class="card card-sm card-gradient-orange" onclick="showPage('plan')" style="cursor:pointer;" tabindex="0" role="button" aria-label="View savings rate">
+          <div class="card-sm-top"><span class="card-sm-label">Savings Rate</span><span class="card-sm-badge">Ratio</span></div>
+          <div class="card-value" id="scSavingsRate" style="color:#fff;font-size:1.6rem;">0%</div>
+          <div class="card-sm-sub">Income saved this month</div>
+        </div>
+        <div class="card card-sm card-gradient-teal" onclick="showPage('health')" style="cursor:pointer;" tabindex="0" role="button" aria-label="View financial health score">
+          <div class="card-sm-top"><span class="card-sm-label">Health Score</span><span class="card-sm-badge">Score</span></div>
+          <div class="card-value" id="scHealthScore" style="color:#fff;font-size:1.6rem;">--</div>
+          <div class="card-sm-sub">Financial wellness</div>
+        </div>
+      </div>
+
+      <!-- Budget Progress -->
+      <div class="card" onclick="showPage('plan')" style="cursor:pointer;">
+        <div class="card-title">&#128176; Monthly Budget</div>
+        <div id="budgetProgressBar">
+          <p style="color:var(--text-secondary);font-size:0.85rem;">Set a budget in the Plan section to track progress.</p>
         </div>
       </div>
 
