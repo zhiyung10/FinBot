@@ -13,6 +13,19 @@
   --yellow: #f59e0b; --border: #e5e7eb; --shadow: 0 1px 3px rgba(0,0,0,0.06);
   --radius: 16px; --sidebar-width: 240px;
 }
+/* Dark theme variables */
+body.dark {
+  --bg: #0f1117; --card: #1a1d2e; --text: #e8eaf0; --text-secondary: #9ca3bf;
+  --accent: #818cf8; --accent-light: rgba(99,102,241,0.12); --green: #34d399; --red: #f87171;
+  --yellow: #fbbf24; --border: rgba(255,255,255,0.08); --shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+@media (prefers-color-scheme: dark) {
+  body.system {
+    --bg: #0f1117; --card: #1a1d2e; --text: #e8eaf0; --text-secondary: #9ca3bf;
+    --accent: #818cf8; --accent-light: rgba(99,102,241,0.12); --green: #34d399; --red: #f87171;
+    --yellow: #fbbf24; --border: rgba(255,255,255,0.08); --shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+}
 body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; font-size: 14px; }
 
 /* Skip link & SR */
@@ -269,7 +282,7 @@ body.sr-optimized .card-value::before { font-size: 0.6rem; font-weight: 400; col
       <li class="nav-divider">More</li>
       <li><a onclick="showPage('receipt')" data-page="receipt" tabindex="0" role="button"><span class="nav-icon">📷</span>Receipt OCR</a></li>
       <li><a onclick="showPage('accessibility')" data-page="accessibility" tabindex="0" role="button"><span class="nav-icon">♿</span>Accessibility</a></li>
-      <li><a onclick="toggleTheme()" tabindex="0" role="button"><span class="nav-icon">🌙</span>Dark/Light</a></li>
+      <li><a onclick="toggleTheme()" tabindex="0" role="button" aria-label="Toggle theme: Light, Dark, or System"><span class="nav-icon">�</span>Theme: <span id="themeLabel">Light</span></a></li>
     </ul>
   </aside>
 
@@ -331,11 +344,14 @@ body.sr-optimized .card-value::before { font-size: 0.6rem; font-weight: 400; col
 
       <!-- AI Insight + Spending Breakdown (side by side) -->
       <div class="grid-2-dashboard">
-        <div class="card">
+        <div class="card" id="insightCard">
           <div class="card-title">🤖 FinBot Insight</div>
-          <p style="font-size:0.85rem;color:var(--text-secondary);" id="aiInsightText">Enter your financial data in the Money section to receive AI-powered insights.</p>
+          <div id="aiInsightContent">
+            <p style="font-size:0.85rem;color:var(--text-secondary);" id="aiInsightText">Enter your financial data in the Money section to receive AI-powered insights.</p>
+          </div>
           <div class="btn-group">
-            <button class="btn btn-secondary" onclick="showPage('ai')">Ask FinBot →</button>
+            <button class="btn btn-secondary" onclick="showPage('ai')" aria-label="Ask FinBot for detailed advice">Ask FinBot →</button>
+            <button class="btn btn-secondary" onclick="generateHomeInsight(true)" aria-label="Refresh insight" style="font-size:0.8rem;">↻ Refresh</button>
           </div>
         </div>
         <div class="card">
@@ -534,7 +550,7 @@ function showPage(pageId) {
   document.querySelectorAll('.sidebar-nav a, .mobile-nav a').forEach(a => { a.classList.remove('active'); a.removeAttribute('aria-current'); });
   document.querySelectorAll('[data-page="' + pageId + '"]').forEach(a => { a.classList.add('active'); a.setAttribute('aria-current', 'page'); });
   window.scrollTo(0, 0);
-  if (pageId === 'home') updateLocalDashboard();
+  if (pageId === 'home') { updateLocalDashboard(); generateHomeInsight(false); }
   if (pageId === 'insights') { renderTrendsChart(); }
   announce('Navigated to ' + pageId);
 }
@@ -673,8 +689,112 @@ function runFeature(feature) {
 }
 
 // Theme
-function toggleTheme() { document.body.classList.toggle('light'); localStorage.setItem('theme',document.body.classList.contains('light')?'light':'dark'); announce('Theme toggled.'); }
-if(localStorage.getItem('theme')==='light') document.body.classList.add('light');
+function setTheme(theme) {
+  document.body.classList.remove('light', 'dark', 'system');
+  if (theme === 'dark') { document.body.classList.add('dark'); }
+  else if (theme === 'system') { document.body.classList.add('system'); }
+  localStorage.setItem('theme', theme);
+  const label = document.getElementById('themeLabel');
+  if (label) label.textContent = theme === 'system' ? 'System' : theme === 'dark' ? 'Dark' : 'Light';
+  document.querySelectorAll('[data-theme-btn]').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.themeBtn === theme);
+    btn.setAttribute('aria-pressed', btn.dataset.themeBtn === theme ? 'true' : 'false');
+  });
+  announce('Theme set to ' + theme + ' mode.');
+}
+function toggleTheme() {
+  const current = localStorage.getItem('theme') || 'light';
+  if (current === 'light') setTheme('dark');
+  else if (current === 'dark') setTheme('system');
+  else setTheme('light');
+}
+// Load saved theme immediately
+(function() {
+  const saved = localStorage.getItem('theme') || 'light';
+  if (saved === 'dark') document.body.classList.add('dark');
+  else if (saved === 'system') document.body.classList.add('system');
+  // Update theme label
+  const label = document.getElementById('themeLabel');
+  if (label) label.textContent = saved.charAt(0).toUpperCase() + saved.slice(1);
+})();
+
+// ========== AUTO HOME INSIGHT ==========
+const INSIGHT_KEY = 'finbot_insight';
+const INSIGHT_DATA_KEY = 'finbot_insight_data_hash';
+
+function generateHomeInsight(forceRefresh) {
+  const income = document.getElementById('incomeInput') ? document.getElementById('incomeInput').value : '';
+  const expenses = document.getElementById('expenseInput') ? document.getElementById('expenseInput').value : '';
+  const assets = document.getElementById('assetInput') ? document.getElementById('assetInput').value : '';
+
+  // Not enough data?
+  if (!income.trim() && !expenses.trim() && !assets.trim()) {
+    document.getElementById('aiInsightContent').innerHTML = '<p style="font-size:0.85rem;color:var(--text-secondary);">Not enough financial data yet.<br><br>Add your income and expenses in the <strong>Money</strong> section so FinBot can provide personalized insights.</p>';
+    return;
+  }
+
+  // Check if data changed since last insight
+  const dataHash = (income + expenses + assets).length.toString() + '_' + income.slice(0,20) + expenses.slice(0,20);
+  const savedHash = localStorage.getItem(INSIGHT_DATA_KEY);
+  const savedInsight = localStorage.getItem(INSIGHT_KEY);
+
+  if (!forceRefresh && savedHash === dataHash && savedInsight) {
+    // Show cached insight
+    document.getElementById('aiInsightContent').innerHTML = savedInsight;
+    return;
+  }
+
+  // Show loading
+  document.getElementById('aiInsightContent').innerHTML = '<p style="font-size:0.85rem;color:var(--text-secondary);"><span class="spinner"></span> Analyzing your latest finances...</p>';
+
+  // Call AI
+  const url = (typeof STREAM_URLS !== 'undefined' && STREAM_URLS.financial_dashboard) ? STREAM_URLS.financial_dashboard : '';
+  if (!url || url.includes('__URL_')) {
+    // No API configured - generate local insight
+    const inc = parseAmounts(income);
+    const exp = parseAmounts(expenses);
+    const rate = inc > 0 ? ((inc - exp) / inc * 100).toFixed(0) : 0;
+    let insight = '';
+    if (exp > inc && inc > 0) {
+      insight = '<strong style="color:var(--red);">⚠ Spending Alert</strong><br>Your expenses (RM' + exp.toLocaleString() + ') exceed your income (RM' + inc.toLocaleString() + ').<br><br><em>Recommendation:</em> Review non-essential expenses and reduce spending by at least RM' + (exp - inc).toLocaleString() + ' to avoid debt.';
+    } else if (rate < 10 && inc > 0) {
+      insight = '<strong style="color:var(--yellow);">💡 Low Savings Rate</strong><br>Your savings rate is ' + rate + '%. Financial experts recommend saving at least 20%.<br><br><em>Recommendation:</em> Try to save an additional RM' + Math.round(inc * 0.1).toLocaleString() + '/month.';
+    } else if (inc > 0) {
+      insight = '<strong style="color:var(--green);">✓ On Track</strong><br>You\'re saving ' + rate + '% of your income this month. Balance: RM' + (inc - exp).toLocaleString() + '.<br><br><em>Tip:</em> Consider allocating surplus to investments or emergency fund.';
+    } else {
+      insight = '<strong>📊 Data Received</strong><br>FinBot has your financial data. Use the AI Advisor for a detailed analysis.';
+    }
+    const html = '<p style="font-size:0.85rem;color:var(--text);line-height:1.7;">' + insight + '</p>';
+    document.getElementById('aiInsightContent').innerHTML = html;
+    localStorage.setItem(INSIGHT_KEY, html);
+    localStorage.setItem(INSIGHT_DATA_KEY, dataHash);
+    return;
+  }
+
+  // Call real API
+  fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ income, expenses, assets })
+  }).then(r => r.json()).then(data => {
+    if (data.error) throw new Error(data.error);
+    // Extract first 3-4 sentences as insight
+    const fullText = data.response || '';
+    const sentences = fullText.split(/[.!]\s/).slice(0, 4).join('. ') + '.';
+    const html = '<p style="font-size:0.85rem;color:var(--text);line-height:1.7;">' + sentences + '</p>';
+    document.getElementById('aiInsightContent').innerHTML = html;
+    localStorage.setItem(INSIGHT_KEY, html);
+    localStorage.setItem(INSIGHT_DATA_KEY, dataHash);
+  }).catch(err => {
+    // Fallback to local insight on error
+    generateHomeInsight.localFallback = true;
+    const inc = parseAmounts(income);
+    const exp = parseAmounts(expenses);
+    const balance = inc - exp;
+    const html = '<p style="font-size:0.85rem;color:var(--text);line-height:1.7;"><strong>📊 Financial Summary</strong><br>Income: RM' + inc.toLocaleString() + ' | Expenses: RM' + exp.toLocaleString() + ' | Balance: RM' + balance.toLocaleString() + '</p>';
+    document.getElementById('aiInsightContent').innerHTML = html;
+  });
+}
 
 // Announce
 function announce(msg) { const el=document.getElementById('a11y-announce'); if(el){el.textContent='';setTimeout(()=>{el.textContent=msg;},50);} }
@@ -704,6 +824,10 @@ function toggleVoiceFeature(){const bar=document.getElementById('voiceCommandBar
 
 // Keyboard nav
 document.querySelectorAll('.sidebar-nav a[role="button"],.mobile-nav a').forEach(a=>{a.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();a.click();}});});
+
+// Auto-generate insight on page load
+updateLocalDashboard();
+generateHomeInsight(false);
 </script>
 
 <!-- External modules -->
