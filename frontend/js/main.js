@@ -98,17 +98,72 @@ function updateHomePieChart() {
 
 // Markdown
 function renderMarkdown(text) {
-  return text.split('\n').map(line => {
-    if (line.match(/^---+$/)) return '<hr>';
-    if (line.match(/^### /)) return '<h3>'+rl(line.slice(4))+'</h3>';
-    if (line.match(/^## /)) return '<h2>'+rl(line.slice(3))+'</h2>';
-    if (line.match(/^# /)) return '<h1>'+rl(line.slice(2))+'</h1>';
-    if (line.match(/^\d+\.\s/)) return '<li>'+rl(line.replace(/^\d+\.\s/,''))+'</li>';
-    if (line.match(/^[-*]\s/)) return '<li>'+rl(line.slice(2))+'</li>';
-    if (line.trim()==='') return '<br>';
-    return '<p>'+rl(line)+'</p>';
-  }).join('');
+  if (!text) return '<p style="color:var(--text-secondary);">No response received.</p>';
+  
+  const lines = text.split('\n');
+  let html = '';
+  let inTable = false;
+  let tableRows = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    // Detect table rows (lines starting and ending with |)
+    if (line.trim().match(/^\|.*\|$/)) {
+      // Skip separator rows like |---|---|
+      if (line.trim().match(/^\|[\s\-:|]+\|$/)) continue;
+      
+      if (!inTable) {
+        inTable = true;
+        tableRows = [];
+      }
+      // Parse cells
+      const cells = line.split('|').slice(1, -1).map(c => c.trim());
+      tableRows.push(cells);
+      continue;
+    }
+
+    // If we were in a table and hit a non-table line, flush the table
+    if (inTable) {
+      html += buildTable(tableRows);
+      inTable = false;
+      tableRows = [];
+    }
+
+    // Regular markdown rendering
+    if (line.match(/^---+$/)) { html += '<hr>'; continue; }
+    if (line.match(/^### /)) { html += '<h3>' + rl(line.slice(4)) + '</h3>'; continue; }
+    if (line.match(/^## /)) { html += '<h2>' + rl(line.slice(3)) + '</h2>'; continue; }
+    if (line.match(/^# /)) { html += '<h1>' + rl(line.slice(2)) + '</h1>'; continue; }
+    if (line.match(/^\d+\.\s/)) { html += '<li>' + rl(line.replace(/^\d+\.\s/, '')) + '</li>'; continue; }
+    if (line.match(/^[-*]\s/)) { html += '<li>' + rl(line.slice(2)) + '</li>'; continue; }
+    if (line.trim() === '') { html += '<br>'; continue; }
+    html += '<p>' + rl(line) + '</p>';
+  }
+
+  // Flush any remaining table
+  if (inTable) {
+    html += buildTable(tableRows);
+  }
+
+  return html;
 }
+
+function buildTable(rows) {
+  if (rows.length === 0) return '';
+  let html = '<table class="ai-table"><thead><tr>';
+  // First row is header
+  rows[0].forEach(cell => { html += '<th>' + rl(cell) + '</th>'; });
+  html += '</tr></thead><tbody>';
+  for (let i = 1; i < rows.length; i++) {
+    html += '<tr>';
+    rows[i].forEach(cell => { html += '<td>' + rl(cell) + '</td>'; });
+    html += '</tr>';
+  }
+  html += '</tbody></table>';
+  return html;
+}
+
 function rl(t) { return t.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/`(.+?)`/g,'<code>$1</code>'); }
 
 // AI Fetch

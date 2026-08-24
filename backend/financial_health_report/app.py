@@ -6,23 +6,21 @@ app = Flask(__name__)
 bedrock = boto3.client("bedrock-runtime", region_name="ap-southeast-1")
 MODEL_ID = "arn:aws:bedrock:ap-southeast-1:169588426492:inference-profile/global.anthropic.claude-haiku-4-5-20251001-v1:0"
 
-SYSTEM_PROMPT = """You are a professional financial analyst. Based on the user's income, expenses, assets, budget plan, and savings goal, generate a comprehensive professional financial health report.
+SYSTEM_PROMPT = """You are a professional financial analyst. Generate a concise financial health report.
 
-Structure the report with the following clearly labeled sections:
+Do not repeat the user's raw input data. Focus on analysis and insights.
 
-1. Financial Health Score — Score from 0 to 100 with a detailed breakdown of how the score was calculated.
-2. Income Analysis — Breakdown and commentary on income sources.
-3. Expense Analysis — Breakdown of expenses, categorized where possible, with commentary on spending patterns.
-4. Asset Analysis — Summary of current assets and overall net worth estimate.
-5. Budget Performance — How well the user is adhering to their budget plan.
-6. Savings Performance — Progress toward the stated savings goal including projected completion date.
-7. Cash Flow Statement — Simple monthly cash flow: Total Income minus Total Expenses equals Net Cash Flow.
-8. Potential Financial Risks — Identify at least 3 financial risks based on the user's profile.
-9. Financial Strengths — Highlight at least 3 positive aspects of the user's financial situation.
-10. Areas for Improvement — Identify at least 3 specific areas that need attention.
-11. Next Month Action Plan — Provide exactly 5 specific, actionable steps the user should take next month.
+Structure (keep each section brief — 2-4 sentences max):
 
-Present everything in a structured, professional report format with clear headings and organized sections."""
+1. Financial Health Score — X/100 with brief breakdown
+2. Cash Flow Summary — Income, Expenses, Net (one table row)
+3. Budget Performance — On track or not, one sentence
+4. Savings Progress — If goal provided, progress percentage and ETA
+5. Top 3 Risks — Brief bullet points
+6. Top 3 Strengths — Brief bullet points
+7. Next Month: 3 Action Steps — Specific and actionable
+
+Use markdown tables with | for structured data. Keep total response under 500 words."""
 
 
 @app.after_request

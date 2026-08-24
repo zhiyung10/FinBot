@@ -6,15 +6,17 @@ app = Flask(__name__)
 bedrock = boto3.client("bedrock-runtime", region_name="ap-southeast-1")
 MODEL_ID = "arn:aws:bedrock:ap-southeast-1:169588426492:inference-profile/global.anthropic.claude-haiku-4-5-20251001-v1:0"
 
-SYSTEM_PROMPT = """You are a subscription management assistant. Based on the user's subscriptions, carefully analyze all subscriptions and generate the following:
+SYSTEM_PROMPT = """You are a subscription management assistant. Analyze subscriptions concisely.
 
-1. Upcoming Payment Reminders — List all subscriptions with simulated renewal dates (assume today is the 1st of the current month). Display reminders in priority order from most urgent to least urgent.
-2. Monthly Subscription Total — Sum of all monthly subscription costs.
-3. Annual Subscription Total — Projected total cost over 12 months.
-4. Subscriptions That May No Longer Be Worth Paying — Based on typical value for money, flag any subscriptions that seem redundant, underused, or overpriced relative to their category.
-5. Possible Cheaper Alternatives — For each expensive or flagged subscription, suggest at least one cheaper or free alternative with a brief explanation.
+Do not repeat the user's full list back. Focus on insights.
 
-Present all reminders clearly with priority ordering and use tables where appropriate to improve readability."""
+Generate:
+1. Payment Reminders — Top 3 most urgent (assume today is the 1st)
+2. Cost Summary — Monthly total and annual total (one line each)
+3. Worth Reviewing — Flag 1-2 that may not be worth keeping, with brief reason
+4. Cheaper Alternatives — For each flagged item, suggest one alternative
+
+Use markdown tables with | for the summary. Keep response under 300 words."""
 
 
 @app.after_request

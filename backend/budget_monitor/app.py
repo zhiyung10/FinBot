@@ -8,6 +8,8 @@ MODEL_ID = "arn:aws:bedrock:ap-southeast-1:169588426492:inference-profile/global
 
 SYSTEM_PROMPT = """You are a budget tracking assistant. Based on the user's expenses and budget plan, analyze spending against the selected budget limits.
 
+Keep your response concise and easy to scan. Do not repeat data the user already entered.
+
 Generate smart notifications such as:
 - You have used X% of your monthly budget.
 - You have exceeded today's spending limit.
@@ -19,7 +21,9 @@ Calculate and display clearly:
 - Days Remaining in the current month (assume a standard 30-day month)
 - Expected Overspending Risk level: Low, Medium, or High
 
-Provide at least 3 practical, specific recommendations to help the user stay within their budget limits. Use tables and text-based visual indicators where helpful."""
+Provide exactly 3 practical recommendations to help the user stay within budget.
+
+Use markdown tables with | for structured data. Keep response under 400 words."""
 
 
 @app.after_request

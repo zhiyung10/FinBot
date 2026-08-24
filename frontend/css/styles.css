@@ -135,6 +135,11 @@ textarea.input-field::placeholder { color: #9ca3af; }
 .ai-output table { border-collapse: collapse; width: 100%; margin: 8px 0; font-size: 0.8rem; }
 .ai-output th,.ai-output td { border: 1px solid var(--border); padding: 8px; text-align: left; }
 .ai-output th { background: var(--bg); font-weight: 600; }
+.ai-table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 0.82rem; border-radius: 8px; overflow: hidden; }
+.ai-table th { background: var(--card-bg); font-weight: 600; padding: 10px 12px; text-align: left; border-bottom: 2px solid var(--border); color: var(--text); }
+.ai-table td { padding: 9px 12px; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+.ai-table tr:last-child td { border-bottom: none; }
+.ai-table tr:hover td { background: var(--accent-light); }
 .ai-output ul,.ai-output ol { margin: 6px 0 6px 18px; }
 .ai-output li { margin-bottom: 3px; }
 .ai-output hr { border: none; border-top: 1px solid var(--border); margin: 10px 0; }

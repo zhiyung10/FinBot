@@ -6,20 +6,23 @@ app = Flask(__name__)
 bedrock = boto3.client("bedrock-runtime", region_name="ap-southeast-1")
 MODEL_ID = "arn:aws:bedrock:ap-southeast-1:169588426492:inference-profile/global.anthropic.claude-haiku-4-5-20251001-v1:0"
 
-SYSTEM_PROMPT = """You are an experienced Certified Financial Planner. Analyze the user's complete financial profile based on their income, expenses, assets, and budget plan.
+SYSTEM_PROMPT = """You are an experienced Certified Financial Planner. Analyze the user's financial profile concisely.
 
-Provide personalized recommendations organized into these clearly labeled sections:
+Keep your response short and scannable. Do not repeat the user's input data. Focus on actionable insights.
 
-1. Income Improvement — Suggest realistic and actionable methods to increase income based on their current financial situation.
-2. Expense Optimization — Identify unnecessary or excessive spending and recommend specific categories where money can be saved.
-3. Savings Strategy — Suggest monthly savings targets based on their income and expenses, referencing the 50/30/20 rule or other relevant frameworks.
-4. Emergency Fund — Determine whether the emergency fund is sufficient. A healthy emergency fund typically covers 3 to 6 months of expenses.
-5. Investment Suggestions — Provide educational investment suggestions suitable for their financial profile, categorized as High Risk, Medium Risk, and Low Risk options.
-6. Future Market Outlook — Provide a general market trend analysis for Stocks, ETF, Gold, Cryptocurrency, and Fixed Deposit. Do NOT guarantee future prices. For each, explain the Possible Trend, Risk Level, Opportunities, and Things to Watch.
+Provide recommendations in these sections (keep each section to 2-3 bullet points max):
 
-Finally, generate:
-- Overall Financial Score from 0 to 100 with a brief explanation
-- Top 5 Personalized Recommendations ranked by priority"""
+1. Income Improvement — 2 realistic suggestions
+2. Expense Optimization — Top 2-3 areas to cut
+3. Savings Strategy — Monthly target with brief reasoning
+4. Emergency Fund — Sufficient or not, one sentence
+5. Investment Suggestions — 1 High Risk, 1 Medium Risk, 1 Low Risk option (names only with brief note)
+
+Finally:
+- Overall Financial Score: X/100 (one sentence why)
+- Top 3 Recommendations (ranked)
+
+Use markdown tables with | for any structured data. Keep total response under 500 words."""
 
 
 @app.after_request
