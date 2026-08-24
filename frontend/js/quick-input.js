@@ -29,6 +29,11 @@ const CATEGORIES = {
     'Adobe Creative Cloud', 'Microsoft 365', 'Google One', 'iCloud',
     'Amazon Prime', 'Gym Membership', 'VPN Service', 'Cloud Storage',
     'Canva Pro', 'ChatGPT Plus', 'Other Subscription'
+  ],
+  budget: [
+    'Daily Limit', 'Weekly Limit', 'Monthly Limit',
+    'Food Budget', 'Transport Budget', 'Entertainment Budget',
+    'Shopping Budget', 'Utilities Budget', 'Other Budget'
   ]
 };
 
@@ -161,6 +166,7 @@ function initQuickInputs() {
   createQuickAdd('expenseInput', 'expenses');
   createQuickAdd('assetInput', 'assets');
   createQuickAdd('subscriptionInput', 'subscriptions');
+  createQuickAdd('budgetInput', 'budget');
 }
 
 // Run after DOM is ready
