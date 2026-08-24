@@ -122,7 +122,7 @@ function extractAmounts(text) {
  * Try to find the total amount (usually the largest or has "TOTAL" nearby)
  */
 function findTotal(text, amounts) {
-  const totalPattern = /(?:total|grand total|amount|jumlah|bayar|subtotal)[:\s]*(?:RM|MYR)?\s?(\d{1,3}(?:[,.]?\d{3})*(?:\.\d{2})?)/gi;
+  const totalPattern = /(?:total|grand total|amount|jumlah|bayar|subtotal|total amount)[:\s]*(?:RM|MYR)?\s?(\d{1,3}(?:[,.]?\d{3})*(?:\.\d{2})?)/gi;
   const match = totalPattern.exec(text);
   if (match) {
     const val = parseFloat(match[1].replace(/,/g, ''));
