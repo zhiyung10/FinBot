@@ -251,8 +251,8 @@ body.simplified .welcome-grid { gap: 20px; }
 .a11y-toggle { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); }
 .a11y-toggle-label { font-size: 0.85rem; color: rgba(255,255,255,0.8); }
 .a11y-toggle-desc { font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 2px; }
-.a11y-switch { position: relative; width: 44px; height: 24px; background: rgba(255,255,255,0.15); border-radius: 12px; cursor: pointer; transition: background 0.2s; border: none; padding: 0; }
-.a11y-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; background: #fff; border-radius: 50%; transition: transform 0.2s; }
+.a11y-switch { position: relative; width: 44px; height: 24px; background: rgba(255,255,255,0.15); border-radius: 12px; cursor: pointer; transition: background 0.2s; border: none; padding: 0; flex-shrink: 0; }
+.a11y-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; background: #fff; border-radius: 50%; transition: transform 0.2s; pointer-events: none; }
 .a11y-switch.active { background: #7c6ff7; }
 .a11y-switch.active::after { transform: translateX(20px); }
 .a11y-switch:focus-visible { outline: 2px solid #fbbf24; outline-offset: 2px; }
@@ -271,6 +271,11 @@ body.sr-optimized .sc-value.blue::before { content: 'Balance: '; font-size: 0.7r
 body.sr-optimized .sc-value.purple::before { content: 'Assets: '; font-size: 0.7rem; font-weight: 400; }
 body.sr-optimized .sc-value.teal::before { content: 'Savings: '; font-size: 0.7rem; font-weight: 400; }
 body.sr-optimized .sc-value.gold::before { content: 'Health: '; font-size: 0.7rem; font-weight: 400; }
+body.sr-optimized .card { border-left: 3px solid #7c6ff7; }
+body.sr-optimized .ai-output { border-left: 3px solid #4ade80; }
+body.sr-optimized .page-header h1::before { content: '📄 '; }
+body.sr-optimized .summary-card { border-left: 3px solid rgba(124,111,247,0.4); }
+body.sr-optimized .sidebar-nav a.active::before { content: '▶ '; }
 
 /* Budget Progress Bar */
 .budget-prog-header { display: flex; justify-content: space-between; font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-bottom: 6px; }
@@ -1093,7 +1098,7 @@ function toggleVoiceFeature() {
     localStorage.removeItem('a11y-voice');
     announce('Voice recognition disabled.');
   } else {
-    if (!isVoiceSupported()) {
+    if (typeof isVoiceSupported === 'function' && !isVoiceSupported()) {
       alert('Voice recognition is not supported in your browser. Please use Chrome or Edge.');
       return;
     }
@@ -1108,7 +1113,7 @@ function toggleVoiceFeature() {
 (function loadVoicePref() {
   const bar = document.getElementById('voiceCommandBar');
   if (bar) {
-    if (localStorage.getItem('a11y-voice') === '1' && isVoiceSupported()) {
+    if (localStorage.getItem('a11y-voice') === '1' && typeof isVoiceSupported === 'function' && isVoiceSupported()) {
       bar.style.display = 'block';
       updateSwitch('toggleVoice', true);
     } else {
