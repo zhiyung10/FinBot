@@ -58,6 +58,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
 .card-change.up { color: var(--green); }
 .card-change.down { color: var(--red); }
 
+/* Accent card (like the blue Balance card in the screenshot) */
+.card-accent { background: linear-gradient(135deg, #4f46e5, #6366f1); border: none; }
+.card-accent .card-title { color: rgba(255,255,255,0.8); }
+.card-accent .card-value { color: #fff; }
+.card-accent .card-change { color: rgba(255,255,255,0.7); }
+
+/* Mini bars in cards */
+.card-mini-bars { display: flex; align-items: flex-end; gap: 3px; height: 40px; margin-top: 12px; }
+.card-mini-bars .mini-bar { width: 8px; border-radius: 3px 3px 0 0; background: rgba(255,255,255,0.3); transition: height 0.3s; }
+
+/* Mini line chart placeholder */
+.card-mini-line { height: 40px; margin-top: 12px; position: relative; overflow: hidden; }
+.card-mini-line svg { width: 100%; height: 100%; }
+
 /* Grid layouts */
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
@@ -255,18 +269,21 @@ body.sr-optimized .card-value::before { font-size: 0.6rem; font-weight: 400; col
 
       <!-- Summary Cards -->
       <div class="grid-3">
-        <div class="card card-sm" onclick="showPage('money')" style="cursor:pointer;">
-          <div class="card-title">Current Balance</div>
-          <div class="card-value" id="scBalance">RM 0</div>
+        <div class="card card-sm card-accent" onclick="showPage('money')" style="cursor:pointer;">
+          <div class="card-title" style="color:rgba(255,255,255,0.8);">Current Balance</div>
+          <div class="card-value" id="scBalance" style="color:#fff;">RM 0</div>
           <div class="card-change" id="scBalanceChange"></div>
+          <div class="card-mini-bars" id="balanceMiniBars"></div>
         </div>
         <div class="card card-sm" onclick="showPage('money')" style="cursor:pointer;">
           <div class="card-title">Income</div>
           <div class="card-value green" id="scIncome">RM 0</div>
+          <div class="card-mini-line" id="incomeLineChart"></div>
         </div>
         <div class="card card-sm" onclick="showPage('money')" style="cursor:pointer;">
           <div class="card-title">Expenses</div>
           <div class="card-value red" id="scExpenses">RM 0</div>
+          <div class="card-mini-line" id="expenseLineChart"></div>
         </div>
       </div>
 
@@ -526,6 +543,26 @@ function updateLocalDashboard() {
   document.getElementById('scBalance').textContent = 'RM ' + balance.toLocaleString();
   document.getElementById('scAssets').textContent = 'RM ' + assets.toLocaleString();
   document.getElementById('scSavingsRate').textContent = savingsRate + '%';
+
+  // Mini bar chart for balance card
+  const barsEl = document.getElementById('balanceMiniBars');
+  if (barsEl) {
+    const vals = [income * 0.7, income * 0.85, income, income * 0.9, balance, balance * 1.1, balance];
+    const max = Math.max(...vals, 1);
+    barsEl.innerHTML = vals.map(v => '<div class="mini-bar" style="height:' + Math.max(4, (v / max) * 36) + 'px;"></div>').join('');
+  }
+
+  // Mini line for income card
+  const incLine = document.getElementById('incomeLineChart');
+  if (incLine && income > 0) {
+    incLine.innerHTML = '<svg viewBox="0 0 100 40"><polyline points="0,35 15,28 30,30 45,20 60,22 75,15 100,10" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round"/></svg>';
+  }
+
+  // Mini line for expense card
+  const expLine = document.getElementById('expenseLineChart');
+  if (expLine && expenses > 0) {
+    expLine.innerHTML = '<svg viewBox="0 0 100 40"><polyline points="0,30 15,25 30,28 45,20 60,30 75,25 100,22" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/></svg>';
+  }
 
   updateBudgetProgress();
   updateHomePieChart();
