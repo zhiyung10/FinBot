@@ -316,13 +316,10 @@ function initImprovements() {
     window.showPage = function(pageId) {
       origShowPage(pageId);
       if (pageId === 'dashboard') {
-        updateBudgetProgress();
+        try { updateBudgetProgress(); } catch(e) {}
       }
       if (pageId === 'trends') {
-        renderTrendsChart();
-      }
-      if (pageId === 'chart' || pageId === 'analytics') {
-        generatePieChart();
+        try { renderTrendsChart(); } catch(e) {}
       }
     };
   }
