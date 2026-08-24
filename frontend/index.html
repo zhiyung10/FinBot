@@ -283,7 +283,7 @@ body.sr-optimized .sc-value.gold::before { content: 'Health: '; font-size: 0.7re
 .budget-select:focus { outline: none; border-color: #7c6ff7; }
 .budget-amount-wrap { display: flex; align-items: center; gap: 0; }
 .budget-rm-label { padding: 10px 10px; background: rgba(124,111,247,0.15); color: #a89ff7; border-radius: 8px 0 0 8px; font-size: 0.85rem; font-weight: 600; border: 1px solid rgba(255,255,255,0.1); border-right: none; }
-.budget-amount-input { padding: 10px 14px; border-radius: 0 8px 8px 0; border: 1px solid rgba(255,255,255,0.1); background: #1e2139; color: #e0e4f0; font-size: 0.85rem; width: 140px; }
+.budget-amount-input { padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: #1e2139; color: #e0e4f0; font-size: 0.85rem; width: 140px; }
 .budget-amount-input:focus { outline: none; border-color: #7c6ff7; }
 .budget-display { margin-top: 14px; padding: 12px 16px; background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.2); border-radius: 10px; font-size: 0.85rem; color: #4ade80; }
 body.light .budget-select, body.light .budget-amount-input { background: #f9f9fc; border-color: #ddd; color: #333; }
@@ -562,7 +562,7 @@ body.light .ocr-raw-text { background: #f5f5f5; color: #666; }
             <option value="monthly" selected>Monthly Limit</option>
           </select>
           <div class="budget-amount-wrap">
-            <span class="budget-rm-label">RM</span>
+            <!--<span class="budget-rm-label">RM</span> -->
             <input type="number" class="budget-amount-input" id="budgetAmountInput" placeholder="Enter amount" min="0" step="0.01" aria-label="Budget limit amount in Ringgit">
           </div>
           <button class="btn btn-primary" onclick="setBudgetFromSelect()" aria-label="Set this budget limit">Set Limit</button>
