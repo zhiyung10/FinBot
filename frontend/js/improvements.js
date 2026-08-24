@@ -321,8 +321,69 @@ function initImprovements() {
       if (pageId === 'trends') {
         renderTrendsChart();
       }
+      if (pageId === 'chart' || pageId === 'analytics') {
+        generatePieChart();
+      }
     };
   }
+}
+
+// ========== PIE CHART (Auto-generate) ==========
+
+function generatePieChart() {
+  const container = document.getElementById('pieChart');
+  if (!container) return;
+
+  const text = document.getElementById('expenseInput').value;
+  if (!text.trim()) {
+    container.innerHTML = '<p style="opacity:0.4;text-align:center;padding:30px;">Add expenses in My Finances to see your chart.</p>';
+    return;
+  }
+
+  const categories = {};
+  text.split('\n').forEach(function(line) {
+    const match = line.match(/(.+?)\s*RM\s?([\d,]+(\.\d+)?)/i);
+    if (match) {
+      const cat = match[1].trim();
+      const amt = parseFloat(match[2].replace(/,/g, ''));
+      if (!isNaN(amt) && amt > 0 && cat) categories[cat] = (categories[cat] || 0) + amt;
+    }
+  });
+
+  const entries = Object.entries(categories).sort(function(a, b) { return b[1] - a[1]; });
+  if (entries.length === 0) {
+    container.innerHTML = '<p style="opacity:0.4;text-align:center;padding:30px;">Could not parse expenses. Use format: Category RM Amount</p>';
+    return;
+  }
+
+  const total = entries.reduce(function(s, e) { return s + e[1]; }, 0);
+  const colors = ['#7c6ff7','#f87171','#4ade80','#fbbf24','#60a5fa','#f472b6','#2dd4bf','#fb923c','#a78bfa','#34d399'];
+
+  // Build SVG pie
+  var cum = 0, paths = '';
+  entries.forEach(function(entry, i) {
+    var angle = (entry[1] / total) * 360;
+    var s = cum, e2 = cum + angle;
+    var la = angle > 180 ? 1 : 0;
+    var x1 = 110 + 90 * Math.cos((s - 90) * Math.PI / 180);
+    var y1 = 110 + 90 * Math.sin((s - 90) * Math.PI / 180);
+    var x2 = 110 + 90 * Math.cos((e2 - 90) * Math.PI / 180);
+    var y2 = 110 + 90 * Math.sin((e2 - 90) * Math.PI / 180);
+    paths += '<path d="M110,110 L' + x1 + ',' + y1 + ' A90,90 0 ' + la + ',1 ' + x2 + ',' + y2 + ' Z" fill="' + colors[i % colors.length] + '"/>';
+    cum = e2;
+  });
+
+  var legend = '<ul style="list-style:none;padding:0;">';
+  entries.forEach(function(e, i) {
+    var pct = ((e[1] / total) * 100).toFixed(1);
+    legend += '<li style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:0.82rem;">' +
+      '<span style="width:12px;height:12px;border-radius:3px;background:' + colors[i % colors.length] + ';display:inline-block;"></span>' +
+      e[0] + ' — RM' + e[1].toLocaleString() + ' (' + pct + '%)</li>';
+  });
+  legend += '</ul>';
+
+  container.innerHTML = '<div style="display:flex;align-items:center;gap:30px;flex-wrap:wrap;justify-content:center;">' +
+    '<svg viewBox="0 0 220 220" style="width:200px;height:200px;">' + paths + '</svg>' + legend + '</div>';
 }
 
 if (document.readyState === 'loading') {
