@@ -914,7 +914,8 @@ function toggleA11y(mode) {
     'large-text': 'toggleLargeText',
     'xl-text': 'toggleXLText',
     'reduced-motion': 'toggleReducedMotion',
-    'simplified': 'toggleSimplified'
+    'simplified': 'toggleSimplified',
+    'sr-optimized': 'toggleScreenReader'
   };
   updateSwitch(switchMap[mode], isActive);
 
@@ -934,11 +935,12 @@ function updateSwitch(id, active) {
 
 // Load saved accessibility preferences
 (function loadA11yPrefs() {
-  const modes = ['high-contrast','color-blind','enhanced-focus','large-text','xl-text','reduced-motion','simplified'];
+  const modes = ['high-contrast','color-blind','enhanced-focus','large-text','xl-text','reduced-motion','simplified','sr-optimized'];
   const switchMap = {
     'high-contrast': 'toggleHighContrast', 'color-blind': 'toggleColorBlind',
     'enhanced-focus': 'toggleEnhancedFocus', 'large-text': 'toggleLargeText',
-    'xl-text': 'toggleXLText', 'reduced-motion': 'toggleReducedMotion', 'simplified': 'toggleSimplified'
+    'xl-text': 'toggleXLText', 'reduced-motion': 'toggleReducedMotion',
+    'simplified': 'toggleSimplified', 'sr-optimized': 'toggleScreenReader'
   };
   modes.forEach(mode => {
     if (localStorage.getItem('a11y-' + mode) === '1') {
