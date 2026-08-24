@@ -271,6 +271,60 @@ body.sr-optimized .sc-value.purple::before { content: 'Assets: '; font-size: 0.7
 body.sr-optimized .sc-value.teal::before { content: 'Savings: '; font-size: 0.7rem; font-weight: 400; }
 body.sr-optimized .sc-value.gold::before { content: 'Health: '; font-size: 0.7rem; font-weight: 400; }
 
+/* Budget Progress Bar */
+.budget-prog-header { display: flex; justify-content: space-between; font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-bottom: 6px; }
+.budget-prog-track { height: 12px; background: rgba(255,255,255,0.06); border-radius: 6px; overflow: hidden; }
+.budget-prog-fill { height: 100%; border-radius: 6px; transition: width 0.5s ease; }
+.budget-prog-info { display: flex; justify-content: space-between; font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-top: 6px; }
+
+/* Trends Chart */
+.trends-empty { color: rgba(255,255,255,0.3); text-align: center; padding: 30px; font-size: 0.85rem; }
+.trends-grid { display: flex; align-items: flex-end; gap: 8px; height: 160px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.trends-month { flex: 1; display: flex; flex-direction: column; align-items: center; }
+.trends-bars { display: flex; gap: 3px; align-items: flex-end; height: 130px; }
+.trends-bar { width: 16px; border-radius: 4px 4px 0 0; min-height: 4px; transition: height 0.3s ease; }
+.trends-bar.trends-income { background: #4ade80; }
+.trends-bar.trends-expense { background: #f87171; }
+.trends-label { font-size: 0.65rem; color: rgba(255,255,255,0.5); margin-top: 6px; text-align: center; }
+.trends-legend { display: flex; gap: 16px; justify-content: center; margin-top: 12px; font-size: 0.75rem; color: rgba(255,255,255,0.5); }
+.trends-legend-item { display: flex; align-items: center; gap: 5px; }
+.trends-dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.trends-dot.trends-income { background: #4ade80; }
+.trends-dot.trends-expense { background: #f87171; }
+.trends-details { margin-top: 12px; }
+.trends-details summary { font-size: 0.78rem; color: rgba(255,255,255,0.4); cursor: pointer; }
+.trends-table { width: 100%; margin-top: 8px; font-size: 0.78rem; border-collapse: collapse; }
+.trends-table th, .trends-table td { padding: 6px 10px; border: 1px solid rgba(255,255,255,0.08); text-align: left; }
+.trends-table th { background: rgba(124,111,247,0.08); color: #c8c4f0; }
+
+/* Currency Converter */
+.converter-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.converter-input { padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: #1e2139; color: #e0e4f0; font-size: 0.85rem; width: 140px; }
+.converter-input:focus { outline: none; border-color: #7c6ff7; }
+.converter-select { padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: #1e2139; color: #e0e4f0; font-size: 0.85rem; }
+.converter-result { margin-top: 12px; font-size: 0.9rem; color: rgba(255,255,255,0.8); }
+body.light .converter-input, body.light .converter-select { background: #f9f9fc; border-color: #ddd; color: #333; }
+body.light .budget-prog-track { background: #e8e8f0; }
+body.light .trends-grid { border-color: #e0e0e0; }
+body.light .trends-table th, body.light .trends-table td { border-color: #e0e0e0; }
+
+/* Save Status */
+.save-status { position: fixed; top: 12px; right: 12px; padding: 8px 16px; background: #166534; color: #4ade80; border-radius: 8px; font-size: 0.78rem; font-weight: 500; z-index: 9000; display: none; border: 1px solid #22c55e; }
+body.light .save-status { background: #dcfce7; color: #166534; border-color: #86efac; }
+
+/* Print */
+@media print {
+  .sidebar, .skip-link, .voice-command-bar, .voice-feedback, .btn-group, .quick-add-bar, .voice-mic-btn, .a11y-switch { display: none !important; }
+  .main { margin-left: 0 !important; padding: 10px !important; }
+  .page { display: block !important; page-break-after: always; }
+  .page:not(.active) { display: none !important; }
+  body { background: #fff !important; color: #000 !important; }
+  .card { border: 1px solid #ccc !important; background: #fff !important; }
+  .ai-output { max-height: none !important; overflow: visible !important; border: 1px solid #ccc !important; background: #fff !important; color: #000 !important; }
+  .summary-card { background: #f9f9f9 !important; border: 1px solid #ccc !important; }
+  .sc-value { color: #000 !important; }
+}
+
 /* Quick Input Bars */
 .quick-add-bar { margin-bottom: 12px; }
 .quick-add-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
@@ -343,6 +397,7 @@ body.light .ocr-raw-text { background: #f5f5f5; color: #666; }
 
 <a href="#main-content" class="skip-link">Skip to main content</a>
 <div id="a11y-announce" role="status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+<div id="saveStatus" class="save-status" role="status" aria-live="polite"></div>
 
 <div class="app">
   <!-- Sidebar -->
@@ -364,6 +419,8 @@ body.light .ocr-raw-text { background: #f5f5f5; color: #666; }
       <li><a onclick="showPage('comparison')" data-page="comparison" tabindex="0" role="button" aria-label="Monthly financial comparison"><span class="nav-icon" aria-hidden="true">&#128202;</span>Monthly Compare</a></li>
       <li><a onclick="showPage('export')" data-page="export" tabindex="0" role="button" aria-label="Export financial report"><span class="nav-icon" aria-hidden="true">&#128196;</span>Export PDF</a></li>
       <li><a onclick="showPage('receipt')" data-page="receipt" tabindex="0" role="button" aria-label="Scan receipt to extract expenses"><span class="nav-icon" aria-hidden="true">&#128247;</span>Receipt OCR</a></li>
+      <li><a onclick="showPage('trends')" data-page="trends" tabindex="0" role="button" aria-label="View spending trends over time"><span class="nav-icon" aria-hidden="true">&#128200;</span>Spending Trends</a></li>
+      <li><a onclick="showPage('converter')" data-page="converter" tabindex="0" role="button" aria-label="Currency converter"><span class="nav-icon" aria-hidden="true">&#128177;</span>Currency Convert</a></li>
       <li><a onclick="toggleTheme()" tabindex="0" role="button" aria-label="Toggle dark and light mode"><span class="nav-icon" aria-hidden="true">&#127769;</span>Dark/Light Mode</a></li>
       <li><a onclick="showPage('accessibility')" data-page="accessibility" tabindex="0" role="button" aria-label="Accessibility settings"><span class="nav-icon">&#9855;</span>Accessibility</a></li>
     </ul>
@@ -442,6 +499,8 @@ body.light .ocr-raw-text { background: #f5f5f5; color: #666; }
       </div>
       <div class="btn-group">
         <button class="btn btn-primary" onclick="showPage('dashboard')">Next: View Dashboard &#8594;</button>
+        <button class="btn btn-secondary" onclick="saveAllData()" aria-label="Manually save all data">&#128190; Save Data</button>
+        <button class="btn btn-secondary" onclick="clearSavedData()" aria-label="Clear all saved financial data" style="color:#f87171;">&#128465; Clear All</button>
       </div>
     </div>
 
@@ -466,6 +525,10 @@ body.light .ocr-raw-text { background: #f5f5f5; color: #666; }
       <div class="btn-group">
         <button class="btn btn-primary" onclick="runFeature('dashboard')">&#9654; Get AI Analysis</button>
         <button class="btn btn-secondary" onclick="showPage('inputs')">&#8592; Edit Inputs</button>
+      </div>
+      <!-- Budget Progress Bar -->
+      <div class="card" id="budgetProgressBar" style="margin-top:20px;">
+        <p style="font-size:0.8rem;color:rgba(255,255,255,0.4);">Set a budget in Step 3 to see progress here.</p>
       </div>
       <div class="ai-output" id="outputDashboard"><span class="placeholder">Click "Get AI Analysis" for a detailed AI-powered dashboard breakdown.</span></div>
     </div>
@@ -621,6 +684,51 @@ body.light .ocr-raw-text { background: #f5f5f5; color: #666; }
       </div>
       <div class="btn-group">
         <button class="btn btn-primary" onclick="exportReport()" aria-label="Download financial report as text file">&#128190; Download Report (.txt)</button>
+      </div>
+    </div>
+
+    <!-- PAGE: Spending Trends -->
+    <div class="page" id="page-trends">
+      <div class="page-header">
+        <h1>&#128200; Spending Trends</h1>
+        <p>Track your income and expenses over time. Save a snapshot each month to build your trend chart.</p>
+      </div>
+      <div class="btn-group" style="margin-bottom:20px;">
+        <button class="btn btn-primary" onclick="saveMonthSnapshot()" aria-label="Save this month's data as a snapshot">&#128190; Save This Month</button>
+        <button class="btn btn-secondary" onclick="clearTrends()" aria-label="Clear all trend history">Clear History</button>
+        <button class="btn btn-secondary" onclick="printReport()" aria-label="Print this page">&#128424; Print</button>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon" aria-hidden="true">&#128202;</span> Monthly Income vs Expenses</div>
+        <div id="trendsChart"></div>
+      </div>
+    </div>
+
+    <!-- PAGE: Currency Converter -->
+    <div class="page" id="page-converter">
+      <div class="page-header">
+        <h1>&#128177; Currency Converter</h1>
+        <p>Quick conversion from Malaysian Ringgit (RM) to other currencies. Rates are approximate.</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon" aria-hidden="true">&#128178;</span> Convert from RM</div>
+        <div class="converter-row">
+          <input type="number" class="converter-input" id="convertAmount" placeholder="Amount (RM)" min="0" step="0.01" aria-label="Amount in Ringgit to convert">
+          <span style="color:rgba(255,255,255,0.5);">&#8594;</span>
+          <select class="converter-select" id="convertTo" aria-label="Target currency">
+            <option value="USD">USD (US Dollar)</option>
+            <option value="SGD">SGD (Singapore Dollar)</option>
+            <option value="GBP">GBP (British Pound)</option>
+            <option value="EUR">EUR (Euro)</option>
+            <option value="IDR">IDR (Indonesian Rupiah)</option>
+            <option value="THB">THB (Thai Baht)</option>
+            <option value="JPY">JPY (Japanese Yen)</option>
+            <option value="AUD">AUD (Australian Dollar)</option>
+            <option value="CNY">CNY (Chinese Yuan)</option>
+          </select>
+          <button class="btn btn-primary" onclick="convertCurrency()" aria-label="Convert currency">Convert</button>
+        </div>
+        <div class="converter-result" id="convertResult"></div>
       </div>
     </div>
 
@@ -1142,6 +1250,8 @@ if (ocrZone) {
 <script src="js/voice-control.js"></script>
 <!-- Quick Input Module -->
 <script src="js/quick-input.js"></script>
+<!-- UX Improvements Module -->
+<script src="js/improvements.js"></script>
 
 </body>
 </html>
