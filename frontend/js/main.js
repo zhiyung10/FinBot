@@ -348,7 +348,7 @@ function updateLocalDashboard() {
     expLine.innerHTML = '<svg viewBox="0 0 100 40"><polyline points="0,30 15,25 30,28 45,20 60,30 75,25 100,22" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/></svg>';
   }
 
-  updateBudgetProgress();
+  if (typeof updateBudgetProgress === 'function') updateBudgetProgress();
   updateHomePieChart();
   updateHomeExpenseBreakdown();
   updateHomeMonthlyOverview();

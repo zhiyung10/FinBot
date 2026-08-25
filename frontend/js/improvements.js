@@ -306,6 +306,8 @@ function printReport() {
 function initImprovements() {
   initAutoSave();
   renderTrendsChart();
+  // Call updateBudgetProgress now that improvements.js is loaded and data is restored
+  try { updateBudgetProgress(); } catch(e) {}
 
   // Update budget progress when dashboard is shown
   const origShowPage = window.showPage;
