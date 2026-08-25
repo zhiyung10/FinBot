@@ -176,72 +176,88 @@ function appendToInput(input, text) {
 // ========== VOICE COMMANDS ==========
 
 /**
- * Parse and execute voice commands
+ * Parse and execute voice commands.
+ * Uses normalized alias matching against actual page IDs.
  */
 function handleVoiceCommand(transcript) {
-  const cmd = transcript.toLowerCase().trim();
+  // Normalize: lowercase, trim, strip punctuation, collapse spaces
+  const cmd = transcript.toLowerCase().trim()
+    .replace(/[.,!?;:'"。，！？；：]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
 
-  // Navigation commands
-  const navMap = {
-    'open home': 'welcome',
-    'go home': 'welcome',
-    'open dashboard': 'dashboard',
-    'go to dashboard': 'dashboard',
-    'open my finances': 'inputs',
-    'open finances': 'inputs',
-    'open budget': 'budget',
-    'open budget monitor': 'budget',
-    'open recommendations': 'recommendation',
-    'open recommendation': 'recommendation',
-    'open health report': 'health',
-    'open health': 'health',
-    'open subscriptions': 'subscription',
-    'open subscription': 'subscription',
-    'open advisor': 'advisor',
-    'open ai advisor': 'advisor',
-    'open chart': 'chart',
-    'open expense chart': 'chart',
-    'open savings progress': 'savingsprogress',
-    'open savings': 'savingsprogress',
-    'open comparison': 'comparison',
-    'open monthly compare': 'comparison',
-    'open export': 'export',
-    'open receipt': 'receipt',
-    'open receipt scanner': 'receipt',
-    'open accessibility': 'accessibility',
-    'open settings': 'accessibility',
-    'go back': null, // special
-    'scroll down': null,
-    'scroll up': null,
-  };
+  // ---- NAVIGATION COMMANDS ----
+  // Maps phrases (normalized) → actual page IDs used by showPage()
+  const navAliases = [
+    // Home
+    { phrases: ['home', 'go home', 'go to home', 'open home', 'show home', 'homepage', 'dashboard', 'go to dashboard', '去 home', '打开 home'], page: 'home' },
+    // Money
+    { phrases: ['money', 'go to money', 'open money', 'show money', 'finances', 'open finances', 'my finances', '去 money', '打开 money'], page: 'money' },
+    // Plan
+    { phrases: ['plan', 'go to plan', 'open plan', 'show plan', 'budget', 'open budget', '去 plan', '打开 plan'], page: 'plan' },
+    // AI Advisor
+    { phrases: ['ai advisor', 'advisor', 'open advisor', 'open ai advisor', 'go to advisor', 'go to ai advisor', 'ai', 'open ai', '去 advisor', '打开 advisor'], page: 'ai' },
+    // Insights
+    { phrases: ['insights', 'open insights', 'go to insights', 'show insights', '去 insights', '打开 insights'], page: 'insights' },
+    // Calendar
+    { phrases: ['calendar', 'open calendar', 'go to calendar', 'show calendar', 'financial calendar', '去 calendar', '打开 calendar'], page: 'calendar' },
+    // Receipt OCR
+    { phrases: ['receipt', 'receipt ocr', 'open receipt', 'open receipt ocr', 'scan receipt', 'receipt scanner', 'open receipt scanner', '去 receipt', '打开 receipt'], page: 'receipt' },
+    // Accessibility
+    { phrases: ['accessibility', 'open accessibility', 'accessibility settings', 'settings', 'open settings', '去 accessibility', '打开 accessibility'], page: 'accessibility' },
+  ];
 
-  // Check navigation commands
-  for (const [phrase, page] of Object.entries(navMap)) {
-    if (cmd.includes(phrase) || cmd === phrase) {
-      if (phrase === 'go back') {
-        window.history.back();
-        showVoiceFeedback('Going back.', 'success');
-        return;
-      }
-      if (phrase === 'scroll down') {
-        window.scrollBy(0, 300);
-        showVoiceFeedback('Scrolling down.', 'success');
-        return;
-      }
-      if (phrase === 'scroll up') {
-        window.scrollBy(0, -300);
-        showVoiceFeedback('Scrolling up.', 'success');
-        return;
-      }
-      if (page && typeof showPage === 'function') {
-        showPage(page);
-        showVoiceFeedback('Navigated to ' + page + '.', 'success');
-        return;
+  // Try exact match first, then includes match (longer phrases first to avoid partial hits)
+  for (const group of navAliases) {
+    // Sort phrases longest first so "go to home" matches before "home"
+    const sorted = group.phrases.slice().sort(function(a, b) { return b.length - a.length; });
+    for (const phrase of sorted) {
+      if (cmd === phrase || cmd === 'go to ' + phrase || cmd === 'open ' + phrase) {
+        if (typeof showPage === 'function') {
+          showPage(group.page);
+          showVoiceFeedback('Opening ' + group.page + '.', 'success');
+          return;
+        }
       }
     }
   }
 
-  // Action commands
+  // Second pass: check if command contains a navigation phrase
+  // Only match if the command is short (≤5 words) to avoid false positives from sentences
+  var wordCount = cmd.split(' ').length;
+  if (wordCount <= 5) {
+    for (const group of navAliases) {
+      const sorted = group.phrases.slice().sort(function(a, b) { return b.length - a.length; });
+      for (const phrase of sorted) {
+        if (cmd.includes(phrase)) {
+          if (typeof showPage === 'function') {
+            showPage(group.page);
+            showVoiceFeedback('Opening ' + group.page + '.', 'success');
+            return;
+          }
+        }
+      }
+    }
+  }
+
+  // ---- UTILITY COMMANDS ----
+  if (cmd === 'go back' || cmd === 'back') {
+    window.history.back();
+    showVoiceFeedback('Going back.', 'success');
+    return;
+  }
+  if (cmd.includes('scroll down')) {
+    window.scrollBy(0, 300);
+    showVoiceFeedback('Scrolling down.', 'success');
+    return;
+  }
+  if (cmd.includes('scroll up')) {
+    window.scrollBy(0, -300);
+    showVoiceFeedback('Scrolling up.', 'success');
+    return;
+  }
+
+  // ---- ACTION COMMANDS ----
   if (cmd.includes('generate dashboard') || cmd.includes('run dashboard')) {
     if (typeof runFeature === 'function') { runFeature('dashboard'); showVoiceFeedback('Generating dashboard.', 'success'); return; }
   }
@@ -257,18 +273,12 @@ function handleVoiceCommand(transcript) {
   if (cmd.includes('analyze subscription') || cmd.includes('run subscription')) {
     if (typeof runFeature === 'function') { runFeature('subscription'); showVoiceFeedback('Analyzing subscriptions.', 'success'); return; }
   }
-  if (cmd.includes('scan receipt')) {
-    if (typeof scanReceipt === 'function') { scanReceipt(); showVoiceFeedback('Scanning receipt.', 'success'); return; }
-  }
-  if (cmd.includes('export report') || cmd.includes('download report')) {
-    if (typeof exportReport === 'function') { exportReport(); showVoiceFeedback('Exporting report.', 'success'); return; }
-  }
   if (cmd.includes('dark mode') || cmd.includes('light mode') || cmd.includes('toggle theme')) {
     if (typeof toggleTheme === 'function') { toggleTheme(); showVoiceFeedback('Theme toggled.', 'success'); return; }
   }
 
-  // If nothing matched, show what was heard
-  showVoiceFeedback('Command not recognized: "' + transcript + '". Try "Open dashboard" or "Analyze budget".', 'info');
+  // ---- NOT RECOGNIZED ----
+  showVoiceFeedback('Command not recognized: "' + transcript + '". Try "go home" or "open money".', 'info');
 }
 
 // ========== CONFIRMATION FLOW ==========

@@ -777,9 +777,10 @@ function generateHomeInsight(forceRefresh) {
 
 // Accessibility toggles
 function toggleA11y(mode) {
-  if(mode==='large-text'&&document.body.classList.contains('xl-text')){document.body.classList.remove('xl-text');updateSwitch('toggleXLText',false);localStorage.removeItem('a11y-xl-text');}
-  if(mode==='xl-text'&&document.body.classList.contains('large-text')){document.body.classList.remove('large-text');updateSwitch('toggleLargeText',false);localStorage.removeItem('a11y-large-text');}
+  if(mode==='large-text'&&document.body.classList.contains('xl-text')){document.body.classList.remove('xl-text');document.documentElement.classList.remove('xl-text');updateSwitch('toggleXLText',false);localStorage.removeItem('a11y-xl-text');}
+  if(mode==='xl-text'&&document.body.classList.contains('large-text')){document.body.classList.remove('large-text');document.documentElement.classList.remove('large-text');updateSwitch('toggleLargeText',false);localStorage.removeItem('a11y-large-text');}
   document.body.classList.toggle(mode);
+  if(mode==='large-text'||mode==='xl-text'){document.documentElement.classList.toggle(mode);}
   const isActive=document.body.classList.contains(mode);
   const map={'high-contrast':'toggleHighContrast','enhanced-focus':'toggleEnhancedFocus','large-text':'toggleLargeText','xl-text':'toggleXLText','reduced-motion':'toggleReducedMotion','simplified':'toggleSimplified'};
   updateSwitch(map[mode],isActive);
@@ -792,7 +793,7 @@ function toggleVoiceFeature(){const bar=document.getElementById('voiceCommandBar
 (function(){
   const modes=['high-contrast','enhanced-focus','large-text','xl-text','reduced-motion','simplified'];
   const map={'high-contrast':'toggleHighContrast','enhanced-focus':'toggleEnhancedFocus','large-text':'toggleLargeText','xl-text':'toggleXLText','reduced-motion':'toggleReducedMotion','simplified':'toggleSimplified'};
-  modes.forEach(m=>{if(localStorage.getItem('a11y-'+m)==='1'){document.body.classList.add(m);updateSwitch(map[m],true);}});
+  modes.forEach(m=>{if(localStorage.getItem('a11y-'+m)==='1'){document.body.classList.add(m);if(m==='large-text'||m==='xl-text'){document.documentElement.classList.add(m);}updateSwitch(map[m],true);}});
   if(window.matchMedia('(prefers-reduced-motion:reduce)').matches)document.body.classList.add('reduced-motion');
   const bar=document.getElementById('voiceCommandBar');if(bar){if(localStorage.getItem('a11y-voice')==='1'){bar.style.display='block';updateSwitch('toggleVoice',true);}else{bar.style.display='none';}}
 })();

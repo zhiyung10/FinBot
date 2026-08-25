@@ -211,6 +211,8 @@ textarea.input-field::placeholder { color: var(--text-secondary); opacity: 0.6; 
 body.high-contrast { --bg: #000; --card: #111; --text: #fff; --text-secondary: #ccc; --border: #555; }
 body.large-text { font-size: 16px; }
 body.xl-text { font-size: 18px; }
+html.large-text { font-size: 18px; }
+html.xl-text { font-size: 20px; }
 body.reduced-motion *,body.reduced-motion *::before,body.reduced-motion *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
 body.enhanced-focus *:focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; }
 body.simplified .nav-icon { display: none; }
