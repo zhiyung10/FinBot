@@ -214,7 +214,6 @@ body.xl-text { font-size: 18px; }
 body.reduced-motion *,body.reduced-motion *::before,body.reduced-motion *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
 body.enhanced-focus *:focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; }
 body.simplified .nav-icon { display: none; }
-body.sr-optimized .card-value::before { font-size: 0.6rem; font-weight: 400; color: var(--text-secondary); }
 @media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; } }
 @media print { .sidebar,.fab,.fab-menu,.voice-command-bar,.skip-link { display: none !important; } .main { margin-left: 0 !important; } body { background: #fff; } }
 

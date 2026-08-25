@@ -317,14 +317,16 @@
       <div class="card"><div class="card-title">Motion & Cognitive</div>
         <div class="a11y-toggle-group">
           <div class="a11y-toggle"><div><div class="a11y-toggle-label">Reduced Motion</div></div><button class="a11y-switch" id="toggleReducedMotion" onclick="toggleA11y('reduced-motion')" role="switch" aria-checked="false"></button></div>
-          <div class="a11y-toggle"><div><div class="a11y-toggle-label">Simplified Interface</div></div><button class="a11y-switch" id="toggleSimplified" onclick="toggleA11y('simplified')" role="switch" aria-checked="false"></button></div>
-          <div class="a11y-toggle"><div><div class="a11y-toggle-label">Screen Reader Optimized</div></div><button class="a11y-switch" id="toggleScreenReader" onclick="toggleA11y('sr-optimized')" role="switch" aria-checked="false"></button></div>
+          <div class="a11y-toggle"><div><div class="a11y-toggle-label">Simplified Interface</div></div><button type="button" class="a11y-switch" id="toggleSimplified" onclick="toggleA11y('simplified')" role="switch" aria-checked="false"></button></div>
         </div>
       </div>
       <div class="card"><div class="card-title">Voice</div>
         <div class="a11y-toggle-group">
-          <div class="a11y-toggle"><div><div class="a11y-toggle-label">Voice Recognition</div><div class="a11y-toggle-desc">Control with voice commands (Chrome/Edge)</div></div><button class="a11y-switch" id="toggleVoice" onclick="toggleVoiceFeature()" role="switch" aria-checked="false"></button></div>
+          <div class="a11y-toggle"><div><div class="a11y-toggle-label">Voice Recognition</div><div class="a11y-toggle-desc">Control with voice commands (Chrome/Edge)</div></div><button type="button" class="a11y-switch" id="toggleVoice" onclick="toggleVoiceFeature()" role="switch" aria-checked="false"></button></div>
         </div>
+      </div>
+      <div class="card"><div class="card-title">Screen Reader Support</div>
+        <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.7;">&#9989; <strong style="color:var(--green);">Always Available</strong><br><br>FinBot supports assistive technologies including Windows Narrator, NVDA, JAWS, VoiceOver, and TalkBack. No configuration is needed &mdash; screen reader compatibility is permanently active.</p>
       </div>
     </div>
 
