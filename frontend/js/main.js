@@ -338,7 +338,6 @@ function updateLocalDashboard() {
   document.getElementById('scBalance').textContent = 'RM ' + s.currentBalance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
   document.getElementById('scAssets').textContent = 'RM ' + s.totalAssets.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
   document.getElementById('scSavingsRate').textContent = s.savingsRate + '%';
-  document.getElementById('scSavingsRate').textContent = i.healthScore + '/100';
 
   // Mini bar chart for balance card
   const barsEl = document.getElementById('balanceMiniBars');
@@ -591,6 +590,10 @@ function renderInsight(insight) {
     const priority = insight.priorityInsight || null;
     const recs = (insight.recommendations || []).slice(0, 3);
 
+    // Update dashboard Health Score card
+    var hsEl2 = document.getElementById('scHealthScore');
+    if (hsEl2 && insight.healthScore != null) { hsEl2.textContent = Math.round(Number(insight.healthScore)); }
+
     // Score color
     let scoreColor = 'var(--green)';
     if (score < 40) scoreColor = 'var(--red)';
@@ -774,6 +777,9 @@ function generateHomeInsight(forceRefresh) {
       var i = data.insight;
       var scoreColor = i.healthScore >= 75 ? 'var(--green)' : i.healthScore >= 50 ? 'var(--yellow)' : 'var(--red)';
       html = '<p style="font-size:0.85rem;color:var(--text);line-height:1.7;"><strong style="color:' + scoreColor + ';">Health Score: ' + i.healthScore + '/100 - ' + (i.healthStatus || '') + '</strong><br>' + (i.summary || '') + '</p>';
+      // Update dashboard Health Score card
+      var hsEl = document.getElementById('scHealthScore');
+      if (hsEl && i.healthScore != null) { hsEl.textContent = Math.round(Number(i.healthScore)); }
     } else {
       var fullText = (data.response || '').replace(/[#*|`]/g, '').replace(/---+/g, '').trim();
       html = '<p style="font-size:0.85rem;color:var(--text);line-height:1.7;">' + fullText.split(/[.!]\s/).slice(0, 3).join('. ') + '.</p>';
