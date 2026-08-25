@@ -325,7 +325,7 @@ function showOCRError(msg) {
   const statusEl = document.getElementById('ocrStatus');
   statusEl.textContent = msg;
   statusEl.style.display = 'block';
-  statusEl.style.color = '#f87171';
+  statusEl.style.color = 'var(--red)';
   setTimeout(function () { statusEl.style.color = ''; }, 3000);
 }
 

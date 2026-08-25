@@ -224,7 +224,7 @@ function renderTrendsChart() {
   // Data table (accessible)
   html += '<details class="trends-details"><summary>View data table</summary><table class="trends-table"><thead><tr><th>Month</th><th>Income</th><th>Expenses</th><th>Balance</th></tr></thead><tbody>';
   trends.forEach(t => {
-    html += `<tr><td>${t.label}</td><td>RM${t.income.toLocaleString()}</td><td>RM${t.expenses.toLocaleString()}</td><td style="color:${t.balance >= 0 ? '#4ade80' : '#f87171'}">RM${t.balance.toLocaleString()}</td></tr>`;
+    html += `<tr><td>${t.label}</td><td>RM${t.income.toLocaleString()}</td><td>RM${t.expenses.toLocaleString()}</td><td style="color:${t.balance >= 0 ? 'var(--green)' : 'var(--red)'}">RM${t.balance.toLocaleString()}</td></tr>`;
   });
   html += '</tbody></table></details>';
 
@@ -266,7 +266,7 @@ function updateBudgetProgress() {
   const totalExpenses = parseAmounts(expenseText);
 
   if (budgetLimit <= 0) {
-    container.innerHTML = '<p style="font-size:0.8rem;color:rgba(255,255,255,0.4);">Set a budget in Step 3 to see progress here.</p>';
+    container.innerHTML = '<p style="font-size:0.8rem;color:var(--text-secondary);">Set a budget in Step 3 to see progress here.</p>';
     return;
   }
 
@@ -291,7 +291,7 @@ function updateBudgetProgress() {
       <span>Spent: RM${totalExpenses.toLocaleString()}</span>
       <span>Budget: RM${budgetLimit.toLocaleString()}</span>
     </div>
-    ${remaining < 0 ? '<p style="color:#f87171;font-size:0.78rem;margin-top:6px;">⚠ Over budget by RM' + Math.abs(remaining).toLocaleString() + '</p>' : '<p style="color:rgba(255,255,255,0.5);font-size:0.78rem;margin-top:6px;">Remaining: RM' + remaining.toLocaleString() + '</p>'}
+    ${remaining < 0 ? '<p style="color:var(--red);font-size:0.78rem;margin-top:6px;">⚠ Over budget by RM' + Math.abs(remaining).toLocaleString() + '</p>' : '<p style="color:var(--text-secondary);font-size:0.78rem;margin-top:6px;">Remaining: RM' + remaining.toLocaleString() + '</p>'}
   `;
 }
 

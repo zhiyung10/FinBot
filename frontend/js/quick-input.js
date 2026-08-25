@@ -155,7 +155,7 @@ function quickAdd(textareaId, type) {
   if (btn) {
     const original = btn.textContent;
     btn.textContent = '✓ Added';
-    btn.style.background = '#22c55e';
+    btn.style.background = 'var(--green)';
     setTimeout(() => { btn.textContent = original; btn.style.background = ''; }, 1000);
   }
 
