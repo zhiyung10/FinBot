@@ -17,7 +17,9 @@ function showPage(pageId) {
   if (pageId === 'home') { updateLocalDashboard(); generateHomeInsight(false); }
   if (pageId === 'insights') { renderTrendsChart(); generatePieChart(); }
   if (pageId === 'calendar') { renderCalendar(); }
-  announce('Navigated to ' + pageId);
+  // Page-change announcement with friendly name
+  var pageNames = { home: 'Home Dashboard', money: 'Money', plan: 'Financial Planning', ai: 'AI Advisor', insights: 'Insights', calendar: 'Financial Calendar', receipt: 'Receipt Scanner', accessibility: 'Accessibility Settings' };
+  announce((pageNames[pageId] || pageId) + ' page loaded.');
 }
 
 function showMoneyTab(tab) {

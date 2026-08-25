@@ -15,10 +15,10 @@
 <div id="saveStatus" class="save-status" role="status" aria-live="polite"></div>
 
 <div class="app">
-  <!-- Sidebar -->
-  <aside class="sidebar" role="complementary" aria-label="Main navigation">
+  <!-- Sidebar Navigation -->
+  <nav class="sidebar" aria-label="Main navigation">
     <div class="sidebar-brand">FinBot</div>
-    <ul class="sidebar-nav" role="navigation" aria-label="Application pages">
+    <ul class="sidebar-nav">
       <li><a onclick="showPage('home')" data-page="home" class="active" tabindex="0" role="button" aria-current="page"><span class="nav-icon">&#127968;</span>Home</a></li>
       <li><a onclick="showPage('money')" data-page="money" tabindex="0" role="button"><span class="nav-icon">&#128179;</span>Money</a></li>
       <li><a onclick="showPage('plan')" data-page="plan" tabindex="0" role="button"><span class="nav-icon">&#127919;</span>Plan</a></li>
@@ -30,10 +30,10 @@
       <li><a onclick="showPage('accessibility')" data-page="accessibility" tabindex="0" role="button"><span class="nav-icon">&#9855;</span>Accessibility</a></li>
       <li><a onclick="toggleTheme()" tabindex="0" role="button" aria-label="Toggle theme"><span class="nav-icon">&#127769;</span>Theme: <span id="themeLabel">Light</span></a></li>
     </ul>
-  </aside>
+  </nav>
 
   <!-- Main Content -->
-  <main class="main" role="main" id="main-content">
+  <main class="main" id="main-content" tabindex="-1">
 
     <!-- ========== HOME DASHBOARD ========== -->
     <div class="page active" id="page-home">
@@ -138,7 +138,7 @@
 
     <!-- ========== MONEY ========== -->
     <div class="page" id="page-money">
-      <h2 class="page-title">&#128179; Money</h2>
+      <h1 class="page-title">&#128179; Money</h2>
       <p class="page-desc">Manage your income, expenses, assets, and subscriptions.</p>
 
       <div class="tabs" id="moneyTabs">
@@ -172,7 +172,7 @@
 
     <!-- ========== PLAN ========== -->
     <div class="page" id="page-plan">
-      <h2 class="page-title">&#127919; Plan</h2>
+      <h1 class="page-title">&#127919; Plan</h2>
       <p class="page-desc">Set budgets, savings goals, and track subscriptions.</p>
 
       <div class="card"><div class="card-title">Budget Limits</div>
@@ -191,7 +191,7 @@
 
     <!-- ========== AI ADVISOR ========== -->
     <div class="page" id="page-ai">
-      <h2 class="page-title">&#129302; AI Advisor</h2>
+      <h1 class="page-title">&#129302; AI Advisor</h2>
       <p class="page-desc">Ask FinBot anything about your finances. Get insights, recommendations, and scenario analysis.</p>
 
       <div class="card">
@@ -210,7 +210,7 @@
 
     <!-- ========== INSIGHTS ========== -->
     <div class="page" id="page-insights">
-      <h2 class="page-title">&#128200; Insights</h2>
+      <h1 class="page-title">&#128200; Insights</h2>
       <p class="page-desc">Understand your financial behaviour with charts and analysis.</p>
 
       <div class="card"><div class="card-title">Expense Breakdown</div>
@@ -229,7 +229,7 @@
 
     <!-- ========== CALENDAR ========== -->
     <div class="page" id="page-calendar">
-      <h2 class="page-title">&#128197; Financial Calendar</h2>
+      <h1 class="page-title">&#128197; Financial Calendar</h2>
       <p class="page-desc">Track your income and spending day by day.</p>
 
       <!-- Month Navigation -->
@@ -274,7 +274,7 @@
 
     <!-- ========== RECEIPT OCR ========== -->
     <div class="page" id="page-receipt">
-      <h2 class="page-title"> Receipt Scanner</h2>
+      <h1 class="page-title"> Receipt Scanner</h2>
       <p class="page-desc">Upload a receipt photo to extract amounts using OCR.</p>
       <div class="card">
         <div class="ocr-upload-zone" id="ocrUploadZone" onclick="document.getElementById('ocrFileInput').click()" tabindex="0" role="button" aria-label="Click to upload receipt image">
@@ -295,7 +295,7 @@
 
     <!-- ========== ACCESSIBILITY ========== -->
     <div class="page" id="page-accessibility">
-      <h2 class="page-title"> Accessibility</h2>
+      <h1 class="page-title"> Accessibility</h2>
       <p class="page-desc">Customize the app for your needs. Preferences are saved automatically.</p>
       <div class="card"><div class="card-title">Display & Vision</div>
         <div class="a11y-toggle-group">
