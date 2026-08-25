@@ -339,7 +339,9 @@ function generatePieChart() {
 
   const categories = {};
   text.split('\n').forEach(function(line) {
-    const match = line.match(/(.+?)\s*RM\s?([\d,]+(\.\d+)?)/i);
+    // Remove date markers before parsing
+    var cleanLine = line.replace(/\[\d{4}-\d{2}-\d{2}\]/g, '').trim();
+    const match = cleanLine.match(/(.+?)\s*RM\s?([\d,]+(\.\d+)?)/i);
     if (match) {
       const cat = match[1].trim();
       const amt = parseFloat(match[2].replace(/,/g, ''));

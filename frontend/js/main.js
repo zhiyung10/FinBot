@@ -31,9 +31,11 @@ function toggleFab() { document.getElementById('fabMenu').classList.toggle('open
 function closeFab() { document.getElementById('fabMenu').classList.remove('open'); }
 document.addEventListener('click', e => { if (!e.target.closest('.fab') && !e.target.closest('.fab-menu')) closeFab(); });
 
-// Parse amounts
+// Parse amounts - extracts RM values, ignores dates in [YYYY-MM-DD] format
 function parseAmounts(text) {
-  const matches = text.match(/RM\s?[\d,]+(\.\d+)?|\d[\d,]*(\.\d+)?/gi) || [];
+  // Remove date markers before parsing to avoid counting date digits as amounts
+  const cleaned = text.replace(/\[\d{4}-\d{2}-\d{2}\]/g, '');
+  const matches = cleaned.match(/RM\s?[\d,]+(\.\d+)?/gi) || [];
   return matches.reduce((sum, m) => { const n = parseFloat(m.replace(/[RM,\s]/gi, '')); return sum + (isNaN(n) ? 0 : n); }, 0);
 }
 
@@ -71,6 +73,77 @@ function getFinancialSummary() {
   };
 }
 
+
+/**
+ * Parse transactions with dates from textarea text.
+ * Format: "Category RM123.45 [2026-08-25]" or "Category RM123.45" (no date = today)
+ * Returns array of { category, amount, date } objects.
+ */
+function parseTransactions(text) {
+  if (!text || !text.trim()) return [];
+  var today = new Date().toISOString().split('T')[0];
+  var transactions = [];
+  text.split('\n').forEach(function(line) {
+    if (!line.trim()) return;
+    var dateMatch = line.match(/\[(\d{4}-\d{2}-\d{2})\]/);
+    var txDate = dateMatch ? dateMatch[1] : today;
+    var amtMatch = line.match(/(.+?)\s*RM\s?([\d,]+(\.\d+)?)/i);
+    if (amtMatch) {
+      var category = amtMatch[1].trim();
+      var amount = parseFloat(amtMatch[2].replace(/,/g, ''));
+      if (!isNaN(amount) && amount > 0 && category) {
+        transactions.push({ category: category, amount: Math.round(amount * 100) / 100, date: txDate });
+      }
+    }
+  });
+  return transactions;
+}
+
+/**
+ * Get transactions grouped by date. Used by future Calendar feature.
+ * Returns: { "2026-08-25": { income: [...], expenses: [...] }, ... }
+ */
+function getTransactionsByDate() {
+  var incomeTransactions = parseTransactions(document.getElementById('incomeInput') ? document.getElementById('incomeInput').value : '');
+  var expenseTransactions = parseTransactions(document.getElementById('expenseInput') ? document.getElementById('expenseInput').value : '');
+
+  var grouped = {};
+
+  incomeTransactions.forEach(function(tx) {
+    if (!grouped[tx.date]) grouped[tx.date] = { income: [], expenses: [] };
+    grouped[tx.date].income.push(tx);
+  });
+
+  expenseTransactions.forEach(function(tx) {
+    if (!grouped[tx.date]) grouped[tx.date] = { income: [], expenses: [] };
+    grouped[tx.date].expenses.push(tx);
+  });
+
+  return grouped;
+}
+
+/**
+ * Get transactions for a specific month (YYYY-MM format).
+ * Returns { income: [...], expenses: [...], totalIncome, totalExpenses }
+ */
+function getTransactionsForMonth(yearMonth) {
+  var allByDate = getTransactionsByDate();
+  var income = [], expenses = [];
+
+  Object.keys(allByDate).forEach(function(date) {
+    if (date.startsWith(yearMonth)) {
+      income = income.concat(allByDate[date].income);
+      expenses = expenses.concat(allByDate[date].expenses);
+    }
+  });
+
+  return {
+    income: income,
+    expenses: expenses,
+    totalIncome: Math.round(income.reduce(function(s, t) { return s + t.amount; }, 0) * 100) / 100,
+    totalExpenses: Math.round(expenses.reduce(function(s, t) { return s + t.amount; }, 0) * 100) / 100
+  };
+}
 // Dashboard calculations — uses central summary
 function updateLocalDashboard() {
   const s = getFinancialSummary();
@@ -112,7 +185,8 @@ function updateHomePieChart() {
   if (!text.trim()) return;
   const categories = {};
   text.split('\n').forEach(line => {
-    const match = line.match(/(.+?)\s*RM\s?([\d,]+(\.\d+)?)/i);
+    var cleanLine = line.replace(/\[\d{4}-\d{2}-\d{2}\]/g, '').trim();
+    const match = cleanLine.match(/(.+?)\s*RM\s?([\d,]+(\.\d+)?)/i);
     if (match) { const cat = match[1].trim(); const amt = parseFloat(match[2].replace(/,/g,'')); if (!isNaN(amt)&&cat) categories[cat]=(categories[cat]||0)+amt; }
   });
   const entries = Object.entries(categories).sort((a,b)=>b[1]-a[1]).slice(0,5);
@@ -139,7 +213,8 @@ function updateHomeExpenseBreakdown() {
   }
   var categories = {};
   text.split('\n').forEach(function(line) {
-    var match = line.match(/(.+?)\s*RM\s?([\d,]+(\.\d+)?)/i);
+    var cleanLine = line.replace(/\[\d{4}-\d{2}-\d{2}\]/g, '').trim();
+    var match = cleanLine.match(/(.+?)\s*RM\s?([\d,]+(\.\d+)?)/i);
     if (match) { var cat = match[1].trim(); var amt = parseFloat(match[2].replace(/,/g,'')); if (!isNaN(amt) && amt > 0 && cat) categories[cat] = (categories[cat] || 0) + amt; }
   });
   var entries = Object.entries(categories).sort(function(a,b){ return b[1]-a[1]; });

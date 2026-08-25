@@ -54,6 +54,10 @@ function createQuickAdd(textareaId, type) {
 
   const categories = CATEGORIES[type] || [];
   const isSubscription = type === 'subscriptions';
+  const hasDate = (type === 'income' || type === 'expenses');
+
+  // Today's date as default
+  const today = new Date().toISOString().split('T')[0];
 
   // Build HTML
   const bar = document.createElement('div');
@@ -67,6 +71,7 @@ function createQuickAdd(textareaId, type) {
       </select>
       <input type="text" class="quick-add-custom" id="qa-custom-${textareaId}" placeholder="Custom category" style="display:none;" aria-label="Enter custom category name">
       <input type="number" class="quick-add-amount" id="qa-amount-${textareaId}" placeholder="Amount (RM)" min="0" step="0.01" aria-label="Enter amount in Ringgit">
+      ${hasDate ? `<input type="date" class="quick-add-date" id="qa-date-${textareaId}" value="${today}" aria-label="Transaction date">` : ''}
       ${isSubscription ? `<select class="quick-add-freq" id="qa-freq-${textareaId}" aria-label="Billing frequency">
         ${FREQUENCIES.map(f => `<option value="${f}">${f}</option>`).join('')}
       </select>` : ''}
@@ -125,7 +130,14 @@ function quickAdd(textareaId, type) {
     const freq = freqSelect ? freqSelect.value : 'Monthly';
     entry = `${category} RM${amount.toFixed(2)} ${freq}`;
   } else {
-    entry = `${category} RM${amount.toFixed(2)}`;
+    // Include date for income/expenses
+    const dateInput = document.getElementById(`qa-date-${textareaId}`);
+    const txDate = dateInput ? dateInput.value : '';
+    if (txDate) {
+      entry = `${category} RM${amount.toFixed(2)} [${txDate}]`;
+    } else {
+      entry = `${category} RM${amount.toFixed(2)}`;
+    }
   }
 
   // Append to textarea
