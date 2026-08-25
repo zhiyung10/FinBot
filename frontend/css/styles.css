@@ -49,7 +49,7 @@ input, textarea, select, button { font-family: inherit; color: inherit; }
 .main { margin-left: var(--sidebar-width); flex: 1; padding: 24px 32px; min-height: 100vh; }
 
 /* Pages */
-.page { display: none; animation: fadeIn 0.2s ease; max-width: 1100px; }
+.page { display: none; animation: fadeIn 0.2s ease; max-width: 1400px; }
 .page.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
@@ -292,18 +292,41 @@ body.simplified .nav-icon { display: none; }
   .cal-cell { min-height: 40px; padding: 3px; }
   .cal-day-income, .cal-day-expense { display: none; }
   .cal-day-count { font-size: 0.55rem; }
+  .home-cal-cell { min-height: 36px; }
+  .home-cal-inc, .home-cal-exp { font-size: 0.5rem; }
 }
 .pie-svg { width: 160px; height: 160px; }
 .pie-legend { list-style: none; }
 .pie-legend li { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; font-size: 0.78rem; }
 .pie-legend .dot { width: 10px; height: 10px; border-radius: 3px; }
 
+/* Home Dashboard Layout */
+.home-main-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 16px; margin-bottom: 20px; align-items: start; }
+.home-right-col { display: flex; flex-direction: column; gap: 16px; }
+
+/* Home Calendar Preview */
+.home-cal-title { font-size: 0.82rem; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+.home-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.home-cal-header { text-align: center; font-size: 0.65rem; font-weight: 600; color: var(--text-secondary); padding: 4px 2px; text-transform: uppercase; }
+.home-cal-cell { min-height: 44px; padding: 4px 2px; border-radius: 6px; text-align: center; border: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 1px; }
+.home-cal-cell.home-cal-empty { border-color: transparent; }
+.home-cal-cell.home-cal-today { border-color: var(--accent); background: var(--accent-light); }
+.home-cal-cell.home-cal-has-data { background: var(--accent-light); }
+.home-cal-num { font-size: 0.72rem; font-weight: 600; color: var(--text); line-height: 1.2; }
+.home-cal-today .home-cal-num { color: var(--accent); }
+.home-cal-inc { font-size: 0.58rem; color: var(--green); font-weight: 600; line-height: 1; }
+.home-cal-exp { font-size: 0.58rem; color: var(--red); font-weight: 600; line-height: 1; }
+
 /* Responsive */
+@media (max-width: 1100px) {
+  .home-main-grid { grid-template-columns: 1fr; }
+}
 @media (max-width: 900px) {
   .sidebar { display: none; }
   .main { margin-left: 0; padding: 16px; }
   .grid-3 { grid-template-columns: 1fr; }
   .grid-2,.grid-2-1,.grid-2-dashboard { grid-template-columns: 1fr; }
+  .home-main-grid { grid-template-columns: 1fr; }
   .mobile-nav { display: flex !important; }
 }
 /* Mobile bottom nav */

@@ -363,6 +363,7 @@ function updateLocalDashboard() {
   updateHomePieChart();
   updateHomeExpenseBreakdown();
   updateHomeMonthlyOverview();
+  renderHomeCalendar();
 }
 
 function updateHomePieChart() {
@@ -457,6 +458,70 @@ function updateHomeMonthlyOverview() {
   html += '<div style="display:flex;justify-content:space-between;font-size:0.82rem;"><span style="color:var(--text-secondary);">Balance</span><span style="font-weight:700;color:' + balColor + ';">RM' + s.currentBalance.toFixed(2) + '</span></div>';
   html += '<div style="font-size:0.72rem;color:var(--text-secondary);margin-top:2px;">Savings Rate: ' + s.savingsRate + '%</div>';
   html += '</div>';
+
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+// ========== HOME CALENDAR PREVIEW ==========
+function renderHomeCalendar() {
+  var container = document.getElementById('homeCalendarGrid');
+  if (!container) return;
+
+  var now = new Date();
+  var year = now.getFullYear();
+  var month = now.getMonth(); // 0-indexed
+  var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var yearMonth = year + '-' + String(month + 1).padStart(2, '0');
+
+  // Get transaction data (reuses existing function)
+  var monthData = (typeof getTransactionsForMonth === 'function') ? getTransactionsForMonth(yearMonth) : { income: [], expenses: [] };
+
+  // Group by day
+  var dayMap = {};
+  monthData.income.forEach(function(tx) {
+    var day = parseInt(tx.date.split('-')[2]);
+    if (!dayMap[day]) dayMap[day] = { income: 0, expenses: 0 };
+    dayMap[day].income += tx.amount;
+  });
+  monthData.expenses.forEach(function(tx) {
+    var day = parseInt(tx.date.split('-')[2]);
+    if (!dayMap[day]) dayMap[day] = { income: 0, expenses: 0 };
+    dayMap[day].expenses += tx.amount;
+  });
+
+  // Build calendar grid
+  var firstDay = new Date(year, month, 1).getDay();
+  var daysInMonth = new Date(year, month + 1, 0).getDate();
+  var startOffset = (firstDay + 6) % 7; // Monday start
+  var today = now.getDate();
+
+  var html = '<div class="home-cal-title">' + monthNames[month] + ' ' + year + '</div>';
+  html += '<div class="home-cal-grid">';
+
+  // Day headers
+  var dayNames = ['M','T','W','T','F','S','S'];
+  dayNames.forEach(function(d) { html += '<div class="home-cal-header">' + d + '</div>'; });
+
+  // Empty cells
+  for (var i = 0; i < startOffset; i++) { html += '<div class="home-cal-cell home-cal-empty"></div>'; }
+
+  // Day cells
+  for (var d = 1; d <= daysInMonth; d++) {
+    var isToday = (d === today);
+    var data = dayMap[d];
+    var classes = 'home-cal-cell';
+    if (isToday) classes += ' home-cal-today';
+    if (data) classes += ' home-cal-has-data';
+
+    html += '<div class="' + classes + '">';
+    html += '<span class="home-cal-num">' + d + '</span>';
+    if (data) {
+      if (data.income > 0) html += '<span class="home-cal-inc">+' + (data.income >= 1000 ? (data.income/1000).toFixed(1) + 'K' : Math.round(data.income)) + '</span>';
+      if (data.expenses > 0) html += '<span class="home-cal-exp">-' + (data.expenses >= 1000 ? (data.expenses/1000).toFixed(1) + 'K' : Math.round(data.expenses)) + '</span>';
+    }
+    html += '</div>';
+  }
 
   html += '</div>';
   container.innerHTML = html;
