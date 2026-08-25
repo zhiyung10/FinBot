@@ -592,7 +592,7 @@ function renderInsight(insight) {
 
     // Update dashboard Health Score card
     var hsEl2 = document.getElementById('scHealthScore');
-    if (hsEl2 && insight.healthScore != null) { hsEl2.textContent = Math.round(Number(insight.healthScore)); }
+    if (hsEl2 && insight.healthScore != null) { hsEl2.textContent = Math.round(Number(insight.healthScore)); localStorage.setItem('finbot_health_score', String(Math.round(Number(insight.healthScore)))); }
 
     // Score color
     let scoreColor = 'var(--green)';
@@ -740,6 +740,10 @@ function generateHomeInsight(forceRefresh) {
 
   if (!forceRefresh && savedHash === dataHash && savedInsight) {
     document.getElementById('aiInsightContent').innerHTML = savedInsight;
+    // Restore health score from cache
+    var cachedScore = localStorage.getItem('finbot_health_score');
+    var hsElCached = document.getElementById('scHealthScore');
+    if (hsElCached && cachedScore) { hsElCached.textContent = cachedScore; }
     return;
   }
 
@@ -761,6 +765,16 @@ function generateHomeInsight(forceRefresh) {
     document.getElementById('aiInsightContent').innerHTML = html;
     localStorage.setItem(INSIGHT_KEY, html);
     localStorage.setItem(INSIGHT_DATA_KEY, dataHash);
+    // Compute a simple local health score and update the card
+    var localScore = 50;
+    if (s.totalIncome > 0) {
+      if (s.savingsRate >= 20) localScore = 85;
+      else if (s.savingsRate >= 10) localScore = 70;
+      else if (s.savingsRate >= 0) localScore = 55;
+      else localScore = 30;
+    }
+    var hsLocal = document.getElementById('scHealthScore');
+    if (hsLocal) { hsLocal.textContent = localScore; localStorage.setItem('finbot_health_score', String(localScore)); }
     return;
   }
 
@@ -779,7 +793,7 @@ function generateHomeInsight(forceRefresh) {
       html = '<p style="font-size:0.85rem;color:var(--text);line-height:1.7;"><strong style="color:' + scoreColor + ';">Health Score: ' + i.healthScore + '/100 - ' + (i.healthStatus || '') + '</strong><br>' + (i.summary || '') + '</p>';
       // Update dashboard Health Score card
       var hsEl = document.getElementById('scHealthScore');
-      if (hsEl && i.healthScore != null) { hsEl.textContent = Math.round(Number(i.healthScore)); }
+      if (hsEl && i.healthScore != null) { hsEl.textContent = Math.round(Number(i.healthScore)); localStorage.setItem('finbot_health_score', String(Math.round(Number(i.healthScore)))); }
     } else {
       var fullText = (data.response || '').replace(/[#*|`]/g, '').replace(/---+/g, '').trim();
       html = '<p style="font-size:0.85rem;color:var(--text);line-height:1.7;">' + fullText.split(/[.!]\s/).slice(0, 3).join('. ') + '.</p>';
