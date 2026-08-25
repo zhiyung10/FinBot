@@ -153,9 +153,9 @@ var calYear = new Date().getFullYear();
 var calMonth = new Date().getMonth(); // 0-indexed
 var calSelectedDate = null;
 
-function calPrevMonth() { calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; } renderCalendar(); }
-function calNextMonth() { calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; } renderCalendar(); }
-function calToday() { calYear = new Date().getFullYear(); calMonth = new Date().getMonth(); calSelectedDate = new Date().toISOString().split('T')[0]; renderCalendar(); }
+function calPrevMonth() { calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; } renderCalendar(); announce(document.getElementById('calMonthTitle').textContent + ' shown.'); }
+function calNextMonth() { calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; } renderCalendar(); announce(document.getElementById('calMonthTitle').textContent + ' shown.'); }
+function calToday() { calYear = new Date().getFullYear(); calMonth = new Date().getMonth(); calSelectedDate = new Date().toISOString().split('T')[0]; renderCalendar(); announce('Showing today, ' + document.getElementById('calMonthTitle').textContent + '.'); }
 
 function renderCalendar() {
   var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -223,9 +223,21 @@ function renderCalendar() {
     if (isToday) classes += ' cal-today';
     if (isSelected) classes += ' cal-selected';
 
-    html += '<div class="' + classes + '" onclick="calSelectDay(\'' + dateStr + '\')" tabindex="0" role="button" aria-label="' + d + ' ' + monthNames[calMonth] + ' ' + calYear;
-    if (dayData) html += ', Income RM' + dayData.income.toFixed(0) + ', Expenses RM' + dayData.expenses.toFixed(0);
-    html += '">';
+    // Build accessible label
+    var ariaLabel = d + ' ' + monthNames[calMonth] + ' ' + calYear;
+    if (isToday) ariaLabel += '. Today';
+    if (isSelected) ariaLabel += '. Selected';
+    if (dayData) {
+      var dayNet = dayData.income - dayData.expenses;
+      ariaLabel += '. Income RM' + dayData.income.toFixed(0) + '. Expenses RM' + dayData.expenses.toFixed(0) + '. Net ' + (dayNet >= 0 ? 'RM' : 'negative RM') + Math.abs(dayNet).toFixed(0) + '. ' + dayData.count + ' transaction' + (dayData.count !== 1 ? 's' : '');
+    } else {
+      ariaLabel += '. No transactions';
+    }
+
+    html += '<div class="' + classes + '" onclick="calSelectDay(\'' + dateStr + '\')" tabindex="0" role="button" aria-label="' + ariaLabel + '"';
+    if (isToday) html += ' aria-current="date"';
+    if (isSelected) html += ' aria-pressed="true"';
+    html += '>';
 
     html += '<div class="cal-day-num">' + d + '</div>';
 
@@ -251,10 +263,27 @@ function renderCalendar() {
 
 function calSelectDay(dateStr) {
   calSelectedDate = dateStr;
-  // Update visual selection
-  document.querySelectorAll('.cal-cell').forEach(function(c) { c.classList.remove('cal-selected'); });
-  event.currentTarget.classList.add('cal-selected');
+  // Update visual selection and aria-pressed
+  document.querySelectorAll('.cal-cell').forEach(function(c) { c.classList.remove('cal-selected'); c.removeAttribute('aria-pressed'); });
+  if (event && event.currentTarget) { event.currentTarget.classList.add('cal-selected'); event.currentTarget.setAttribute('aria-pressed', 'true'); }
   calShowDayDetail(dateStr);
+
+  // Announce selection
+  var allByDate = getTransactionsByDate();
+  var dayTx = allByDate[dateStr];
+  var parts = dateStr.split('-');
+  var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var displayDate = parseInt(parts[2]) + ' ' + monthNames[parseInt(parts[1])-1] + ' ' + parts[0];
+  var msg = displayDate + ' selected.';
+  if (dayTx && (dayTx.income.length > 0 || dayTx.expenses.length > 0)) {
+    var totalInc = dayTx.income.reduce(function(s,t){ return s + t.amount; }, 0);
+    var totalExp = dayTx.expenses.reduce(function(s,t){ return s + t.amount; }, 0);
+    var txCount = dayTx.income.length + dayTx.expenses.length;
+    msg += ' ' + txCount + ' transaction' + (txCount !== 1 ? 's' : '') + '. Income RM' + totalInc.toFixed(0) + '. Expenses RM' + totalExp.toFixed(0) + '.';
+  } else {
+    msg += ' No transactions.';
+  }
+  announce(msg);
 }
 
 function calShowDayDetail(dateStr) {
@@ -269,7 +298,7 @@ function calShowDayDetail(dateStr) {
     var parts = dateStr.split('-');
     var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     var displayDate = parseInt(parts[2]) + ' ' + monthNames[parseInt(parts[1])-1] + ' ' + parts[0];
-    content.innerHTML = '<div style="font-size:0.9rem;font-weight:600;color:var(--text);margin-bottom:8px;">' + displayDate + '</div><p style="color:var(--text-secondary);font-size:0.85rem;">No transactions on this date.</p>';
+    content.innerHTML = '<h2 style="font-size:1rem;font-weight:600;color:var(--text);margin-bottom:8px;">' + displayDate + '</h2><p style="color:var(--text-secondary);font-size:0.85rem;">No transactions on this date.</p>';
     return;
   }
 
@@ -281,7 +310,7 @@ function calShowDayDetail(dateStr) {
   var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   var displayDate = parseInt(parts[2]) + ' ' + monthNames[parseInt(parts[1])-1] + ' ' + parts[0];
 
-  var html = '<div style="font-size:0.95rem;font-weight:700;color:var(--text);margin-bottom:12px;">' + displayDate + '</div>';
+  var html = '<h2 style="font-size:1rem;font-weight:700;color:var(--text);margin-bottom:12px;">' + displayDate + '</h2>';
 
   // Summary
   html += '<div style="display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap;">';

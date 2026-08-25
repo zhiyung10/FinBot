@@ -252,7 +252,7 @@ body.simplified .nav-icon { display: none; }
 /* Calendar */
 .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
 .cal-header { text-align: center; font-size: 0.7rem; font-weight: 600; color: var(--text-secondary); padding: 8px 4px; text-transform: uppercase; }
-.cal-cell { min-height: 70px; padding: 6px; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; transition: background 0.15s, border-color 0.15s; position: relative; }
+.cal-cell { min-height: 70px; padding: 6px; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; transition: background 0.15s, border-color 0.15s; position: relative; min-width: 44px; }
 .cal-cell:hover { background: var(--accent-light); border-color: var(--accent); }
 .cal-cell.cal-today { border-color: var(--accent); background: var(--accent-light); }
 .cal-cell.cal-selected { border-color: var(--accent); background: var(--accent-light); box-shadow: 0 0 0 2px var(--accent); }
