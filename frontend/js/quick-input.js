@@ -150,8 +150,6 @@ function quickAdd(textareaId, type) {
   // Scroll textarea to bottom
   textarea.scrollTop = textarea.scrollHeight;
 
-  // Announce
-
   // Show brief feedback
   const btn = document.querySelector(`[onclick="quickAdd('${textareaId}', '${type}')"]`);
   if (btn) {

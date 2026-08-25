@@ -17,7 +17,6 @@ function showPage(pageId) {
   if (pageId === 'home') { updateLocalDashboard(); generateHomeInsight(false); }
   if (pageId === 'insights') { renderTrendsChart(); generatePieChart(); }
   if (pageId === 'calendar') { renderCalendar(); }
-  // Page-change announcement with friendly name
 }
 
 function showMoneyTab(tab) {
@@ -265,23 +264,6 @@ function calSelectDay(dateStr) {
   document.querySelectorAll('.cal-cell').forEach(function(c) { c.classList.remove('cal-selected'); c.removeAttribute('aria-pressed'); });
   if (event && event.currentTarget) { event.currentTarget.classList.add('cal-selected'); event.currentTarget.setAttribute('aria-pressed', 'true'); }
   calShowDayDetail(dateStr);
-
-  // Announce selection
-  var allByDate = getTransactionsByDate();
-  var dayTx = allByDate[dateStr];
-  var parts = dateStr.split('-');
-  var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  var displayDate = parseInt(parts[2]) + ' ' + monthNames[parseInt(parts[1])-1] + ' ' + parts[0];
-  var msg = displayDate + ' selected.';
-  if (dayTx && (dayTx.income.length > 0 || dayTx.expenses.length > 0)) {
-    var totalInc = dayTx.income.reduce(function(s,t){ return s + t.amount; }, 0);
-    var totalExp = dayTx.expenses.reduce(function(s,t){ return s + t.amount; }, 0);
-    var txCount = dayTx.income.length + dayTx.expenses.length;
-    msg += ' ' + txCount + ' transaction' + (txCount !== 1 ? 's' : '') + '. Income RM' + totalInc.toFixed(0) + '. Expenses RM' + totalExp.toFixed(0) + '.';
-  } else {
-    msg += ' No transactions.';
-  }
- 
 }
 
 function calShowDayDetail(dateStr) {
@@ -334,7 +316,6 @@ function calShowDayDetail(dateStr) {
 
   detail.style.display = 'block';
   content.innerHTML = html;
-  if (typeof announce === 'function')
 }
 
 // Dashboard calculations — uses central summary
