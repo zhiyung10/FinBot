@@ -103,6 +103,8 @@ function updateLocalDashboard() {
 
   updateBudgetProgress();
   updateHomePieChart();
+  updateHomeExpenseBreakdown();
+  updateHomeMonthlyOverview();
 }
 
 function updateHomePieChart() {
@@ -124,6 +126,80 @@ function updateHomePieChart() {
   });
   html += '</div>';
   document.getElementById('homePieChart').innerHTML = html;
+}
+
+// Compact Expense Breakdown for Home (reuses same data as Insights pieChart)
+function updateHomeExpenseBreakdown() {
+  var container = document.getElementById('homeExpenseBreakdown');
+  if (!container) return;
+  var text = document.getElementById('expenseInput').value;
+  if (!text.trim()) {
+    container.innerHTML = '<p style="color:var(--text-secondary);font-size:0.82rem;text-align:center;padding:20px;">No expense data for this month yet.</p>';
+    return;
+  }
+  var categories = {};
+  text.split('\n').forEach(function(line) {
+    var match = line.match(/(.+?)\s*RM\s?([\d,]+(\.\d+)?)/i);
+    if (match) { var cat = match[1].trim(); var amt = parseFloat(match[2].replace(/,/g,'')); if (!isNaN(amt) && amt > 0 && cat) categories[cat] = (categories[cat] || 0) + amt; }
+  });
+  var entries = Object.entries(categories).sort(function(a,b){ return b[1]-a[1]; });
+  if (entries.length === 0) { container.innerHTML = '<p style="color:var(--text-secondary);font-size:0.82rem;text-align:center;padding:20px;">Could not parse expenses.</p>'; return; }
+  var total = entries.reduce(function(s,e){ return s + e[1]; }, 0);
+  var colors = ['#6366f1','#ef4444','#10b981','#f59e0b','#ec4899','#8b5cf6','#06b6d4'];
+
+  // Build compact horizontal bars
+  var html = '<div style="display:flex;flex-direction:column;gap:6px;">';
+  entries.slice(0, 5).forEach(function(e, i) {
+    var pct = ((e[1] / total) * 100).toFixed(1);
+    html += '<div style="display:flex;align-items:center;gap:8px;font-size:0.8rem;">';
+    html += '<span style="flex:1;color:var(--text);">' + e[0] + '</span>';
+    html += '<span style="font-weight:600;color:var(--text);min-width:70px;text-align:right;">RM' + e[1].toFixed(2) + '</span>';
+    html += '<div style="width:60px;height:6px;background:var(--border);border-radius:3px;overflow:hidden;"><div style="height:100%;width:' + pct + '%;background:' + colors[i % colors.length] + ';border-radius:3px;"></div></div>';
+    html += '<span style="min-width:36px;text-align:right;color:var(--text-secondary);font-size:0.72rem;">' + pct + '%</span>';
+    html += '</div>';
+  });
+  if (entries.length > 5) {
+    html += '<p style="font-size:0.72rem;color:var(--text-secondary);margin-top:4px;">+ ' + (entries.length - 5) + ' more categories</p>';
+  }
+  html += '<p style="font-size:0.75rem;color:var(--text-secondary);margin-top:8px;border-top:1px solid var(--border);padding-top:8px;">Total: <strong style="color:var(--text);">RM' + total.toFixed(2) + '</strong></p>';
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+// Monthly Overview bar chart for Home (reuses centralized summary)
+function updateHomeMonthlyOverview() {
+  var container = document.getElementById('homeMonthlyOverview');
+  if (!container) return;
+  var s = getFinancialSummary();
+  if (s.totalIncome === 0 && s.totalExpenses === 0) {
+    container.innerHTML = '<p style="color:var(--text-secondary);font-size:0.82rem;text-align:center;padding:20px;">Add your first transaction to see your monthly overview.</p>';
+    return;
+  }
+  var max = Math.max(s.totalIncome, s.totalExpenses, 1);
+
+  var html = '<div style="display:flex;flex-direction:column;gap:12px;">';
+
+  // Income bar
+  html += '<div>';
+  html += '<div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:4px;"><span style="color:var(--text-secondary);">Income</span><span style="font-weight:600;color:var(--green, #10b981);">RM' + s.totalIncome.toFixed(2) + '</span></div>';
+  html += '<div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden;"><div style="height:100%;width:' + ((s.totalIncome / max) * 100) + '%;background:var(--green, #10b981);border-radius:4px;"></div></div>';
+  html += '</div>';
+
+  // Expenses bar
+  html += '<div>';
+  html += '<div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:4px;"><span style="color:var(--text-secondary);">Expenses</span><span style="font-weight:600;color:var(--red, #ef4444);">RM' + s.totalExpenses.toFixed(2) + '</span></div>';
+  html += '<div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden;"><div style="height:100%;width:' + ((s.totalExpenses / max) * 100) + '%;background:var(--red, #ef4444);border-radius:4px;"></div></div>';
+  html += '</div>';
+
+  // Balance
+  var balColor = s.currentBalance >= 0 ? 'var(--green, #10b981)' : 'var(--red, #ef4444)';
+  html += '<div style="border-top:1px solid var(--border);padding-top:10px;margin-top:4px;">';
+  html += '<div style="display:flex;justify-content:space-between;font-size:0.82rem;"><span style="color:var(--text-secondary);">Balance</span><span style="font-weight:700;color:' + balColor + ';">RM' + s.currentBalance.toFixed(2) + '</span></div>';
+  html += '<div style="font-size:0.72rem;color:var(--text-secondary);margin-top:2px;">Savings Rate: ' + s.savingsRate + '%</div>';
+  html += '</div>';
+
+  html += '</div>';
+  container.innerHTML = html;
 }
 
 // Markdown

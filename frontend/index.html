@@ -105,6 +105,33 @@
           </div>
         </div>
       </div>
+
+      <!-- Financial Insights Section -->
+      <div class="card" style="margin-bottom:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div class="card-title" style="margin-bottom:0;">Financial Insights</div>
+          <button class="btn btn-secondary" onclick="showPage('insights')" style="font-size:0.75rem;padding:6px 12px;">View Insights &#8594;</button>
+        </div>
+        <p style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:16px;">See where your money is going this month.</p>
+
+        <div class="grid-2-dashboard">
+          <!-- Expense Breakdown (compact) -->
+          <div style="padding:12px;background:var(--bg);border-radius:12px;border:1px solid var(--border);">
+            <div style="font-size:0.78rem;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:10px;">Expense Breakdown</div>
+            <div id="homeExpenseBreakdown">
+              <p style="color:var(--text-secondary);font-size:0.82rem;text-align:center;padding:20px;">No expense data for this month yet.</p>
+            </div>
+          </div>
+
+          <!-- Monthly Overview -->
+          <div style="padding:12px;background:var(--bg);border-radius:12px;border:1px solid var(--border);">
+            <div style="font-size:0.78rem;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:10px;">Monthly Overview</div>
+            <div id="homeMonthlyOverview">
+              <p style="color:var(--text-secondary);font-size:0.82rem;text-align:center;padding:20px;">Add your first transaction to see your monthly overview.</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- ========== MONEY ========== -->
