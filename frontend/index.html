@@ -43,17 +43,17 @@
 
       <!-- Summary Cards -->
       <div class="grid-3">
-        <div class="card card-sm card-gradient-blue" onclick="showPage('money')" style="cursor:pointer;" tabindex="0" role="button" aria-label="View current balance details">
+        <div class="card card-sm card-gradient-blue" aria-label="Current Balance">
           <div class="card-sm-top"><span class="card-sm-label">Current Balance</span><span class="card-sm-badge up">Active</span></div>
           <div class="card-value" id="scBalance" style="color:#fff;font-size:1.6rem;">RM 0</div>
           <div class="card-sm-sub" id="scBalanceChange">Updated now</div>
         </div>
-        <div class="card card-sm card-gradient-green" onclick="showPage('money')" style="cursor:pointer;" tabindex="0" role="button" aria-label="View income details">
+        <div class="card card-sm card-gradient-green" onclick="goToMoneyTab('income')" style="cursor:pointer;" tabindex="0" role="button" aria-label="Total Income. Open Income in Money.">
           <div class="card-sm-top"><span class="card-sm-label">Total Income</span><span class="card-sm-badge up">&#9650;</span></div>
           <div class="card-value green" id="scIncome" style="color:#fff;font-size:1.6rem;">RM 0</div>
           <div class="card-sm-sub">This month's income</div>
         </div>
-        <div class="card card-sm card-gradient-red" onclick="showPage('money')" style="cursor:pointer;" tabindex="0" role="button" aria-label="View expense details">
+        <div class="card card-sm card-gradient-red" onclick="goToMoneyTab('expenses')" style="cursor:pointer;" tabindex="0" role="button" aria-label="Total Expenses. Open Expenses in Money.">
           <div class="card-sm-top"><span class="card-sm-label">Total Expenses</span><span class="card-sm-badge down">&#9660;</span></div>
           <div class="card-value red" id="scExpenses" style="color:#fff;font-size:1.6rem;">RM 0</div>
           <div class="card-sm-sub">This month's spending</div>
@@ -62,7 +62,7 @@
 
       <!-- Second row cards -->
       <div class="grid-3">
-        <div class="card card-sm card-gradient-purple" onclick="showPage('money')" style="cursor:pointer;" tabindex="0" role="button" aria-label="View total assets">
+        <div class="card card-sm card-gradient-purple" onclick="goToMoneyTab('assets')" style="cursor:pointer;" tabindex="0" role="button" aria-label="Total Assets. Open Assets in Money.">
           <div class="card-sm-top"><span class="card-sm-label">Total Assets</span><span class="card-sm-badge up">Portfolio</span></div>
           <div class="card-value" id="scAssets" style="color:#fff;font-size:1.6rem;">RM 0</div>
           <div class="card-sm-sub">Net worth estimate</div>
@@ -72,7 +72,7 @@
           <div class="card-value" id="scSavingsRate" style="color:#fff;font-size:1.6rem;">0%</div>
           <div class="card-sm-sub">Income saved this month</div>
         </div>
-        <div class="card card-sm card-gradient-teal" onclick="showPage('health')" style="cursor:pointer;" tabindex="0" role="button" aria-label="View financial health score">
+        <div class="card card-sm card-gradient-teal" onclick="showPage('plan')" style="cursor:pointer;" tabindex="0" role="button" aria-label="View financial health score">
           <div class="card-sm-top"><span class="card-sm-label">Health Score</span><span class="card-sm-badge">Score</span></div>
           <div class="card-value" id="scHealthScore" style="color:#fff;font-size:1.6rem;">--</div>
           <div class="card-sm-sub">Financial wellness</div>

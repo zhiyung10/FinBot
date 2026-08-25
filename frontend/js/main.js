@@ -23,7 +23,18 @@ function showMoneyTab(tab) {
   document.querySelectorAll('.money-tab').forEach(t => t.style.display = 'none');
   document.getElementById('moneyTab-' + tab).style.display = 'block';
   document.querySelectorAll('#moneyTabs .tab').forEach(t => t.classList.remove('active'));
-  event.target.classList.add('active');
+  // Find the correct tab button and activate it
+  const tabs = document.querySelectorAll('#moneyTabs .tab');
+  const tabNames = ['income', 'expenses', 'assets', 'subscriptions'];
+  const idx = tabNames.indexOf(tab);
+  if (idx >= 0 && tabs[idx]) { tabs[idx].classList.add('active'); }
+  else if (typeof event !== 'undefined' && event && event.target) { event.target.classList.add('active'); }
+}
+
+/** Navigate to Money page and open a specific tab */
+function goToMoneyTab(tab) {
+  showPage('money');
+  showMoneyTab(tab);
 }
 
 // FAB
@@ -800,6 +811,8 @@ function toggleVoiceFeature(){const bar=document.getElementById('voiceCommandBar
 
 // Keyboard nav
 document.querySelectorAll('.sidebar-nav a[role="button"],.mobile-nav a').forEach(a=>{a.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();a.click();}});});
+// Keyboard support for dashboard KPI cards with role="button"
+document.querySelectorAll('.card[role="button"]').forEach(c=>{c.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();c.click();}});});
 
 // Auto-generate insight on page load
 updateLocalDashboard();
