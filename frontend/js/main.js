@@ -150,9 +150,9 @@ var calYear = new Date().getFullYear();
 var calMonth = new Date().getMonth(); // 0-indexed
 var calSelectedDate = null;
 
-function calPrevMonth() { calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; } renderCalendar().textContent + ' shown.'); }
-function calNextMonth() { calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; } renderCalendar().textContent + ' shown.'); }
-function calToday() { calYear = new Date().getFullYear(); calMonth = new Date().getMonth(); calSelectedDate = new Date().toISOString().split('T')[0]; renderCalendar().textContent + '.'); }
+function calPrevMonth() { calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; } renderCalendar().textContent + ' shown.' }
+function calNextMonth() { calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; } renderCalendar().textContent + ' shown.' }
+function calToday() { calYear = new Date().getFullYear(); calMonth = new Date().getMonth(); calSelectedDate = new Date().toISOString().split('T')[0]; renderCalendar().textContent + '.' }
 
 function renderCalendar() {
   var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
