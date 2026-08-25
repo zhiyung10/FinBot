@@ -15,7 +15,7 @@ function showPage(pageId) {
   document.querySelectorAll('[data-page="' + pageId + '"]').forEach(a => { a.classList.add('active'); a.setAttribute('aria-current', 'page'); });
   window.scrollTo(0, 0);
   if (pageId === 'home') { updateLocalDashboard(); generateHomeInsight(false); }
-  if (pageId === 'insights') { renderTrendsChart(); }
+  if (pageId === 'insights') { renderTrendsChart(); generatePieChart(); }
   announce('Navigated to ' + pageId);
 }
 
