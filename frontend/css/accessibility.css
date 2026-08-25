@@ -43,6 +43,9 @@
   border: 0;
 }
 
+/* Ensure label.card-title matches div.card-title appearance */
+label.card-title { display: block; cursor: pointer; }
+
 /* Enhanced focus indicator for accessibility mode */
 .finbot-focus-visible:focus-visible {
   outline: 3px solid var(--accent, #6366f1);

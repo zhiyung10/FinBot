@@ -96,8 +96,8 @@
             <p style="font-size:0.85rem;color:var(--text-secondary);" id="aiInsightText">Enter your financial data in the Money section to receive AI-powered insights.</p>
           </div>
           <div class="btn-group">
-            <button class="btn btn-secondary" onclick="showPage('ai')" aria-label="Ask FinBot &#8594;</button>
-            <button class="btn btn-secondary" onclick="generateHomeInsight(true)" aria-label="Refresh insight" style="font-size:0.8rem;">&#8635; Refresh</button>
+            <button type="button" class="btn btn-secondary" onclick="showPage('ai')" aria-label="Ask FinBot &#8594;</button>
+            <button type="button" class="btn btn-secondary" onclick="generateHomeInsight(true)" aria-label="Refresh insight" style="font-size:0.8rem;">&#8635; Refresh</button>
           </div>
         </div>
         <div class="card">
@@ -112,7 +112,7 @@
       <div class="card" style="margin-bottom:16px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
           <div class="card-title" style="margin-bottom:0;">Financial Insights</div>
-          <button class="btn btn-secondary" onclick="showPage('insights')" style="font-size:0.75rem;padding:6px 12px;">View Insights &#8594;</button>
+          <button type="button" class="btn btn-secondary" onclick="showPage('insights')" style="font-size:0.75rem;padding:6px 12px;">View Insights &#8594;</button>
         </div>
         <p style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:16px;">See where your money is going this month.</p>
 
@@ -149,24 +149,28 @@
       </div>
 
       <div id="moneyTab-income" class="money-tab">
-        <div class="card"><div class="card-title">Monthly Income</div>
+        <div class="card">
+        <label for="incomeInput" class="card-title">Monthly Income</label>
         <textarea class="input-field" id="incomeInput" placeholder="Enter your monthly income sources.&#10;&#10;Example:&#10;Salary RM4500&#10;Freelance RM800&#10;Passive Income RM300"></textarea></div>
       </div>
       <div id="moneyTab-expenses" class="money-tab" style="display:none;">
-        <div class="card"><div class="card-title">Monthly Expenses</div>
+        <div class="card">
+        <label for="expenseInput" class="card-title">Monthly Expenses</label>
         <textarea class="input-field" id="expenseInput" placeholder="List all monthly expenses.&#10;&#10;Example:&#10;Food RM600&#10;Transport RM350&#10;Rental RM800&#10;Entertainment RM200"></textarea></div>
       </div>
       <div id="moneyTab-assets" class="money-tab" style="display:none;">
-        <div class="card"><div class="card-title">Current Assets</div>
+        <div class="card">
+        <label for="assetInput" class="card-title">Current Assets</label>
         <textarea class="input-field" id="assetInput" placeholder="List all your current assets.&#10;&#10;Example:&#10;Savings RM12000&#10;EPF RM30000&#10;Stocks RM5000"></textarea></div>
       </div>
       <div id="moneyTab-subscriptions" class="money-tab" style="display:none;">
-        <div class="card"><div class="card-title">Subscriptions</div>
+        <div class="card">
+        <label for="subscriptionInput" class="card-title">Subscriptions</label>
         <textarea class="input-field" id="subscriptionInput" placeholder="Enter all recurring subscriptions.&#10;&#10;Example:&#10;Netflix RM55 Monthly&#10;Spotify RM16 Monthly"></textarea></div>
       </div>
 
       <div class="btn-group">
-        <button class="btn btn-primary" onclick="saveAllData(); updateLocalDashboard(); showPage('home');">Save & View Dashboard</button>
+        <button class="btn btn-primary" type="button" onclick="saveAllData(); updateLocalDashboard(); announce('Financial data saved successfully.'); showPage('home');">Save &amp; View Dashboard</button>
       </div>
     </div>
 
@@ -175,15 +179,15 @@
       <h1 class="page-title">&#127919; Plan</h2>
       <p class="page-desc">Set budgets, savings goals, and track subscriptions.</p>
 
-      <div class="card"><div class="card-title">Budget Limits</div>
+      <div class="card"><label for="budgetInput" class="card-title">Budget Limits</label>
       <textarea class="input-field" id="budgetInput" placeholder="Set your budget limits.&#10;&#10;Example:&#10;Monthly Limit RM3000&#10;Food Budget RM600&#10;Transport Budget RM350"></textarea></div>
 
-      <div class="card"><div class="card-title">Savings Goal</div>
+      <div class="card"><label for="savingsInput" class="card-title">Savings Goal</label>
       <textarea class="input-field" id="savingsInput" placeholder="Describe your savings goal:&#10;&#10;- What are you saving for?&#10;- Target Amount (e.g. RM50000)&#10;- Current Savings (e.g. RM5000)&#10;- Monthly Contribution (e.g. RM500)"></textarea></div>
 
       <div class="btn-group">
-        <button class="btn btn-primary" onclick="runFeature('budget')">Analyze Budget</button>
-        <button class="btn btn-secondary" onclick="runFeature('health')">Health Report</button>
+        <button type="button" class="btn btn-primary" onclick="runFeature('budget')">Analyze Budget</button>
+        <button type="button" class="btn btn-secondary" onclick="runFeature('health')">Health Report</button>
       </div>
       <div class="ai-output" id="outputBudget"><span class="placeholder">Set your budget limits and click "Analyze Budget".</span></div>
       <div class="ai-output" id="outputHealthReport" style="display:none;"><span class="placeholder">Click "Health Report" for comprehensive analysis.</span></div>
@@ -195,12 +199,12 @@
       <p class="page-desc">Ask FinBot anything about your finances. Get insights, recommendations, and scenario analysis.</p>
 
       <div class="card">
-        <div class="card-title">Ask FinBot</div>
+        <label for="adviseInput" class="card-title">Ask FinBot</label>
         <textarea class="input-field" id="adviseInput" style="min-height:100px;" placeholder="Ask a financial question:&#10;&#10; Can I afford a RM300 monthly car loan?&#10; How much should I save each month?&#10; What happens if I lose 20% of my income?"></textarea>
         <div class="btn-group">
-          <button class="btn btn-primary" onclick="runFeature('advisor')">Get AI Analysis</button>
-          <button class="btn btn-secondary" onclick="runFeature('recommendation')">Recommendations</button>
-          <button class="btn btn-secondary" onclick="runFeature('dashboard')">Dashboard Analysis</button>
+          <button type="button" class="btn btn-primary" onclick="runFeature('advisor')">Get AI Analysis</button>
+          <button type="button" class="btn btn-secondary" onclick="runFeature('recommendation')">Recommendations</button>
+          <button type="button" class="btn btn-secondary" onclick="runFeature('dashboard')">Dashboard Analysis</button>
         </div>
       </div>
       <div class="ai-output" id="outputAdvisor"><span class="placeholder">Ask a question above to get personalized financial advice.</span></div>
@@ -220,8 +224,8 @@
       <div class="card"><div class="card-title">Spending Trends</div>
         <div id="trendsChart"></div>
         <div class="btn-group">
-          <button class="btn btn-secondary" onclick="saveMonthSnapshot()">Save This Month</button>
-          <button class="btn btn-secondary" onclick="runFeature('subscription')">Subscription Analysis</button>
+          <button type="button" class="btn btn-secondary" onclick="saveMonthSnapshot()">Save This Month</button>
+          <button type="button" class="btn btn-secondary" onclick="runFeature('subscription')">Subscription Analysis</button>
         </div>
       </div>
       <div class="ai-output" id="outputSubscription" style="display:none;"><span class="placeholder">Click "Subscription Analysis".</span></div>
@@ -234,11 +238,11 @@
 
       <!-- Month Navigation -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-        <button class="btn btn-secondary" onclick="calPrevMonth()" aria-label="Previous month">&#8592;</button>
+        <button type="button" class="btn btn-secondary" onclick="calPrevMonth()" aria-label="Previous month">&#8592;</button>
         <h3 id="calMonthTitle" style="font-size:1.1rem;font-weight:700;color:var(--text);"></h3>
         <div style="display:flex;gap:6px;">
-          <button class="btn btn-secondary" onclick="calToday()" style="font-size:0.75rem;padding:6px 12px;">Today</button>
-          <button class="btn btn-secondary" onclick="calNextMonth()" aria-label="Next month">&#8594;</button>
+          <button type="button" class="btn btn-secondary" onclick="calToday()" style="font-size:0.75rem;padding:6px 12px;">Today</button>
+          <button type="button" class="btn btn-secondary" onclick="calNextMonth()" aria-label="Next month">&#8594;</button>
         </div>
       </div>
 
@@ -288,7 +292,7 @@
       <p id="ocrStatus" style="display:none;font-size:0.85rem;color:var(--text-secondary);margin-bottom:12px;" role="status" aria-live="polite"></p>
       <div class="btn-group">
         <button class="btn btn-primary" id="ocrScanBtn" onclick="scanReceipt()" style="display:none;">Scan Receipt</button>
-        <button class="btn btn-secondary" onclick="clearOCRResults()">Clear</button>
+        <button type="button" class="btn btn-secondary" onclick="clearOCRResults()">Clear</button>
       </div>
       <div class="card" id="ocrResults" style="display:none;margin-top:12px;"></div>
     </div>
@@ -348,7 +352,7 @@
 <!-- Voice UI -->
 <div class="voice-command-bar" id="voiceCommandBar"><button class="voice-command-btn" onclick="startVoiceInput('command')" aria-label="Voice command"></button><div class="voice-indicator"></div></div>
 <div id="voiceFeedback" class="voice-feedback" role="status" aria-live="polite"></div>
-<div class="voice-confirm-overlay" id="voiceConfirmModal" role="dialog" aria-modal="true"><div class="voice-confirm-box"><p id="voiceConfirmMessage"></p><div class="btn-group" style="justify-content:center;"><button class="btn btn-primary" onclick="confirmVoiceAction()">Confirm</button><button class="btn btn-secondary" onclick="cancelVoiceAction()">Cancel</button></div></div></div>
+<div class="voice-confirm-overlay" id="voiceConfirmModal" role="dialog" aria-modal="true"><div class="voice-confirm-box"><p id="voiceConfirmMessage"></p><div class="btn-group" style="justify-content:center;"><button type="button" class="btn btn-primary" onclick="confirmVoiceAction()">Confirm</button><button type="button" class="btn btn-secondary" onclick="cancelVoiceAction()">Cancel</button></div></div></div>
 
 <script src="js/accessibility.js"></script>
 <script src="js/main.js"></script>
