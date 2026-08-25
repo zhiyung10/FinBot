@@ -1,4 +1,4 @@
-const STREAM_URLS = {
+﻿const STREAM_URLS = {
   financial_dashboard: '__URL_FINANCIAL_DASHBOARD__',
   budget_monitor: '__URL_BUDGET_MONITOR__',
   ai_financial_recommendation: '__URL_AI_FINANCIAL_RECOMMENDATION__',
@@ -18,8 +18,6 @@ function showPage(pageId) {
   if (pageId === 'insights') { renderTrendsChart(); generatePieChart(); }
   if (pageId === 'calendar') { renderCalendar(); }
   // Page-change announcement with friendly name
-  var pageNames = { home: 'Home Dashboard', money: 'Money', plan: 'Financial Planning', ai: 'AI Advisor', insights: 'Insights', calendar: 'Financial Calendar', receipt: 'Receipt Scanner', accessibility: 'Accessibility Settings' };
-  announce((pageNames[pageId] || pageId) + ' page loaded.');
 }
 
 function showMoneyTab(tab) {
@@ -153,9 +151,9 @@ var calYear = new Date().getFullYear();
 var calMonth = new Date().getMonth(); // 0-indexed
 var calSelectedDate = null;
 
-function calPrevMonth() { calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; } renderCalendar(); announce(document.getElementById('calMonthTitle').textContent + ' shown.'); }
-function calNextMonth() { calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; } renderCalendar(); announce(document.getElementById('calMonthTitle').textContent + ' shown.'); }
-function calToday() { calYear = new Date().getFullYear(); calMonth = new Date().getMonth(); calSelectedDate = new Date().toISOString().split('T')[0]; renderCalendar(); announce('Showing today, ' + document.getElementById('calMonthTitle').textContent + '.'); }
+function calPrevMonth() { calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; } renderCalendar().textContent + ' shown.'); }
+function calNextMonth() { calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; } renderCalendar().textContent + ' shown.'); }
+function calToday() { calYear = new Date().getFullYear(); calMonth = new Date().getMonth(); calSelectedDate = new Date().toISOString().split('T')[0]; renderCalendar().textContent + '.'); }
 
 function renderCalendar() {
   var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -283,7 +281,7 @@ function calSelectDay(dateStr) {
   } else {
     msg += ' No transactions.';
   }
-  announce(msg);
+ 
 }
 
 function calShowDayDetail(dateStr) {
@@ -336,7 +334,7 @@ function calShowDayDetail(dateStr) {
 
   detail.style.display = 'block';
   content.innerHTML = html;
-  if (typeof announce === 'function') announce('Showing transactions for ' + displayDate);
+  if (typeof announce === 'function')
 }
 
 // Dashboard calculations — uses central summary
@@ -553,12 +551,12 @@ async function fetchAI(url, body, panelId) {
     panel.innerHTML = '<div class="error">⚠ AI backend not configured. The API URL placeholder has not been replaced during deployment.<br><br>This usually means:<br>• The GitHub Actions deploy workflow has not run yet<br>• The CloudFormation stack outputs are not available<br><br>Please re-run the deployment workflow or manually upload the frontend after deployment.</div>';
     panel.setAttribute('aria-busy','false');
     console.error('[FinBot] fetchAI failed: URL is a placeholder or empty.', { url, panelId });
-    announce('Error: AI backend not configured.');
+   
     return;
   }
 
   panel.innerHTML = '<div class="loading-msg"><span class="spinner"></span>Generating AI response...</div>';
-  announce('Generating AI response.');
+ 
   try {
     const res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
     if (!res.ok) {
@@ -581,11 +579,11 @@ async function fetchAI(url, body, panelId) {
     }
 
     panel.setAttribute('aria-busy','false');
-    announce('AI analysis complete.');
+   
   } catch (err) {
     panel.innerHTML = '<div class="error">⚠ Error: '+err.message+'</div>';
     panel.setAttribute('aria-busy','false');
-    announce('Error: '+err.message);
+   
   }
 }
 
@@ -710,7 +708,7 @@ function setTheme(theme) {
     btn.classList.toggle('active', btn.dataset.themeBtn === theme);
     btn.setAttribute('aria-pressed', btn.dataset.themeBtn === theme ? 'true' : 'false');
   });
-  announce('Theme set to ' + theme + ' mode.');
+ 
 }
 function toggleTheme() {
   const current = localStorage.getItem('theme') || 'light';
@@ -795,8 +793,6 @@ function generateHomeInsight(forceRefresh) {
     document.getElementById('aiInsightContent').innerHTML = html;
   });
 }
-// Announce
-function announce(msg) { const el=document.getElementById('a11y-announce'); if(el){el.textContent='';setTimeout(()=>{el.textContent=msg;},50);} }
 
 // Accessibility toggles
 function toggleA11y(mode) {
@@ -804,18 +800,17 @@ function toggleA11y(mode) {
   if(mode==='xl-text'&&document.body.classList.contains('large-text')){document.body.classList.remove('large-text');updateSwitch('toggleLargeText',false);localStorage.removeItem('a11y-large-text');}
   document.body.classList.toggle(mode);
   const isActive=document.body.classList.contains(mode);
-  const map={'high-contrast':'toggleHighContrast','color-blind':'toggleColorBlind','enhanced-focus':'toggleEnhancedFocus','large-text':'toggleLargeText','xl-text':'toggleXLText','reduced-motion':'toggleReducedMotion','simplified':'toggleSimplified'};
+  const map={'high-contrast':'toggleHighContrast','enhanced-focus':'toggleEnhancedFocus','large-text':'toggleLargeText','xl-text':'toggleXLText','reduced-motion':'toggleReducedMotion','simplified':'toggleSimplified'};
   updateSwitch(map[mode],isActive);
   if(isActive)localStorage.setItem('a11y-'+mode,'1');else localStorage.removeItem('a11y-'+mode);
-  announce(mode.replace(/-/g,' ')+(isActive?' enabled':' disabled'));
 }
 function updateSwitch(id,active){const el=document.getElementById(id);if(!el)return;if(active){el.classList.add('active');el.setAttribute('aria-checked','true');}else{el.classList.remove('active');el.setAttribute('aria-checked','false');}}
-function toggleVoiceFeature(){const bar=document.getElementById('voiceCommandBar');const btn=document.getElementById('toggleVoice');if(bar.style.display!=='none'&&bar.style.display!==''){bar.style.display='none';if(btn){btn.classList.remove('active');btn.setAttribute('aria-checked','false');}localStorage.removeItem('a11y-voice');announce('Voice disabled.');}else{bar.style.display='block';if(btn){btn.classList.add('active');btn.setAttribute('aria-checked','true');}localStorage.setItem('a11y-voice','1');announce('Voice enabled.');}}
+function toggleVoiceFeature(){const bar=document.getElementById('voiceCommandBar');const btn=document.getElementById('toggleVoice');if(bar.style.display!=='none'&&bar.style.display!==''){bar.style.display='none';if(btn){btn.classList.remove('active');btn.setAttribute('aria-checked','false');}localStorage.removeItem('a11y-voice');}else{bar.style.display='block';if(btn){btn.classList.add('active');btn.setAttribute('aria-checked','true');}localStorage.setItem('a11y-voice','1');}}
 
 // Load a11y prefs
 (function(){
-  const modes=['high-contrast','color-blind','enhanced-focus','large-text','xl-text','reduced-motion','simplified'];
-  const map={'high-contrast':'toggleHighContrast','color-blind':'toggleColorBlind','enhanced-focus':'toggleEnhancedFocus','large-text':'toggleLargeText','xl-text':'toggleXLText','reduced-motion':'toggleReducedMotion','simplified':'toggleSimplified'};
+  const modes=['high-contrast','enhanced-focus','large-text','xl-text','reduced-motion','simplified'];
+  const map={'high-contrast':'toggleHighContrast','enhanced-focus':'toggleEnhancedFocus','large-text':'toggleLargeText','xl-text':'toggleXLText','reduced-motion':'toggleReducedMotion','simplified':'toggleSimplified'};
   modes.forEach(m=>{if(localStorage.getItem('a11y-'+m)==='1'){document.body.classList.add(m);updateSwitch(map[m],true);}});
   if(window.matchMedia('(prefers-reduced-motion:reduce)').matches)document.body.classList.add('reduced-motion');
   const bar=document.getElementById('voiceCommandBar');if(bar){if(localStorage.getItem('a11y-voice')==='1'){bar.style.display='block';updateSwitch('toggleVoice',true);}else{bar.style.display='none';}}

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Receipt OCR Scanner Module
  * Uses Tesseract.js to extract text and amounts from receipt images.
  * Extracted amounts can be added to the Expense Input with transaction date.
@@ -61,8 +61,6 @@ async function scanReceipt() {
   progressEl.querySelector('.progress-fill').style.width = '0%';
   scanBtn.disabled = true;
 
-  if (typeof announce === 'function') announce('Scanning receipt, please wait.');
-
   try {
     const worker = await Tesseract.createWorker('eng', 1, {
       logger: function (m) {
@@ -85,11 +83,9 @@ async function scanReceipt() {
     displayOCRResults(text, amounts);
 
     statusEl.textContent = 'Scan complete! Found ' + amounts.length + ' amount(s).';
-    if (typeof announce === 'function') announce('Scan complete. Found ' + amounts.length + ' amounts.');
 
   } catch (err) {
     showOCRError('Scan failed: ' + err.message);
-    if (typeof announce === 'function') announce('Receipt scan failed.');
   } finally {
     scanBtn.disabled = false;
     progressEl.style.display = 'none';
@@ -314,7 +310,6 @@ function addOCRToExpenses() {
   statusEl.textContent = 'Saved: ' + description + ' RM' + amount.toFixed(2) + ' on ' + txDate;
   statusEl.style.display = 'block';
 
-  if (typeof announce === 'function') announce('Expense saved: ' + description + ' RM' + amount.toFixed(2) + ' on ' + txDate);
 
   // Reset form fields but keep results visible for multiple receipts
   descInput.value = '';

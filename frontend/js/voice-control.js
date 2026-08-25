@@ -39,7 +39,6 @@ function initVoiceRecognition() {
   recognition.onstart = function () {
     voiceListening = true;
     updateVoiceUI('listening');
-    if (typeof announce === 'function') announce('Listening for your voice input.');
   };
 
   recognition.onresult = function (event) {
@@ -62,7 +61,6 @@ function initVoiceRecognition() {
     }
 
     showVoiceFeedback(msg, 'error');
-    if (typeof announce === 'function') announce(msg);
   };
 
   recognition.onend = function () {
@@ -81,7 +79,6 @@ function initVoiceRecognition() {
 function startVoiceInput(mode, targetInputId) {
   if (!isVoiceSupported()) {
     showVoiceFeedback('Voice recognition is not supported in this browser. Try Chrome or Edge.', 'error');
-    if (typeof announce === 'function') announce('Voice recognition not supported in this browser.');
     return;
   }
 
@@ -154,13 +151,11 @@ function handleDictation(text) {
       function () {
         appendToInput(input, text);
         showVoiceFeedback('Added: ' + text, 'success');
-        if (typeof announce === 'function') announce('Added to input: ' + text);
       }
     );
   } else {
     appendToInput(input, text);
     showVoiceFeedback('Added: ' + text, 'success');
-    if (typeof announce === 'function') announce('Text entered: ' + text);
   }
 }
 
@@ -226,7 +221,6 @@ function handleVoiceCommand(transcript) {
       if (phrase === 'go back') {
         window.history.back();
         showVoiceFeedback('Going back.', 'success');
-        if (typeof announce === 'function') announce('Going back.');
         return;
       }
       if (phrase === 'scroll down') {
@@ -275,7 +269,6 @@ function handleVoiceCommand(transcript) {
 
   // If nothing matched, show what was heard
   showVoiceFeedback('Command not recognized: "' + transcript + '". Try "Open dashboard" or "Analyze budget".', 'info');
-  if (typeof announce === 'function') announce('Command not recognized: ' + transcript);
 }
 
 // ========== CONFIRMATION FLOW ==========
@@ -287,7 +280,6 @@ function showVoiceConfirmation(message, onConfirm) {
   msgEl.textContent = message;
   modal.style.display = 'flex';
   modal.querySelector('.voice-confirm-yes').focus();
-  if (typeof announce === 'function') announce(message + '. Say Confirm or Cancel.');
 }
 
 function confirmVoiceAction() {
@@ -299,7 +291,6 @@ function cancelVoiceAction() {
   pendingAction = null;
   document.getElementById('voiceConfirmModal').style.display = 'none';
   showVoiceFeedback('Action cancelled.', 'info');
-  if (typeof announce === 'function') announce('Action cancelled.');
 }
 
 // ========== UI FEEDBACK ==========

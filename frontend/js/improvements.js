@@ -1,4 +1,4 @@
-/**
+﻿/**
  * UX Improvements Module
  * 1. Auto-save/load data (localStorage)
  * 2. Currency converter
@@ -53,7 +53,6 @@ function clearSavedData() {
     if (el) el.value = '';
   });
   showSaveStatus('All data cleared.');
-  if (typeof announce === 'function') announce('All saved data cleared.');
 }
 
 function showSaveStatus(msg) {
@@ -147,7 +146,6 @@ function setBudgetFromSelect() {
 
   // Save
   if (typeof saveAllData === 'function') saveAllData();
-  if (typeof announce === 'function') announce('Budget set: ' + label + ' limit RM' + amount.toFixed(2));
 }
 
 // ========== 3. SPENDING TRENDS (Multi-month) ==========
@@ -188,7 +186,6 @@ function saveMonthSnapshot() {
 
   renderTrendsChart();
   showSaveStatus('Month snapshot saved: ' + monthLabel);
-  if (typeof announce === 'function') announce('Monthly snapshot saved for ' + monthLabel);
 }
 
 /**

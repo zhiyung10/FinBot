@@ -11,7 +11,6 @@
 <body>
 
 <a href="#main-content" class="skip-link">Skip to main content</a>
-<div id="a11y-announce" role="status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 <div id="saveStatus" class="save-status" role="status" aria-live="polite"></div>
 
 <div class="app">
@@ -170,7 +169,7 @@
       </div>
 
       <div class="btn-group">
-        <button class="btn btn-primary" type="button" onclick="saveAllData(); updateLocalDashboard(); announce('Financial data saved successfully.'); showPage('home');">Save &amp; View Dashboard</button>
+        <button class="btn btn-primary" type="button" onclick="saveAllData(); updateLocalDashboard(); showPage('home');">Save &amp; View Dashboard</button>
       </div>
     </div>
 
@@ -304,7 +303,6 @@
       <div class="card"><div class="card-title">Display & Vision</div>
         <div class="a11y-toggle-group">
           <div class="a11y-toggle"><div><div class="a11y-toggle-label">High Contrast</div><div class="a11y-toggle-desc">Increase contrast for better visibility</div></div><button class="a11y-switch" id="toggleHighContrast" onclick="toggleA11y('high-contrast')" role="switch" aria-checked="false"></button></div>
-          <div class="a11y-toggle"><div><div class="a11y-toggle-label">Color Blind Mode</div><div class="a11y-toggle-desc">Add text labels to color-coded values</div></div><button class="a11y-switch" id="toggleColorBlind" onclick="toggleA11y('color-blind')" role="switch" aria-checked="false"></button></div>
           <div class="a11y-toggle"><div><div class="a11y-toggle-label">Enhanced Focus</div><div class="a11y-toggle-desc">Thicker focus outlines for keyboard navigation</div></div><button class="a11y-switch" id="toggleEnhancedFocus" onclick="toggleA11y('enhanced-focus')" role="switch" aria-checked="false"></button></div>
         </div>
       </div>
@@ -356,7 +354,6 @@
 <div id="voiceFeedback" class="voice-feedback" role="status" aria-live="polite"></div>
 <div class="voice-confirm-overlay" id="voiceConfirmModal" role="dialog" aria-modal="true"><div class="voice-confirm-box"><p id="voiceConfirmMessage"></p><div class="btn-group" style="justify-content:center;"><button type="button" class="btn btn-primary" onclick="confirmVoiceAction()">Confirm</button><button type="button" class="btn btn-secondary" onclick="cancelVoiceAction()">Cancel</button></div></div></div>
 
-<script src="js/accessibility.js"></script>
 <script src="js/main.js"></script>
 
 <!-- External modules -->

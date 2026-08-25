@@ -209,8 +209,6 @@ textarea.input-field::placeholder { color: #9ca3af; }
 /* Accessibility */
 *:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 body.high-contrast { --bg: #000; --card: #111; --text: #fff; --text-secondary: #ccc; --border: #555; }
-body.color-blind .card-value.green::after { content: ' (Income)'; font-size: 0.6rem; font-weight: 400; }
-body.color-blind .card-value.red::after { content: ' (Expense)'; font-size: 0.6rem; font-weight: 400; }
 body.large-text { font-size: 16px; }
 body.xl-text { font-size: 18px; }
 body.reduced-motion *,body.reduced-motion *::before,body.reduced-motion *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
