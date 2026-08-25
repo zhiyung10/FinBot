@@ -338,6 +338,7 @@ function updateLocalDashboard() {
   document.getElementById('scBalance').textContent = 'RM ' + s.currentBalance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
   document.getElementById('scAssets').textContent = 'RM ' + s.totalAssets.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
   document.getElementById('scSavingsRate').textContent = s.savingsRate + '%';
+  document.getElementById('scSavingsRate').textContent = i.healthScore + '/100';
 
   // Mini bar chart for balance card
   const barsEl = document.getElementById('balanceMiniBars');
