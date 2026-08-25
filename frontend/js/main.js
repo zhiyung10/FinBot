@@ -739,11 +739,19 @@ function generateHomeInsight(forceRefresh) {
   var savedInsight = localStorage.getItem(INSIGHT_KEY);
 
   if (!forceRefresh && savedHash === dataHash && savedInsight) {
+    // Restore cached insight HTML
     document.getElementById('aiInsightContent').innerHTML = savedInsight;
-    // Restore health score from cache
+    // Restore health score from cache — if missing, invalidate cache so AI regenerates
     var cachedScore = localStorage.getItem('finbot_health_score');
     var hsElCached = document.getElementById('scHealthScore');
-    if (hsElCached && cachedScore) { hsElCached.textContent = cachedScore; }
+    if (hsElCached && cachedScore) {
+      hsElCached.textContent = cachedScore;
+    } else if (hsElCached) {
+      // Old cache without health score — force regeneration
+      localStorage.removeItem(INSIGHT_KEY);
+      localStorage.removeItem(INSIGHT_DATA_KEY);
+      generateHomeInsight(true);
+    }
     return;
   }
 
@@ -765,16 +773,6 @@ function generateHomeInsight(forceRefresh) {
     document.getElementById('aiInsightContent').innerHTML = html;
     localStorage.setItem(INSIGHT_KEY, html);
     localStorage.setItem(INSIGHT_DATA_KEY, dataHash);
-    // Compute a simple local health score and update the card
-    var localScore = 50;
-    if (s.totalIncome > 0) {
-      if (s.savingsRate >= 20) localScore = 85;
-      else if (s.savingsRate >= 10) localScore = 70;
-      else if (s.savingsRate >= 0) localScore = 55;
-      else localScore = 30;
-    }
-    var hsLocal = document.getElementById('scHealthScore');
-    if (hsLocal) { hsLocal.textContent = localScore; localStorage.setItem('finbot_health_score', String(localScore)); }
     return;
   }
 
