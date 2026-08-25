@@ -23,6 +23,7 @@
       <li><a onclick="showPage('plan')" data-page="plan" tabindex="0" role="button"><span class="nav-icon">&#127919;</span>Plan</a></li>
       <li><a onclick="showPage('ai')" data-page="ai" tabindex="0" role="button"><span class="nav-icon">&#129302;</span>AI Advisor</a></li>
       <li><a onclick="showPage('insights')" data-page="insights" tabindex="0" role="button"><span class="nav-icon">&#128200;</span>Insights</a></li>
+      <li><a onclick="showPage('calendar')" data-page="calendar" tabindex="0" role="button"><span class="nav-icon">&#128197;</span>Calendar</a></li>
       <li class="nav-divider">More</li>
       <li><a onclick="showPage('receipt')" data-page="receipt" tabindex="0" role="button"><span class="nav-icon">&#128247;</span>Receipt OCR</a></li>
       <li><a onclick="showPage('accessibility')" data-page="accessibility" tabindex="0" role="button"><span class="nav-icon">&#9855;</span>Accessibility</a></li>
@@ -223,6 +224,51 @@
         </div>
       </div>
       <div class="ai-output" id="outputSubscription" style="display:none;"><span class="placeholder">Click "Subscription Analysis".</span></div>
+    </div>
+
+    <!-- ========== CALENDAR ========== -->
+    <div class="page" id="page-calendar">
+      <h2 class="page-title">&#128197; Financial Calendar</h2>
+      <p class="page-desc">Track your income and spending day by day.</p>
+
+      <!-- Month Navigation -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <button class="btn btn-secondary" onclick="calPrevMonth()" aria-label="Previous month">&#8592;</button>
+        <h3 id="calMonthTitle" style="font-size:1.1rem;font-weight:700;color:var(--text);"></h3>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-secondary" onclick="calToday()" style="font-size:0.75rem;padding:6px 12px;">Today</button>
+          <button class="btn btn-secondary" onclick="calNextMonth()" aria-label="Next month">&#8594;</button>
+        </div>
+      </div>
+
+      <!-- Monthly Summary -->
+      <div class="grid-3" id="calSummary">
+        <div class="card card-sm" style="text-align:center;">
+          <div class="card-title">Income</div>
+          <div id="calTotalIncome" style="font-size:1.2rem;font-weight:700;color:var(--green);">RM 0</div>
+        </div>
+        <div class="card card-sm" style="text-align:center;">
+          <div class="card-title">Expenses</div>
+          <div id="calTotalExpenses" style="font-size:1.2rem;font-weight:700;color:var(--red);">RM 0</div>
+        </div>
+        <div class="card card-sm" style="text-align:center;">
+          <div class="card-title">Net Balance</div>
+          <div id="calTotalNet" style="font-size:1.2rem;font-weight:700;color:var(--accent);">RM 0</div>
+        </div>
+      </div>
+
+      <!-- Calendar Grid -->
+      <div class="card" style="padding:12px;overflow-x:auto;">
+        <div class="cal-grid" id="calGrid"></div>
+      </div>
+
+      <!-- Selected Day Detail -->
+      <div class="card" id="calDayDetail" style="display:none;margin-top:16px;">
+        <div id="calDayContent"></div>
+      </div>
+
+      <!-- Empty month message -->
+      <p id="calEmptyMsg" style="display:none;color:var(--text-secondary);font-size:0.85rem;text-align:center;padding:20px;">No financial activity recorded this month.</p>
     </div>
 
     <!-- ========== RECEIPT OCR ========== -->

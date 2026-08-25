@@ -241,6 +241,31 @@ body.sr-optimized .card-value::before { font-size: 0.6rem; font-weight: 400; col
 
 /* Pie chart */
 .pie-container { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; justify-content: center; }
+
+/* Calendar */
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.cal-header { text-align: center; font-size: 0.7rem; font-weight: 600; color: var(--text-secondary); padding: 8px 4px; text-transform: uppercase; }
+.cal-cell { min-height: 70px; padding: 6px; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; transition: background 0.15s, border-color 0.15s; position: relative; }
+.cal-cell:hover { background: var(--accent-light); border-color: var(--accent); }
+.cal-cell.cal-today { border-color: var(--accent); background: var(--accent-light); }
+.cal-cell.cal-selected { border-color: var(--accent); background: var(--accent-light); box-shadow: 0 0 0 2px var(--accent); }
+.cal-cell.cal-empty { border-color: transparent; cursor: default; }
+.cal-cell.cal-empty:hover { background: transparent; }
+.cal-day-num { font-size: 0.78rem; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.cal-cell.cal-today .cal-day-num { color: var(--accent); }
+.cal-day-income { font-size: 0.65rem; color: var(--green); }
+.cal-day-expense { font-size: 0.65rem; color: var(--red); }
+.cal-day-count { font-size: 0.6rem; color: var(--text-secondary); margin-top: 2px; }
+@media (max-width: 900px) {
+  .cal-cell { min-height: 50px; padding: 4px; }
+  .cal-day-num { font-size: 0.7rem; }
+  .cal-day-income, .cal-day-expense { font-size: 0.6rem; }
+}
+@media (max-width: 500px) {
+  .cal-cell { min-height: 40px; padding: 3px; }
+  .cal-day-income, .cal-day-expense { display: none; }
+  .cal-day-count { font-size: 0.55rem; }
+}
 .pie-svg { width: 160px; height: 160px; }
 .pie-legend { list-style: none; }
 .pie-legend li { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; font-size: 0.78rem; }

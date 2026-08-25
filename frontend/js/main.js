@@ -16,6 +16,7 @@ function showPage(pageId) {
   window.scrollTo(0, 0);
   if (pageId === 'home') { updateLocalDashboard(); generateHomeInsight(false); }
   if (pageId === 'insights') { renderTrendsChart(); generatePieChart(); }
+  if (pageId === 'calendar') { renderCalendar(); }
   announce('Navigated to ' + pageId);
 }
 
@@ -144,6 +145,169 @@ function getTransactionsForMonth(yearMonth) {
     totalExpenses: Math.round(expenses.reduce(function(s, t) { return s + t.amount; }, 0) * 100) / 100
   };
 }
+
+// ========== FINANCIAL CALENDAR ==========
+var calYear = new Date().getFullYear();
+var calMonth = new Date().getMonth(); // 0-indexed
+var calSelectedDate = null;
+
+function calPrevMonth() { calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; } renderCalendar(); }
+function calNextMonth() { calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; } renderCalendar(); }
+function calToday() { calYear = new Date().getFullYear(); calMonth = new Date().getMonth(); calSelectedDate = new Date().toISOString().split('T')[0]; renderCalendar(); }
+
+function renderCalendar() {
+  var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var yearMonth = calYear + '-' + String(calMonth + 1).padStart(2, '0');
+
+  // Update title
+  document.getElementById('calMonthTitle').textContent = monthNames[calMonth] + ' ' + calYear;
+
+  // Get transactions for this month
+  var monthData = getTransactionsForMonth(yearMonth);
+
+  // Update monthly summary
+  document.getElementById('calTotalIncome').textContent = 'RM ' + monthData.totalIncome.toFixed(2);
+  document.getElementById('calTotalExpenses').textContent = 'RM ' + monthData.totalExpenses.toFixed(2);
+  var net = monthData.totalIncome - monthData.totalExpenses;
+  var netEl = document.getElementById('calTotalNet');
+  netEl.textContent = (net >= 0 ? '+' : '') + 'RM ' + net.toFixed(2);
+  netEl.style.color = net >= 0 ? 'var(--green)' : 'var(--red)';
+
+  // Group by day
+  var dayMap = {};
+  monthData.income.forEach(function(tx) {
+    var day = parseInt(tx.date.split('-')[2]);
+    if (!dayMap[day]) dayMap[day] = { income: 0, expenses: 0, count: 0 };
+    dayMap[day].income += tx.amount;
+    dayMap[day].count++;
+  });
+  monthData.expenses.forEach(function(tx) {
+    var day = parseInt(tx.date.split('-')[2]);
+    if (!dayMap[day]) dayMap[day] = { income: 0, expenses: 0, count: 0 };
+    dayMap[day].expenses += tx.amount;
+    dayMap[day].count++;
+  });
+
+  // Show/hide empty message
+  var hasActivity = Object.keys(dayMap).length > 0;
+  document.getElementById('calEmptyMsg').style.display = hasActivity ? 'none' : 'block';
+
+  // Build calendar grid
+  var firstDay = new Date(calYear, calMonth, 1).getDay(); // 0=Sun
+  var daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  var today = new Date().toISOString().split('T')[0];
+
+  // Adjust so Monday is first (0=Mon)
+  var startOffset = (firstDay + 6) % 7;
+
+  var html = '';
+  // Headers
+  var dayNames = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
+  dayNames.forEach(function(d) { html += '<div class="cal-header">' + d + '</div>'; });
+
+  // Empty cells before first day
+  for (var i = 0; i < startOffset; i++) {
+    html += '<div class="cal-cell cal-empty"></div>';
+  }
+
+  // Day cells
+  for (var d = 1; d <= daysInMonth; d++) {
+    var dateStr = yearMonth + '-' + String(d).padStart(2, '0');
+    var isToday = dateStr === today;
+    var isSelected = dateStr === calSelectedDate;
+    var dayData = dayMap[d];
+
+    var classes = 'cal-cell';
+    if (isToday) classes += ' cal-today';
+    if (isSelected) classes += ' cal-selected';
+
+    html += '<div class="' + classes + '" onclick="calSelectDay(\'' + dateStr + '\')" tabindex="0" role="button" aria-label="' + d + ' ' + monthNames[calMonth] + ' ' + calYear;
+    if (dayData) html += ', Income RM' + dayData.income.toFixed(0) + ', Expenses RM' + dayData.expenses.toFixed(0);
+    html += '">';
+
+    html += '<div class="cal-day-num">' + d + '</div>';
+
+    if (dayData) {
+      if (dayData.income > 0) html += '<div class="cal-day-income">+RM' + (dayData.income >= 1000 ? (dayData.income/1000).toFixed(1) + 'K' : dayData.income.toFixed(0)) + '</div>';
+      if (dayData.expenses > 0) html += '<div class="cal-day-expense">-RM' + (dayData.expenses >= 1000 ? (dayData.expenses/1000).toFixed(1) + 'K' : dayData.expenses.toFixed(0)) + '</div>';
+      if (dayData.count > 1) html += '<div class="cal-day-count">' + dayData.count + ' txns</div>';
+    }
+
+    html += '</div>';
+  }
+
+  document.getElementById('calGrid').innerHTML = html;
+
+  // Add keyboard support to cal cells
+  document.querySelectorAll('.cal-cell:not(.cal-empty)').forEach(function(cell) {
+    cell.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); cell.click(); } });
+  });
+
+  // Refresh detail if a date is selected
+  if (calSelectedDate) calShowDayDetail(calSelectedDate);
+}
+
+function calSelectDay(dateStr) {
+  calSelectedDate = dateStr;
+  // Update visual selection
+  document.querySelectorAll('.cal-cell').forEach(function(c) { c.classList.remove('cal-selected'); });
+  event.currentTarget.classList.add('cal-selected');
+  calShowDayDetail(dateStr);
+}
+
+function calShowDayDetail(dateStr) {
+  var detail = document.getElementById('calDayDetail');
+  var content = document.getElementById('calDayContent');
+
+  var allByDate = getTransactionsByDate();
+  var dayTx = allByDate[dateStr];
+
+  if (!dayTx || (dayTx.income.length === 0 && dayTx.expenses.length === 0)) {
+    detail.style.display = 'block';
+    var parts = dateStr.split('-');
+    var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    var displayDate = parseInt(parts[2]) + ' ' + monthNames[parseInt(parts[1])-1] + ' ' + parts[0];
+    content.innerHTML = '<div style="font-size:0.9rem;font-weight:600;color:var(--text);margin-bottom:8px;">' + displayDate + '</div><p style="color:var(--text-secondary);font-size:0.85rem;">No transactions on this date.</p>';
+    return;
+  }
+
+  var totalInc = dayTx.income.reduce(function(s,t){ return s + t.amount; }, 0);
+  var totalExp = dayTx.expenses.reduce(function(s,t){ return s + t.amount; }, 0);
+  var net = totalInc - totalExp;
+
+  var parts = dateStr.split('-');
+  var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var displayDate = parseInt(parts[2]) + ' ' + monthNames[parseInt(parts[1])-1] + ' ' + parts[0];
+
+  var html = '<div style="font-size:0.95rem;font-weight:700;color:var(--text);margin-bottom:12px;">' + displayDate + '</div>';
+
+  // Summary
+  html += '<div style="display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap;">';
+  html += '<div style="font-size:0.82rem;"><span style="color:var(--text-secondary);">Income</span><br><strong style="color:var(--green);">RM' + totalInc.toFixed(2) + '</strong></div>';
+  html += '<div style="font-size:0.82rem;"><span style="color:var(--text-secondary);">Expenses</span><br><strong style="color:var(--red);">RM' + totalExp.toFixed(2) + '</strong></div>';
+  html += '<div style="font-size:0.82rem;"><span style="color:var(--text-secondary);">Net</span><br><strong style="color:' + (net >= 0 ? 'var(--green)' : 'var(--red)') + ';">' + (net >= 0 ? '+' : '') + 'RM' + net.toFixed(2) + '</strong></div>';
+  html += '</div>';
+
+  // Transactions list
+  if (dayTx.income.length > 0) {
+    html += '<div style="font-size:0.75rem;font-weight:600;color:var(--text-secondary);text-transform:uppercase;margin-bottom:6px;">Income</div>';
+    dayTx.income.forEach(function(tx) {
+      html += '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:0.83rem;"><span style="color:var(--text);">' + tx.category + '</span><span style="color:var(--green);font-weight:600;">+RM' + tx.amount.toFixed(2) + '</span></div>';
+    });
+  }
+
+  if (dayTx.expenses.length > 0) {
+    html += '<div style="font-size:0.75rem;font-weight:600;color:var(--text-secondary);text-transform:uppercase;margin-top:12px;margin-bottom:6px;">Expenses</div>';
+    dayTx.expenses.forEach(function(tx) {
+      html += '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:0.83rem;"><span style="color:var(--text);">' + tx.category + '</span><span style="color:var(--red);font-weight:600;">-RM' + tx.amount.toFixed(2) + '</span></div>';
+    });
+  }
+
+  detail.style.display = 'block';
+  content.innerHTML = html;
+  if (typeof announce === 'function') announce('Showing transactions for ' + displayDate);
+}
+
 // Dashboard calculations — uses central summary
 function updateLocalDashboard() {
   const s = getFinancialSummary();
