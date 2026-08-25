@@ -1,7 +1,7 @@
 /**
  * Receipt OCR Scanner Module
  * Uses Tesseract.js to extract text and amounts from receipt images.
- * Extracted amounts can be added to the Expense Input.
+ * Extracted amounts can be added to the Expense Input with transaction date.
  */
 
 // State
@@ -61,7 +61,6 @@ async function scanReceipt() {
   progressEl.querySelector('.progress-fill').style.width = '0%';
   scanBtn.disabled = true;
 
-  // Announce to screen reader
   if (typeof announce === 'function') announce('Scanning receipt, please wait.');
 
   try {
@@ -79,7 +78,7 @@ async function scanReceipt() {
     const text = result.data.text;
     await worker.terminate();
 
-    // Extract amounts
+    // Extract amounts and date
     const amounts = extractAmounts(text);
     ocrExtractedAmounts = amounts;
 
@@ -102,7 +101,6 @@ async function scanReceipt() {
  */
 function extractAmounts(text) {
   const amounts = [];
-  // Match patterns like: RM 12.50, RM12.50, 12.50, MYR 12.50
   const pattern = /(?:RM|MYR|rm|Rm)?\s?(\d{1,3}(?:[,.]?\d{3})*(?:\.\d{2})?)/g;
   let match;
 
@@ -114,12 +112,74 @@ function extractAmounts(text) {
     }
   }
 
-  // Remove duplicates and sort descending
   return [...new Set(amounts)].sort(function (a, b) { return b - a; });
 }
 
 /**
- * Try to find the total amount (usually the largest or has "TOTAL" nearby)
+ * Detect receipt transaction date from OCR text.
+ * Supports formats: DD/MM/YYYY, DD-MM-YYYY, YYYY-MM-DD, DD Mon YYYY, DD Month YYYY
+ * Returns ISO date string (YYYY-MM-DD) or null if not detected.
+ */
+function detectReceiptDate(text) {
+  const months = {
+    'jan': '01', 'january': '01', 'feb': '02', 'february': '02',
+    'mar': '03', 'march': '03', 'apr': '04', 'april': '04',
+    'may': '05', 'jun': '06', 'june': '06', 'jul': '07', 'july': '07',
+    'aug': '08', 'august': '08', 'sep': '09', 'september': '09',
+    'oct': '10', 'october': '10', 'nov': '11', 'november': '11',
+    'dec': '12', 'december': '12'
+  };
+
+  // Try DD/MM/YYYY or DD-MM-YYYY
+  var match = text.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+  if (match) {
+    var day = match[1].padStart(2, '0');
+    var month = match[2].padStart(2, '0');
+    var year = match[3];
+    // Validate
+    if (parseInt(month) >= 1 && parseInt(month) <= 12 && parseInt(day) >= 1 && parseInt(day) <= 31) {
+      return year + '-' + month + '-' + day;
+    }
+  }
+
+  // Try YYYY-MM-DD
+  match = text.match(/(\d{4})-(\d{2})-(\d{2})/);
+  if (match) {
+    var year = match[1], month = match[2], day = match[3];
+    if (parseInt(month) >= 1 && parseInt(month) <= 12 && parseInt(day) >= 1 && parseInt(day) <= 31) {
+      return year + '-' + month + '-' + day;
+    }
+  }
+
+  // Try DD Mon YYYY or DD Month YYYY
+  match = text.match(/(\d{1,2})\s+(jan|january|feb|february|mar|march|apr|april|may|jun|june|jul|july|aug|august|sep|september|oct|october|nov|november|dec|december)\s+(\d{4})/i);
+  if (match) {
+    var day = match[1].padStart(2, '0');
+    var monthName = match[2].toLowerCase();
+    var month = months[monthName];
+    var year = match[3];
+    if (month && parseInt(day) >= 1 && parseInt(day) <= 31) {
+      return year + '-' + month + '-' + day;
+    }
+  }
+
+  // Try Mon DD, YYYY
+  match = text.match(/(jan|january|feb|february|mar|march|apr|april|may|jun|june|jul|july|aug|august|sep|september|oct|october|nov|november|dec|december)\s+(\d{1,2}),?\s+(\d{4})/i);
+  if (match) {
+    var monthName = match[1].toLowerCase();
+    var month = months[monthName];
+    var day = match[2].padStart(2, '0');
+    var year = match[3];
+    if (month && parseInt(day) >= 1 && parseInt(day) <= 31) {
+      return year + '-' + month + '-' + day;
+    }
+  }
+
+  return null; // Could not detect date
+}
+
+/**
+ * Try to find the total amount
  */
 function findTotal(text, amounts) {
   const totalPattern = /(?:total|grand total|amount|jumlah|bayar|subtotal|total amount)[:\s]*(?:RM|MYR)?\s?(\d{1,3}(?:[,.]?\d{3})*(?:\.\d{2})?)/gi;
@@ -128,17 +188,21 @@ function findTotal(text, amounts) {
     const val = parseFloat(match[1].replace(/,/g, ''));
     if (!isNaN(val) && val > 0) return val;
   }
-  // Fallback: largest amount
   return amounts.length > 0 ? amounts[0] : null;
 }
 
 /**
- * Display OCR results
+ * Display OCR results with date field
  */
 function displayOCRResults(rawText, amounts) {
   const resultsEl = document.getElementById('ocrResults');
   const total = findTotal(rawText, amounts);
   ocrSelectedAmount = total;
+
+  // Detect receipt date
+  const detectedDate = detectReceiptDate(rawText);
+  const today = new Date().toISOString().split('T')[0];
+  const proposedDate = detectedDate || today;
 
   let html = '';
 
@@ -149,6 +213,11 @@ function displayOCRResults(rawText, amounts) {
     html += '<div class="ocr-total-value">RM' + total.toFixed(2) + '</div>';
     html += '</div>';
   }
+
+  // Show detected date
+  html += '<div style="margin-bottom:12px;padding:8px 12px;border-radius:8px;background:' + (detectedDate ? 'rgba(16,185,129,0.08)' : 'rgba(245,158,11,0.08)') + ';border:1px solid ' + (detectedDate ? 'rgba(16,185,129,0.2)' : 'rgba(245,158,11,0.2)') + ';">';
+  html += '<span style="font-size:0.78rem;color:var(--text-secondary);">' + (detectedDate ? '&#9989; Date detected from receipt' : '&#9888; Date not detected - defaulting to today') + '</span>';
+  html += '</div>';
 
   // Show all amounts as selectable chips
   if (amounts.length > 0) {
@@ -163,13 +232,30 @@ function displayOCRResults(rawText, amounts) {
     html += '<p class="ocr-no-results">No amounts detected. Try a clearer image.</p>';
   }
 
-  // Add to expenses form
+  // Save form with date field
   html += '<div class="ocr-add-section">';
-  html += '<label for="ocrDescription" class="ocr-form-label">Description (optional)</label>';
-  html += '<input type="text" id="ocrDescription" class="ocr-input" placeholder="e.g., Lunch at restaurant" aria-label="Expense description">';
+  html += '<label for="ocrDescription" class="ocr-form-label">Description / Merchant</label>';
+  html += '<input type="text" id="ocrDescription" class="ocr-input" placeholder="e.g., FamilyMart, Lunch" aria-label="Expense description">';
+
   html += '<label for="ocrAmount" class="ocr-form-label">Amount (RM)</label>';
   html += '<input type="number" id="ocrAmount" class="ocr-input" step="0.01" min="0.01" value="' + (ocrSelectedAmount || '') + '" aria-label="Expense amount in Ringgit">';
-  html += '<button class="btn btn-primary" onclick="addOCRToExpenses()" aria-label="Add scanned amount to expenses">Add to Expenses</button>';
+
+  html += '<label for="ocrDate" class="ocr-form-label">Transaction Date</label>';
+  html += '<input type="date" id="ocrDate" class="ocr-input" value="' + proposedDate + '" aria-label="Transaction date for this expense">';
+
+  html += '<label for="ocrCategory" class="ocr-form-label">Category</label>';
+  html += '<select id="ocrCategory" class="ocr-input" aria-label="Expense category">';
+  html += '<option value="Receipt Item">Receipt Item</option>';
+  html += '<option value="Food">Food</option>';
+  html += '<option value="Groceries">Groceries</option>';
+  html += '<option value="Shopping">Shopping</option>';
+  html += '<option value="Transport">Transport</option>';
+  html += '<option value="Healthcare">Healthcare</option>';
+  html += '<option value="Utilities">Utilities</option>';
+  html += '<option value="Other">Other</option>';
+  html += '</select>';
+
+  html += '<button class="btn btn-primary" onclick="addOCRToExpenses()" aria-label="Save scanned expense" style="margin-top:8px;">Save Expense</button>';
   html += '</div>';
 
   // Raw text (collapsible)
@@ -185,7 +271,6 @@ function displayOCRResults(rawText, amounts) {
 function selectOCRAmount(amt) {
   ocrSelectedAmount = amt;
   document.getElementById('ocrAmount').value = amt.toFixed(2);
-  // Update chip styles
   document.querySelectorAll('.ocr-chip').forEach(function (chip) {
     chip.classList.remove('selected');
     if (chip.textContent === 'RM' + amt.toFixed(2)) chip.classList.add('selected');
@@ -193,20 +278,25 @@ function selectOCRAmount(amt) {
 }
 
 /**
- * Add the selected amount to the Expense Input textarea
+ * Add the confirmed OCR expense to the Expense Input textarea with date
  */
 function addOCRToExpenses() {
   const amountInput = document.getElementById('ocrAmount');
   const descInput = document.getElementById('ocrDescription');
-  const amount = parseFloat(amountInput.value);
+  const dateInput = document.getElementById('ocrDate');
+  const catInput = document.getElementById('ocrCategory');
 
+  const amount = parseFloat(amountInput.value);
   if (isNaN(amount) || amount <= 0) {
     showOCRError('Please enter a valid amount greater than 0.');
     return;
   }
 
-  const description = descInput.value.trim() || 'Receipt Item';
-  const expenseEntry = description + ' RM' + amount.toFixed(2);
+  const description = descInput.value.trim() || catInput.value || 'Receipt Item';
+  const txDate = dateInput.value || new Date().toISOString().split('T')[0];
+
+  // Format: Description RM123.45 [2026-08-25]
+  const expenseEntry = description + ' RM' + amount.toFixed(2) + ' [' + txDate + ']';
 
   // Append to expense input
   const expenseInput = document.getElementById('expenseInput');
@@ -216,16 +306,21 @@ function addOCRToExpenses() {
     expenseInput.value = expenseEntry;
   }
 
+  // Auto-save if available
+  if (typeof saveAllData === 'function') saveAllData();
+
   // Show success
   const statusEl = document.getElementById('ocrStatus');
-  statusEl.textContent = 'Added "' + expenseEntry + '" to your expenses.';
+  statusEl.textContent = 'Saved: ' + description + ' RM' + amount.toFixed(2) + ' on ' + txDate;
   statusEl.style.display = 'block';
 
-  if (typeof announce === 'function') announce('Added ' + expenseEntry + ' to expenses.');
+  if (typeof announce === 'function') announce('Expense saved: ' + description + ' RM' + amount.toFixed(2) + ' on ' + txDate);
 
-  // Reset form
+  // Reset form fields but keep results visible for multiple receipts
   descInput.value = '';
   amountInput.value = '';
+  // Reset date to today for next receipt
+  dateInput.value = new Date().toISOString().split('T')[0];
 }
 
 /**
