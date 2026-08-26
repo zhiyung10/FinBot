@@ -11,8 +11,12 @@
 function showPage(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + pageId).classList.add('active');
-  document.querySelectorAll('.sidebar-nav a, .mobile-nav a').forEach(a => { a.classList.remove('active'); a.removeAttribute('aria-current'); });
+  document.querySelectorAll('.sidebar-nav a, .mobile-nav-item').forEach(a => { a.classList.remove('active'); a.removeAttribute('aria-current'); });
   document.querySelectorAll('[data-page="' + pageId + '"]').forEach(a => { a.classList.add('active'); a.setAttribute('aria-current', 'page'); });
+  // If navigating to a page inside More, highlight More button
+  var morePages = ['plan','insights','receipt','accessibility'];
+  var moreBtn = document.getElementById('mobileMoreBtn');
+  if (moreBtn) { if (morePages.indexOf(pageId) >= 0) { moreBtn.classList.add('active'); } }
   window.scrollTo(0, 0);
   if (pageId === 'home') { updateLocalDashboard(); generateHomeInsight(false); }
   if (pageId === 'insights') { renderTrendsChart(); generatePieChart(); }
@@ -41,6 +45,20 @@ function goToMoneyTab(tab) {
 function toggleFab() { document.getElementById('fabMenu').classList.toggle('open'); }
 function closeFab() { document.getElementById('fabMenu').classList.remove('open'); }
 document.addEventListener('click', e => { if (!e.target.closest('.fab') && !e.target.closest('.fab-menu')) closeFab(); });
+
+// Mobile More menu
+function toggleMobileMore() {
+  var overlay = document.getElementById('mobileMoreOverlay');
+  var sheet = document.getElementById('mobileMoreSheet');
+  if (sheet.classList.contains('open')) { closeMobileMore(); } else { overlay.classList.add('open'); sheet.classList.add('open'); }
+}
+function closeMobileMore() {
+  var overlay = document.getElementById('mobileMoreOverlay');
+  var sheet = document.getElementById('mobileMoreSheet');
+  if (overlay) overlay.classList.remove('open');
+  if (sheet) sheet.classList.remove('open');
+}
+function mobileMoreNav(pageId) { closeMobileMore(); showPage(pageId); }
 
 // Parse amounts - extracts RM values, ignores dates in [YYYY-MM-DD] format
 function parseAmounts(text) {
@@ -765,6 +783,8 @@ function setTheme(theme) {
   localStorage.setItem('theme', theme);
   const label = document.getElementById('themeLabel');
   if (label) label.textContent = theme === 'system' ? 'System' : theme === 'dark' ? 'Dark' : 'Light';
+  const mLabel = document.getElementById('mobileThemeLabel');
+  if (mLabel) mLabel.textContent = theme === 'system' ? 'System' : theme === 'dark' ? 'Dark' : 'Light';
   document.querySelectorAll('[data-theme-btn]').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.themeBtn === theme);
     btn.setAttribute('aria-pressed', btn.dataset.themeBtn === theme ? 'true' : 'false');
@@ -894,7 +914,7 @@ function toggleVoiceFeature(){const bar=document.getElementById('voiceCommandBar
 })();
 
 // Keyboard nav
-document.querySelectorAll('.sidebar-nav a[role="button"],.mobile-nav a').forEach(a=>{a.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();a.click();}});});
+document.querySelectorAll('.sidebar-nav a[role="button"]').forEach(a=>{a.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();a.click();}});});
 // Keyboard support for dashboard KPI cards with role="button"
 document.querySelectorAll('.card[role="button"]').forEach(c=>{c.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();c.click();}});});
 

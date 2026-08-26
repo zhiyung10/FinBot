@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -336,12 +336,23 @@
 
 <!-- Mobile Bottom Nav -->
 <nav class="mobile-nav" aria-label="Mobile navigation">
-  <a onclick="showPage('home')" data-page="home" class="active"><span class="mn-icon"> </span>Home</a>
-  <a onclick="showPage('money')" data-page="money"><span class="mn-icon"></span>Money</a>
-  <a onclick="showPage('ai')" data-page="ai"><span class="mn-icon"></span>AI</a>
-  <a onclick="showPage('plan')" data-page="plan"><span class="mn-icon"></span>Plan</a>
-  <a onclick="showPage('insights')" data-page="insights"><span class="mn-icon"> </span>More</a>
+  <button type="button" onclick="showPage('home')" data-page="home" class="mobile-nav-item active" aria-label="Home"><span class="mn-icon">&#127968;</span><span class="mn-label">Home</span></button>
+  <button type="button" onclick="showPage('money')" data-page="money" class="mobile-nav-item" aria-label="Money"><span class="mn-icon">&#128179;</span><span class="mn-label">Money</span></button>
+  <button type="button" onclick="showPage('ai')" data-page="ai" class="mobile-nav-item" aria-label="AI Advisor"><span class="mn-icon">&#129302;</span><span class="mn-label">AI</span></button>
+  <button type="button" onclick="showPage('calendar')" data-page="calendar" class="mobile-nav-item" aria-label="Calendar"><span class="mn-icon">&#128197;</span><span class="mn-label">Calendar</span></button>
+  <button type="button" onclick="toggleMobileMore()" class="mobile-nav-item" id="mobileMoreBtn" aria-label="More navigation options"><span class="mn-icon">&#8943;</span><span class="mn-label">More</span></button>
 </nav>
+
+<!-- Mobile More Sheet -->
+<div class="mobile-more-overlay" id="mobileMoreOverlay" onclick="closeMobileMore()" aria-hidden="true"></div>
+<div class="mobile-more-sheet" id="mobileMoreSheet" role="dialog" aria-label="More navigation">
+  <div class="mobile-more-header">More</div>
+  <button type="button" class="mobile-more-item" onclick="mobileMoreNav('plan')"><span>&#127919;</span>Plan</button>
+  <button type="button" class="mobile-more-item" onclick="mobileMoreNav('insights')"><span>&#128200;</span>Insights</button>
+  <button type="button" class="mobile-more-item" onclick="mobileMoreNav('receipt')"><span>&#128247;</span>Receipt OCR</button>
+  <button type="button" class="mobile-more-item" onclick="mobileMoreNav('accessibility')"><span>&#9855;</span>Accessibility</button>
+  <button type="button" class="mobile-more-item" onclick="closeMobileMore(); toggleTheme();"><span>&#127769;</span>Theme: <span id="mobileThemeLabel">Light</span></button>
+</div>
 
 <!-- Voice UI -->
 <div class="voice-command-bar" id="voiceCommandBar"><button class="voice-command-btn" onclick="startVoiceInput('command')" aria-label="Voice command"></button><div class="voice-indicator"></div></div>
