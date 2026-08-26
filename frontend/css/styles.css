@@ -241,6 +241,18 @@ html.xl-text { font-size: 20px; }
 body.reduced-motion *,body.reduced-motion *::before,body.reduced-motion *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
 body.enhanced-focus *:focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; }
 body.simplified .nav-icon { display: none; }
+/* Simplified Interface — reduce visual clutter on all devices */
+body.simplified .card-sm-badge { display: none; }
+body.simplified .card-sm-sub { display: none; }
+body.simplified .dash-header p { display: none; }
+body.simplified .page-desc { display: none; }
+body.simplified .card-mini-bars { display: none; }
+body.simplified .card-mini-line { display: none; }
+body.simplified .fab-menu a { padding: 8px 12px; }
+body.simplified .trends-legend { display: none; }
+body.simplified .cal-day-count { display: none; }
+body.simplified .home-cal-title { display: none; }
+body.simplified .mobile-more-item span:first-child { display: none; }
 @media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; } }
 @media print { .sidebar,.fab,.fab-menu,.voice-command-bar,.skip-link { display: none !important; } .main { margin-left: 0 !important; } body { background: #fff; } }
 
@@ -295,7 +307,7 @@ body.simplified .nav-icon { display: none; }
 }
 @media (max-width: 500px) {
   .cal-cell { min-height: 40px; padding: 3px; }
-  .cal-day-income, .cal-day-expense { display: none; }
+  .cal-day-income, .cal-day-expense { font-size: 0.55rem; }
   .cal-day-count { font-size: 0.55rem; }
   .home-cal-cell { min-height: 36px; }
   .home-cal-inc, .home-cal-exp { font-size: 0.5rem; }
