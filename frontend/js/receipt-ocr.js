@@ -93,22 +93,62 @@ async function scanReceipt() {
 }
 
 /**
- * Extract RM amounts from OCR text
+ * Extract monetary amounts from OCR text.
+ *
+ * STRICT RULE: A number is only treated as money if it is directly associated
+ * with a recognized currency indicator (symbol or ISO code). Standalone numbers
+ * (quantities, dates, phone numbers, invoice numbers, barcodes, etc.) are ignored.
+ *
+ * Supported indicators:
+ *   - ISO codes: RM, MYR, USD, SGD, EUR, GBP, AUD, CAD, JPY, CNY, RMB, HKD,
+ *                THB, KRW, INR, IDR, PHP, VND
+ *   - Symbols:   $ € £ ¥ ₹ ₩ ₽ ฿
+ *
+ * The indicator may appear immediately before the number or with a little
+ * whitespace. A trailing-code form (e.g. "10.50 MYR") is also supported.
  */
 function extractAmounts(text) {
-  const amounts = [];
-  const pattern = /(?:RM|MYR|rm|Rm)?\s?(\d{1,3}(?:[,.]?\d{3})*(?:\.\d{2})?)/g;
-  let match;
+  var amounts = [];
+  if (!text) return amounts;
 
-  while ((match = pattern.exec(text)) !== null) {
-    const cleaned = match[1].replace(/,/g, '');
-    const num = parseFloat(cleaned);
-    if (!isNaN(num) && num > 0.5 && num < 100000) {
-      amounts.push(num);
+  // Recognized currency codes (word-boundary matched, case-insensitive)
+  var codes = 'RM|MYR|USD|SGD|EUR|GBP|AUD|CAD|JPY|CNY|RMB|HKD|THB|KRW|INR|IDR|PHP|VND';
+  // Recognized currency symbols
+  var symbols = '\\$|€|£|¥|₹|₩|₽|฿';
+
+  // Numeric amount: thousands-separated form OR plain digits, with optional
+  // decimal part. The comma form is listed first; the plain-digit form uses
+  // \d+ so long unseparated numbers (e.g. 1000) are captured fully.
+  var numberPart = '\\d{1,3}(?:,\\d{3})+(?:\\.\\d{1,2})?|\\d+(?:\\.\\d{1,2})?';
+
+  // Pattern 1: currency BEFORE the number — "RM 10.50", "$10", "MYR1,234.50"
+  var prefixPattern = new RegExp(
+    '(?:' + codes + '|' + symbols + ')\\s*(' + numberPart + ')',
+    'gi'
+  );
+  // Pattern 2: currency AFTER the number — "10.50 MYR", "25.00 USD"
+  var suffixPattern = new RegExp(
+    '(' + numberPart + ')\\s*(?:' + codes + ')\\b',
+    'gi'
+  );
+
+  function pushMatch(raw) {
+    var cleaned = raw.replace(/,/g, '');
+    var num = parseFloat(cleaned);
+    // Reasonable money bounds; reject 0 and absurdly large values
+    if (!isNaN(num) && num > 0 && num < 1000000) {
+      amounts.push(Math.round(num * 100) / 100);
     }
   }
 
-  return [...new Set(amounts)].sort(function (a, b) { return b - a; });
+  var m;
+  while ((m = prefixPattern.exec(text)) !== null) { pushMatch(m[1]); }
+  while ((m = suffixPattern.exec(text)) !== null) { pushMatch(m[1]); }
+
+  // Remove duplicates, sort descending (largest likely = total)
+  var unique = [];
+  amounts.forEach(function (a) { if (unique.indexOf(a) === -1) unique.push(a); });
+  return unique.sort(function (a, b) { return b - a; });
 }
 
 /**
@@ -175,15 +215,24 @@ function detectReceiptDate(text) {
 }
 
 /**
- * Try to find the total amount
+ * Try to find the total amount.
+ * Prefers a "total" keyword followed by a currency-indicated amount.
+ * Falls back to the largest validated amount (amounts[0]) if no explicit
+ * total is found. Never fabricates a value.
  */
 function findTotal(text, amounts) {
-  const totalPattern = /(?:total|grand total|amount|jumlah|bayar|subtotal|total amount)[:\s]*(?:RM|MYR)?\s?(\d{1,3}(?:[,.]?\d{3})*(?:\.\d{2})?)/gi;
-  const match = totalPattern.exec(text);
+  // Currency + number sub-pattern
+  var cur = '(?:RM|MYR|USD|SGD|EUR|GBP|AUD|CAD|JPY|CNY|RMB|HKD|THB|KRW|INR|IDR|PHP|VND|\\$|€|£|¥|₹|₩|₽|฿)';
+  var numPart = '(\\d{1,3}(?:,\\d{3})+(?:\\.\\d{1,2})?|\\d+(?:\\.\\d{1,2})?)';
+
+  // Pass 1: strong total keywords (word-boundary \b avoids matching "Subtotal")
+  var strongPattern = new RegExp('\\b(?:grand\\s*total|total\\s*amount|amount\\s*due|total|jumlah|bayar)[:\\s]*' + cur + '\\s*' + numPart, 'gi');
+  var match = strongPattern.exec(text);
   if (match) {
-    const val = parseFloat(match[1].replace(/,/g, ''));
-    if (!isNaN(val) && val > 0) return val;
+    var val = parseFloat(match[1].replace(/,/g, ''));
+    if (!isNaN(val) && val > 0) return Math.round(val * 100) / 100;
   }
+  // Fallback: largest validated monetary amount (already currency-checked)
   return amounts.length > 0 ? amounts[0] : null;
 }
 
