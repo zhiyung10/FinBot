@@ -116,12 +116,14 @@ function extractAmounts(text) {
   // Recognized currency symbols
   var symbols = '\\$|€|£|¥|₹|₩|₽|฿';
 
-  // Numeric amount: thousands-separated form OR plain digits, with optional
-  // decimal part. The comma form is listed first; the plain-digit form uses
-  // \d+ so long unseparated numbers (e.g. 1000) are captured fully.
-  var numberPart = '\\d{1,3}(?:,\\d{3})+(?:\\.\\d{1,2})?|\\d+(?:\\.\\d{1,2})?';
+  // Numeric amount: MUST contain a decimal point with EXACTLY two decimal
+  // places (standard currency format, e.g. 19.20, 1,234.50, 107.60).
+  // Requiring the ".XX" structure prevents OCR-merged integers like "1920"
+  // (from "$19.20") being read as RM1920.00, and prevents phone/invoice/
+  // barcode digit runs from being captured.
+  var numberPart = '\\d{1,3}(?:,\\d{3})+\\.\\d{2}|\\d+\\.\\d{2}';
 
-  // Pattern 1: currency BEFORE the number — "RM 10.50", "$10", "MYR1,234.50"
+  // Pattern 1: currency BEFORE the number — "RM 10.50", "$19.20", "MYR1,234.50"
   var prefixPattern = new RegExp(
     '(?:' + codes + '|' + symbols + ')\\s*(' + numberPart + ')',
     'gi'
