@@ -4,7 +4,7 @@ from flask import Flask, request, jsonify, Response
 
 app = Flask(__name__)
 bedrock = boto3.client("bedrock-runtime", region_name="ap-southeast-1")
-MODEL_ID = "arn:aws:bedrock:ap-southeast-1:169588426492:inference-profile/global.anthropic.claude-haiku-4-5-20251001-v1:0"
+MODEL_ID = "arn:aws:bedrock:ap-southeast-1:658214608421:inference-profile/global.anthropic.claude-sonnet-4-5-20250929-v1:0"
 
 SYSTEM_PROMPT = """You are a financial insight assistant. Analyze the user's financial data and return ONLY a valid JSON object with no additional text, no markdown, no code fences.
 
