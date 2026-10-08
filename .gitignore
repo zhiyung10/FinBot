@@ -24,3 +24,4 @@ secrets.txt
 *.secret
 *-secrets.txt
 bedrock-key.txt
+deploy_cloudshell.txt
