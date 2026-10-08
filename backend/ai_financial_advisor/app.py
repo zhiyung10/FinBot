@@ -6,6 +6,7 @@ app = Flask(__name__)
 bedrock = boto3.client("bedrock-runtime", region_name="ap-southeast-1")
 MODEL_ID = "arn:aws:bedrock:ap-southeast-1:658214608421:inference-profile/global.anthropic.claude-sonnet-4-5-20250929-v1:0"
 
+
 SYSTEM_PROMPT = """You are an expert Certified Financial Planner and scenario analyst.
 
 Keep your response concise and actionable. Do not repeat the user's raw data back to them.

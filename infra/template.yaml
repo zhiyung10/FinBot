@@ -2,11 +2,23 @@ AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: AI Personal Finance Advisor - Lambda Functions + S3 Frontend
 
+Parameters:
+  BedrockApiKey:
+    Type: String
+    NoEcho: true
+    Default: ""
+    Description: >-
+      Bedrock API bearer token (AWS_BEARER_TOKEN_BEDROCK). Passed at deploy time
+      via --parameter-overrides. NEVER hardcode this value in the template.
+
 Globals:
   Function:
     Timeout: 60
     MemorySize: 256
     Runtime: python3.12
+    Environment:
+      Variables:
+        AWS_BEARER_TOKEN_BEDROCK: !Ref BedrockApiKey
 
 Resources:
   AppBedrockRole:

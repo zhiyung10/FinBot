@@ -17,5 +17,10 @@ venv/
 .DS_Store
 Thumbs.db
 
-# Env
+# Env & secrets — NEVER commit these
 .env
+.env.*
+secrets.txt
+*.secret
+*-secrets.txt
+bedrock-key.txt
